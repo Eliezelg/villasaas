@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: villa_user
+          POSTGRES_PASSWORD: villa_password
+          POSTGRES_DB: villa_saas_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Create .env file
+        working-directory: ./backend
+        run: |
+          cp .env.test .env
+          echo "DATABASE_URL=postgresql://villa_user:villa_password@localhost:5432/villa_saas_test?schema=public" >> .env
+      
+      - name: Run Prisma migrations
+        working-directory: ./backend
+        run: npx prisma db push
+      
+      - name: Run tests
+        working-directory: ./backend
+        run: npm test
+      
+      - name: Check TypeScript
+        working-directory: ./backend
+        run: npm run typecheck
+      
+      - name: Run linter
+        working-directory: ./backend
+        run: npm run lint
+
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Check TypeScript
+        working-directory: ./frontend
+        run: npm run typecheck
+      
+      - name: Run linter
+        working-directory: ./frontend
+        run: npm run lint
+      
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build

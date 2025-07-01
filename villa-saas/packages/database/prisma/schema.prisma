@@ -1,0 +1,607 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== MULTI-TENANCY ====================
+
+model Tenant {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Informations du propriétaire
+  name        String
+  email       String   @unique
+  phone       String?
+  companyName String?
+  siret       String?
+  vatNumber   String?
+
+  // Configuration
+  subdomain     String?  @unique
+  customDomain  String?  @unique
+  isActive      Boolean  @default(true)
+  settings      Json     @default("{}")
+
+  // Stripe Connect
+  stripeAccountId         String?
+  stripeAccountStatus     String?
+  stripeDetailsSubmitted  Boolean @default(false)
+  stripeChargesEnabled    Boolean @default(false)
+  stripePayoutsEnabled    Boolean @default(false)
+
+  // Relations
+  users         User[]
+  properties    Property[]
+  bookings      Booking[]
+  periods       Period[]
+  tourists      TouristTax[]
+  emails        EmailTemplate[]
+  integrations  Integration[]
+  auditLogs     AuditLog[]
+
+  @@index([email])
+  @@index([subdomain])
+  @@index([customDomain])
+}
+
+// ==================== UTILISATEURS ====================
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email          String  @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  phone          String?
+  isActive       Boolean @default(true)
+  emailVerified  Boolean @default(false)
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Rôle et permissions
+  role        UserRole @default(USER)
+  permissions Json     @default("[]")
+
+  // Tokens
+  refreshTokens RefreshToken[]
+  sessions      Session[]
+
+  // Relations
+  bookings   Booking[]
+  auditLogs  AuditLog[]
+
+  @@unique([email, tenantId])
+  @@index([tenantId])
+  @@index([email])
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  token     String   @unique
+  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  token     String   @unique
+  userAgent String?
+  ip        String?
+  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+}
+
+// ==================== PROPRIÉTÉS ====================
+
+model Property {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Informations de base
+  name         String
+  slug         String
+  propertyType PropertyType
+  status       PropertyStatus @default(DRAFT)
+
+  // Localisation
+  address      String
+  city         String
+  postalCode   String
+  country      String  @default("FR")
+  latitude     Float?
+  longitude    Float?
+
+  // Capacité
+  bedrooms    Int
+  bathrooms   Int
+  maxGuests   Int
+  surfaceArea Float? // en m²
+
+  // Description multilingue
+  description Json // { fr: "", en: "", es: "", ... }
+
+  // Tarifs de base
+  basePrice        Float
+  weekendPremium   Float?  @default(0)
+  cleaningFee      Float?
+  securityDeposit  Float?
+
+  // Règles
+  minNights        Int     @default(1)
+  checkInTime      String  @default("16:00")
+  checkOutTime     String  @default("11:00")
+  checkInDays      Json    @default("[1,2,3,4,5,6,0]") // Jours autorisés
+  instantBooking   Boolean @default(false)
+
+  // Équipements et caractéristiques (pour l'IA)
+  amenities         Json    @default("{}") // { wifi: true, pool: true, ... }
+  atmosphere        Json    @default("{}") // { romantic: 0.8, family: 0.9, ... }
+  proximity         Json    @default("{}") // { beach: 500, shops: 200, ... }
+  
+  // Recherche IA
+  searchableContent String? @db.Text
+  embedding         Float[] @default([]) // Vector pour similarité sémantique
+
+  // Médias
+  images           PropertyImage[]
+  
+  // Relations
+  bookings         Booking[]
+  blockedPeriods   BlockedPeriod[]
+  periods          Period[]
+  reviews          Review[]
+  
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([status])
+  @@index([slug])
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  VILLA
+  STUDIO
+  LOFT
+  CHALET
+  BUNGALOW
+  MOBILE_HOME
+  BOAT
+  OTHER
+}
+
+enum PropertyStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model PropertyImage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  url         String
+  alt         String?
+  caption     Json?    // Multilingue
+  order       Int
+  isPrimary   Boolean  @default(false)
+  
+  @@unique([propertyId, order])
+  @@index([propertyId])
+}
+
+// ==================== TARIFICATION ====================
+
+model Period {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  priority   Int      @default(0) // Plus élevé = plus prioritaire
+
+  // Tarifs
+  basePrice         Float
+  weekendPremium    Float?
+  minNights         Int?
+  checkInDays       Json?   // Override les jours de check-in
+
+  // Application
+  isGlobal   Boolean @default(false) // S'applique à toutes les propriétés du tenant
+  isActive   Boolean @default(true)
+
+  @@index([tenantId])
+  @@index([propertyId])
+  @@index([startDate, endDate])
+  @@index([priority])
+}
+
+// ==================== RÉSERVATIONS ====================
+
+model Booking {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Référence unique
+  reference String @unique @default(cuid())
+
+  // Dates
+  checkIn  DateTime
+  checkOut DateTime
+  nights   Int
+
+  // Invités
+  adults   Int
+  children Int      @default(0)
+  infants  Int      @default(0)
+  pets     Int      @default(0)
+
+  // Informations client
+  guestFirstName String
+  guestLastName  String
+  guestEmail     String
+  guestPhone     String
+  guestCountry   String?
+  guestAddress   String?
+  guestNotes     String? @db.Text
+
+  // Statut
+  status BookingStatus
+
+  // Montants
+  accommodationTotal Float
+  cleaningFee        Float @default(0)
+  touristTax         Float @default(0)
+  extraFees          Json  @default("[]") // Frais additionnels
+  discountAmount     Float @default(0)
+  discountCode       String?
+  subtotal           Float
+  total              Float
+  currency           String @default("EUR")
+
+  // Paiement
+  paymentStatus   PaymentStatus @default(PENDING)
+  stripePaymentId String?
+  depositAmount   Float         @default(0)
+  depositPaid     Boolean       @default(false)
+  
+  // Commission
+  commissionRate   Float   @default(0.15) // 15%
+  commissionAmount Float
+  payoutAmount     Float
+  payoutStatus     PayoutStatus @default(PENDING)
+  stripeTransferId String?
+
+  // Annulation
+  cancellationDate      DateTime?
+  cancellationReason    String?
+  refundAmount          Float?
+  stripeRefundId        String?
+
+  // Métadonnées
+  source           String? // website, airbnb, booking, etc.
+  externalId       String? // ID de réservation externe
+  specialRequests  String? @db.Text
+  internalNotes    String? @db.Text
+
+  // Relations
+  payments  Payment[]
+  reviews   Review[]
+  
+  @@index([tenantId])
+  @@index([propertyId])
+  @@index([userId])
+  @@index([reference])
+  @@index([status])
+  @@index([checkIn, checkOut])
+  @@index([guestEmail])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ==================== PAIEMENTS ====================
+
+model Payment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  amount          Float
+  currency        String
+  type            PaymentType
+  status          PaymentStatus
+  stripePaymentId String?
+  metadata        Json?
+
+  @@index([bookingId])
+  @@index([stripePaymentId])
+}
+
+enum PaymentType {
+  BOOKING
+  DEPOSIT
+  REFUND
+  EXTRA
+}
+
+// ==================== PÉRIODES BLOQUÉES ====================
+
+model BlockedPeriod {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  startDate DateTime
+  endDate   DateTime
+  reason    String?
+  notes     String?
+
+  @@index([propertyId])
+  @@index([startDate, endDate])
+}
+
+// ==================== TAXES DE SÉJOUR ====================
+
+model TouristTax {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  name        String
+  enabled     Boolean @default(true)
+  
+  // Configuration du calcul
+  calculationType TaxCalculationType
+  amount          Float?             // Montant fixe par personne par nuit
+  percentage      Float?             // Pourcentage du prix
+  maxAmount       Float?             // Plafond par personne par nuit
+  
+  // Exemptions
+  exemptions Json @default("{ \"minAge\": 18, \"maxNights\": null }")
+  
+  // Application
+  startDate DateTime?
+  endDate   DateTime?
+  
+  @@index([tenantId])
+}
+
+enum TaxCalculationType {
+  FIXED_PER_PERSON_PER_NIGHT
+  PERCENTAGE_OF_PRICE
+  HYBRID
+}
+
+// ==================== AVIS ====================
+
+model Review {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  // Notes
+  overall      Int // 1-5
+  cleanliness  Int?
+  accuracy     Int?
+  checkIn      Int?
+  communication Int?
+  location     Int?
+  value        Int?
+
+  // Commentaire
+  comment      String? @db.Text
+  privateReply String? @db.Text
+
+  // Statut
+  isPublished Boolean @default(true)
+  isVerified  Boolean @default(false)
+
+  @@index([propertyId])
+  @@index([bookingId])
+  @@index([overall])
+}
+
+// ==================== EMAILS ====================
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  type      EmailType
+  name      String
+  subject   Json      // Multilingue
+  content   Json      // Multilingue, HTML
+  variables Json      // Variables disponibles
+  isActive  Boolean   @default(true)
+
+  @@unique([tenantId, type])
+  @@index([tenantId])
+  @@index([type])
+}
+
+enum EmailType {
+  BOOKING_CONFIRMATION
+  BOOKING_REMINDER
+  BOOKING_CANCELLATION
+  PAYMENT_CONFIRMATION
+  PAYMENT_FAILED
+  REVIEW_REQUEST
+  WELCOME_OWNER
+  WELCOME_GUEST
+}
+
+// ==================== INTÉGRATIONS ====================
+
+model Integration {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  type         IntegrationType
+  isActive     Boolean         @default(true)
+  credentials  Json            // Chiffré
+  settings     Json
+  lastSyncAt   DateTime?
+  syncStatus   String?
+
+  @@unique([tenantId, type])
+  @@index([tenantId])
+  @@index([type])
+}
+
+enum IntegrationType {
+  AIRBNB
+  BOOKING_COM
+  GOOGLE_CALENDAR
+  ICAL
+}
+
+// ==================== AUDIT ====================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action   String
+  entity   String
+  entityId String?
+  details  Json?
+  ip       String?
+  userAgent String?
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+// ==================== RECHERCHE IA ====================
+
+model SearchQuery {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  originalQuery    String   @db.Text
+  parsedIntent     Json     // Intention extraite par IA
+  embedding        Float[] @default([]) // Vector de la requête
+  
+  // Résultats
+  returnedIds      String[] // IDs des propriétés retournées
+  clickedId        String?  // ID cliqué
+  bookedId         String?  // ID réservé
+  
+  // Métriques
+  processingTimeMs Int
+  resultCount      Int
+  
+  @@index([createdAt])
+}
