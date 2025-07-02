@@ -4,56 +4,129 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Villa SaaS - A multi-tenant vacation rental management platform currently in planning phase. The project consists of three main applications:
-- **Booking sites**: Public-facing booking websites with custom domains per property owner
-- **Dashboard**: Admin interface for property owners to manage listings
-- **Hub**: Future AI-powered marketplace for travelers
+Villa SaaS - A multi-tenant vacation rental management platform currently in active development (Phase 2). The project consists of three main applications:
+- **Dashboard**: Admin interface for property owners to manage listings ✅ En développement
+- **Booking sites**: Public-facing booking websites with custom domains per property owner 🔄 À venir
+- **Hub**: Future AI-powered marketplace for travelers 🔄 À venir
+
+## Current Development Status
+
+### ✅ Phase 1 - Complétée
+- Architecture monorepo avec npm workspaces
+- Backend Fastify + TypeScript + Prisma
+- Frontend Next.js 14 avec App Router
+- Authentification JWT avec refresh tokens
+- Multi-tenancy complet
+- Tests et CI/CD
+
+### 🔄 Phase 2 - En cours (55% complété)
+- ✅ Module de gestion des propriétés (100%)
+- ✅ Système de tarification dynamique (100%)
+- ✅ Documentation API complète (100%)
+- ❌ Calendrier de disponibilité (0%)
+- ❌ Module de réservations (0%)
+- ❌ Analytics et rapports (0%)
 
 ## Development Commands
 
 ```bash
 # Initial Setup
-pnpm install
+npm install
 cp .env.example .env.local
-docker-compose up -d postgres redis
-pnpm db:push
-pnpm db:seed
+docker-compose up -d
+./update-db.sh
 
 # Development
-pnpm dev              # Run all apps in parallel
-pnpm dev:api         # Backend API only
-pnpm dev:dashboard   # Admin dashboard only
-pnpm dev:booking     # Booking site only
+npm run dev           # Run backend (dans apps/backend)
+npm run dev           # Run frontend (dans apps/web)
 
 # Testing
-pnpm test            # All tests
-pnpm test:unit       # Unit tests only
-pnpm test:e2e        # E2E tests
+npm test              # All tests
+npm run test:watch    # Tests en mode watch
 
 # Database
-pnpm db:push         # Push schema changes
-pnpm db:seed         # Seed test data
+./update-db.sh        # Push schema changes + generate client
+npm run db:studio     # Prisma Studio (dans packages/database)
 
 # Build & Deploy
-pnpm build           # Build all apps
-pnpm deploy          # Build and deploy
+npm run build         # Build all apps
+npm run start         # Start en production
+
+# Utilitaires
+npm run lint          # Linting
+npm run typecheck     # Type checking
 ```
+
+## 🚨 Points Critiques du Développement
+
+### 1. Monorepo avec npm workspaces
+- **Structure**: `apps/` pour les applications, `packages/` pour le code partagé
+- **Dépendances**: Utiliser `file:../../packages/xxx` au lieu de `workspace:*`
+- **Installation**: Toujours installer depuis la racine avec `npm install`
+
+### 2. Multi-tenancy OBLIGATOIRE
+```typescript
+// ❌ JAMAIS
+const property = await prisma.property.findFirst({
+  where: { id: propertyId }
+});
+
+// ✅ TOUJOURS
+const property = await prisma.property.findFirst({
+  where: { 
+    id: propertyId,
+    tenantId: req.tenantId // OBLIGATOIRE
+  }
+});
+```
+
+### 3. Gestion des images de PropertyImage
+- PropertyImage n'a PAS de tenantId (isolation via la relation property)
+- Toujours vérifier la propriété d'abord, puis les images
+```typescript
+// Vérifier que la propriété appartient au tenant
+const property = await prisma.property.findFirst({
+  where: { id: propertyId, tenantId }
+});
+if (!property) throw new Error('Not found');
+
+// Ensuite seulement, gérer les images
+const image = await prisma.propertyImage.create({
+  data: { propertyId, ... } // PAS de tenantId ici
+});
+```
+
+### 4. Optimisation des images
+- 4 tailles générées automatiquement : small (400px), medium (800px), large (1200px), original
+- Format WebP pour la compression
+- Stockage dans `apps/backend/uploads/properties/`
+- URLs stockées dans le champ JSON `urls`
+
+### 5. Géolocalisation
+- API Nominatim (OpenStreetMap) pour le géocodage
+- Pas de headers User-Agent depuis le navigateur
+- Fallback sur recherche par ville si adresse introuvable
+
+### 6. Tarification dynamique
+- Périodes avec priorités (plus haute priorité = appliquée)
+- Suppléments weekend automatiques (vendredi/samedi)
+- Réductions long séjour : 5% (7+ nuits), 10% (28+ nuits)
+- Service `PricingService` pour tous les calculs
 
 ## Architecture
 
-### Project Structure
+### Project Structure (Réelle)
 ```
 villa-saas/
 ├── apps/
-│   ├── api/          # Fastify backend
-│   ├── booking/      # Next.js booking sites
-│   ├── dashboard/    # Next.js admin
-│   └── hub/          # Future marketplace
+│   ├── backend/      # API Fastify + TypeScript
+│   └── web/          # Frontend Next.js 14
 ├── packages/
-│   ├── database/     # Prisma schema + types
-│   ├── ui/          # Shared components
-│   ├── utils/       # Helper functions
-│   └── types/       # Shared TypeScript types
+│   ├── database/     # Prisma schema + client
+│   ├── types/        # Types TypeScript partagés
+│   └── utils/        # Utilitaires partagés
+├── update-db.sh      # Script mise à jour DB
+└── package.json      # Workspaces npm
 ```
 
 ### Tech Stack
@@ -177,9 +250,89 @@ Generate embeddings using OpenAI text-embedding-3-small model.
 
 ## Current Status
 
-Project is in planning phase with comprehensive documentation in `/docs`:
-- `cahier-charges-villa-saas-v2.md`: Business requirements and technical specifications
-- `villa-saas-dev-guide.md`: Developer guide and best practices
-- `villa-saas-fonctionnalites-detaillees.md`: Detailed functional specifications
+Le projet est en développement actif (Phase 2) :
+- Backend API fonctionnel avec 30+ endpoints
+- Frontend avec dashboard propriétaire
+- Gestion complète des propriétés avec images
+- Système de tarification dynamique avec calendriers
+- Documentation API Swagger complète
 
-No code implementation has begun yet. When starting development, create the monorepo structure and follow the patterns documented above.
+## 📝 Patterns de Code Importants
+
+### Composants avec Optimistic UI
+```typescript
+// Pattern pour les mises à jour optimistes (ex: ImageUpload)
+const [localState, setLocalState] = useState(serverState);
+
+// Mise à jour optimiste
+setLocalState(newState);
+
+// Puis sync avec serveur
+const { error } = await apiCall();
+if (error) {
+  setLocalState(serverState); // Rollback si erreur
+}
+```
+
+### Services Frontend
+```typescript
+// Pattern standard pour les services
+class ServiceName {
+  async getAll() {
+    return apiClient.get<Type[]>('/endpoint');
+  }
+  
+  async create(data: CreateType) {
+    return apiClient.post<Type>('/endpoint', data);
+  }
+}
+
+export const serviceName = new ServiceName();
+```
+
+### Validation Zod + React Hook Form
+```typescript
+const schema = z.object({
+  name: z.string().min(1, 'Requis'),
+  price: z.coerce.number().positive()
+});
+
+const form = useForm<z.infer<typeof schema>>({
+  resolver: zodResolver(schema),
+  defaultValues: { ... }
+});
+```
+
+## 🔧 Problèmes Résolus
+
+1. **argon2 remplacé par bcryptjs** : Problèmes d'installation sur certains systèmes
+2. **workspace:* remplacé par file:** : npm ne supporte pas le protocole workspace
+3. **PropertyImage sans tenantId** : Isolation via la relation avec Property
+4. **CORS pour images statiques** : Headers ajoutés dans le plugin static
+5. **Géocodage Nominatim** : Pas de User-Agent depuis le navigateur
+
+## 📋 Checklist Nouveau Module
+
+Lors de l'ajout d'un nouveau module :
+
+1. **Backend** :
+   - [ ] Créer le fichier routes dans `modules/[module]/`
+   - [ ] Ajouter les schémas Zod pour validation
+   - [ ] Implémenter l'isolation multi-tenant
+   - [ ] Enregistrer les routes dans `app.ts`
+   - [ ] Ajouter la documentation Swagger
+   - [ ] Créer les tests
+
+2. **Frontend** :
+   - [ ] Créer le service dans `services/`
+   - [ ] Créer les types dans `types/`
+   - [ ] Créer les composants dans `components/`
+   - [ ] Ajouter les pages dans `app/dashboard/`
+   - [ ] Implémenter la gestion d'erreurs
+   - [ ] Ajouter les toasts de feedback
+
+3. **Database** :
+   - [ ] Ajouter le modèle dans `schema.prisma`
+   - [ ] Vérifier les index nécessaires
+   - [ ] Exécuter `./update-db.sh`
+   - [ ] Tester avec Prisma Studio

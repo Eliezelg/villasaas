@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { getTenantId, createTenantFilter, addTenantToData } from '@villa-saas/utils';
+import { PropertyAIService } from '../../services/property-ai.service';
 
 const createPropertySchema = z.object({
   name: z.string().min(1).max(100),
@@ -40,11 +41,32 @@ export async function propertyRoutes(fastify: FastifyInstance): Promise<void> {
             images: true,
           },
         },
+        images: {
+          where: { isPrimary: true },
+          take: 1,
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
 
-    reply.send(properties);
+    // Si aucune image primaire, prendre la première image
+    const propertiesWithImages = await Promise.all(
+      properties.map(async (property) => {
+        if (property.images.length === 0 && property._count.images > 0) {
+          const firstImage = await fastify.prisma.propertyImage.findFirst({
+            where: { propertyId: property.id },
+            orderBy: { order: 'asc' },
+          });
+          return {
+            ...property,
+            images: firstImage ? [firstImage] : [],
+          };
+        }
+        return property;
+      })
+    );
+
+    reply.send(propertiesWithImages);
   });
 
   // Get property by ID
@@ -139,13 +161,36 @@ export async function propertyRoutes(fastify: FastifyInstance): Promise<void> {
       counter++;
     }
 
+    // Préparer les données avec le contenu searchable
+    const propertyData = {
+      ...data,
+      slug,
+      amenities: data.amenities || {},
+      atmosphere: data.atmosphere || {},
+      proximity: data.proximity || {},
+    };
+
+    // Générer le contenu searchable
+    const searchableContent = PropertyAIService.generateSearchableContent(propertyData);
+    
+    // Générer l'embedding (async mais on ne bloque pas)
+    const embeddingContent = PropertyAIService.prepareEmbeddingContent(propertyData);
+    PropertyAIService.generateEmbedding(embeddingContent).then(embedding => {
+      // Mettre à jour l'embedding en arrière-plan
+      if (embedding.length > 0) {
+        fastify.prisma.property.update({
+          where: { id: property.id },
+          data: { embedding }
+        }).catch(err => {
+          fastify.log.error('Failed to update embedding:', err);
+        });
+      }
+    });
+
     const property = await fastify.prisma.property.create({
       data: addTenantToData({
-        ...data,
-        slug,
-        amenities: {},
-        atmosphere: {},
-        proximity: {},
+        ...propertyData,
+        searchableContent,
       }, tenantId),
     });
 

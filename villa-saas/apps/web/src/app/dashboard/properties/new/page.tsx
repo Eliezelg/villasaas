@@ -29,6 +29,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { LocationForm } from '@/components/property/simple-location-form';
+import { AmenitiesForm } from '@/components/property/amenities-form';
 
 const propertyTypes = [
   { value: 'APARTMENT', label: 'Appartement' },
@@ -71,6 +73,10 @@ export default function NewPropertyPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [latitude, setLatitude] = useState<number | undefined>();
+  const [longitude, setLongitude] = useState<number | undefined>();
+  const [amenities, setAmenities] = useState<Record<string, boolean>>({});
+  const [atmosphere, setAtmosphere] = useState<Record<string, number>>({});
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -107,6 +113,10 @@ export default function NewPropertyPage() {
         weekendPremium: data.weekendPremium === '' ? undefined : Number(data.weekendPremium),
         cleaningFee: data.cleaningFee === '' ? undefined : Number(data.cleaningFee),
         securityDeposit: data.securityDeposit === '' ? undefined : Number(data.securityDeposit),
+        latitude,
+        longitude,
+        amenities,
+        atmosphere,
       });
 
       if (error) {
@@ -448,6 +458,26 @@ export default function NewPropertyPage() {
               />
             </div>
           </Card>
+
+          <LocationForm
+            address={form.watch('address')}
+            city={form.watch('city')}
+            postalCode={form.watch('postalCode')}
+            country={form.watch('country')}
+            latitude={latitude}
+            longitude={longitude}
+            onLocationChange={({ latitude: lat, longitude: lon }) => {
+              if (lat !== undefined) setLatitude(lat);
+              if (lon !== undefined) setLongitude(lon);
+            }}
+          />
+
+          <AmenitiesForm
+            amenities={amenities}
+            atmosphere={atmosphere}
+            onAmenitiesChange={setAmenities}
+            onAtmosphereChange={setAtmosphere}
+          />
 
           <div className="flex justify-end gap-4">
             <Button

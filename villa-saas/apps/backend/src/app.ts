@@ -8,12 +8,18 @@ import { errorHandler } from './utils/error-handler';
 import authPlugin from './plugins/auth';
 import prismaPlugin from './plugins/prisma';
 import redisPlugin from './plugins/redis';
+import staticPlugin from './plugins/static';
+import swaggerPlugin from './plugins/swagger';
 
 import { healthRoutes } from './modules/health/health.routes';
 import { authRoutes } from './modules/auth/auth.routes';
 import { tenantRoutes } from './modules/tenants/tenants.routes';
 import { userRoutes } from './modules/users/users.routes';
 import { propertyRoutes } from './modules/properties/properties.routes';
+import { propertyImageRoutes } from './modules/properties/images.routes';
+import { periodRoutes } from './modules/periods/periods.routes';
+import { pricingRoutes } from './modules/pricing/pricing.routes';
+import availabilityRoutes from './modules/availability/availability.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -43,10 +49,14 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     },
   });
 
+  // Register Swagger before routes
+  await app.register(swaggerPlugin);
+
   // Custom plugins
   await app.register(prismaPlugin);
   await app.register(redisPlugin);
   await app.register(authPlugin);
+  await app.register(staticPlugin);
 
   // Routes
   await app.register(healthRoutes, { prefix: '/health' });
@@ -54,6 +64,10 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(tenantRoutes, { prefix: '/api/tenants' });
   await app.register(userRoutes, { prefix: '/api/users' });
   await app.register(propertyRoutes, { prefix: '/api/properties' });
+  await app.register(propertyImageRoutes, { prefix: '/api/properties' });
+  await app.register(periodRoutes, { prefix: '/api/periods' });
+  await app.register(pricingRoutes, { prefix: '/api/pricing' });
+  await app.register(availabilityRoutes, { prefix: '/api/availability' });
 
   return app;
 }

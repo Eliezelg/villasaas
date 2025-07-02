@@ -134,7 +134,19 @@ export default function PropertiesPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {properties.map((property) => (
             <Card key={property.id} className="overflow-hidden">
-              <div className="aspect-video bg-muted" />
+              <div className="aspect-video bg-muted relative overflow-hidden">
+                {property.images && property.images.length > 0 ? (
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${property.images[0].url}`}
+                    alt={property.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <Building2 className="h-8 w-8 text-muted-foreground/50" />
+                  </div>
+                )}
+              </div>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>

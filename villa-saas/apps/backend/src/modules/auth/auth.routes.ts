@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { AuthService } from './auth.service';
 import { registerSchema, loginSchema } from './auth.dto';
+import { swaggerTags } from '../../utils/swagger-schemas';
 
 export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   const authService = new AuthService(fastify);
@@ -8,6 +9,9 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   // Register
   fastify.post('/register', {
     schema: {
+      tags: [swaggerTags.auth],
+      summary: 'Créer un nouveau compte',
+      description: 'Crée un nouveau compte utilisateur et une nouvelle organisation (tenant)',
       body: {
         type: 'object',
         required: ['email', 'password', 'firstName', 'lastName', 'companyName'],

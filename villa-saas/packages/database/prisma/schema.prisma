@@ -217,9 +217,10 @@ model PropertyImage {
   propertyId String
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   
-  url         String
+  url         String      // URL de base ou originale
+  urls        Json?       // URLs des différentes tailles {small, medium, large, original}
   alt         String?
-  caption     Json?    // Multilingue
+  caption     Json?       // Multilingue
   order       Int
   isPrimary   Boolean  @default(false)
   

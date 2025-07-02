@@ -3,12 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { propertiesService } from '@/services/properties.service';
 import type { Property } from '@/types/property';
+import { ImageUpload } from '@/components/property/image-upload-optimistic';
+import { PeriodsManager } from '@/components/pricing/periods-manager';
+import { InteractivePricingCalendar } from '@/components/pricing/interactive-pricing-calendar';
+import { AvailabilityCalendar } from '@/components/availability/availability-calendar';
+import { BlockedPeriodsManager } from '@/components/availability/blocked-periods-manager';
+import { BookingRulesForm } from '@/components/availability/booking-rules-form';
 
 const propertyTypeLabels: Record<string, string> = {
   APARTMENT: 'Appartement',
@@ -113,6 +119,11 @@ export default function PropertyDetailPage() {
           <Badge variant={statusLabels[property.status].variant}>
             {statusLabels[property.status].label}
           </Badge>
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/dashboard/properties/${property.id}/preview`}>
+              <Eye className="h-4 w-4" />
+            </Link>
+          </Button>
           <Button variant="outline" size="icon">
             <Edit2 className="h-4 w-4" />
           </Button>
@@ -123,6 +134,22 @@ export default function PropertyDetailPage() {
       </div>
 
       <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Images</CardTitle>
+            <CardDescription>
+              Ajoutez des photos de votre propriété. La première image sera l'image principale.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ImageUpload
+              propertyId={property.id}
+              images={property.images || []}
+              onImagesChange={() => loadProperty(property.id)}
+            />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Informations générales</CardTitle>
@@ -148,58 +175,91 @@ export default function PropertyDetailPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tarification</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Prix de base</p>
-              <p className="text-lg font-semibold">{property.basePrice} € / nuit</p>
-            </div>
-            {property.weekendPremium && (
+        {/* Section Tarification */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Tarification</h2>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Tarifs de base</CardTitle>
+              <CardDescription>
+                Prix par défaut appliqués quand aucune période tarifaire n'est active
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground">Supplément weekend</p>
-                <p className="text-lg font-semibold">+{property.weekendPremium} €</p>
+                <p className="text-sm text-muted-foreground">Prix de base</p>
+                <p className="text-lg font-semibold">{property.basePrice} € / nuit</p>
               </div>
-            )}
-            {property.cleaningFee && (
-              <div>
-                <p className="text-sm text-muted-foreground">Frais de ménage</p>
-                <p className="text-lg font-semibold">{property.cleaningFee} €</p>
-              </div>
-            )}
-            {property.securityDeposit && (
-              <div>
-                <p className="text-sm text-muted-foreground">Caution</p>
-                <p className="text-lg font-semibold">{property.securityDeposit} €</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              {property.weekendPremium && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Supplément weekend</p>
+                  <p className="text-lg font-semibold">+{property.weekendPremium} €</p>
+                </div>
+              )}
+              {property.cleaningFee && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Frais de ménage</p>
+                  <p className="text-lg font-semibold">{property.cleaningFee} €</p>
+                </div>
+              )}
+              {property.securityDeposit && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Caution</p>
+                  <p className="text-lg font-semibold">{property.securityDeposit} €</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Règles de réservation</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Séjour minimum</p>
-                <p>{property.minNights} {property.minNights > 1 ? 'nuits' : 'nuit'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Horaires</p>
-                <p>Arrivée: {property.checkInTime}</p>
-                <p>Départ: {property.checkOutTime}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Réservation instantanée</p>
-              <p>{property.instantBooking ? 'Activée' : 'Désactivée'}</p>
-            </div>
-          </CardContent>
-        </Card>
+          <PeriodsManager 
+            propertyId={property.id} 
+            propertyName={property.name}
+          />
+
+          <InteractivePricingCalendar
+            propertyId={property.id}
+            basePrice={property.basePrice}
+            weekendPremium={property.weekendPremium}
+          />
+        </div>
+
+        {/* Section Disponibilités et Règles */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold">Disponibilités et Règles</h2>
+          
+          <BookingRulesForm
+            propertyId={property.id}
+            initialData={{
+              minNights: property.minNights,
+              checkInTime: property.checkInTime,
+              checkOutTime: property.checkOutTime,
+              checkInDays: property.checkInDays || [0, 1, 2, 3, 4, 5, 6],
+              instantBooking: property.instantBooking
+            }}
+            onUpdate={() => loadProperty(property.id)}
+          />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Calendrier de disponibilité</CardTitle>
+              <CardDescription>
+                Visualisez les disponibilités et gérez les périodes bloquées
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <AvailabilityCalendar 
+                propertyId={property.id}
+                checkInDays={property.checkInDays || [0, 1, 2, 3, 4, 5, 6]}
+                minNights={property.minNights}
+              />
+              <BlockedPeriodsManager 
+                propertyId={property.id} 
+                onUpdate={() => {}}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

@@ -66,6 +66,8 @@ export interface CreatePropertyData {
   city: string;
   postalCode: string;
   country: string;
+  latitude?: number;
+  longitude?: number;
   bedrooms: number;
   bathrooms: number;
   maxGuests: number;
@@ -78,7 +80,11 @@ export interface CreatePropertyData {
   minNights: number;
   checkInTime: string;
   checkOutTime: string;
+  checkInDays?: number[];
   instantBooking: boolean;
+  amenities?: Record<string, boolean>;
+  atmosphere?: Record<string, number>;
+  proximity?: Record<string, number>;
 }
 
 export interface UpdatePropertyData extends Partial<CreatePropertyData> {
