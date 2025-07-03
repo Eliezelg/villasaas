@@ -19,13 +19,13 @@ Villa SaaS - A multi-tenant vacation rental management platform currently in act
 - Multi-tenancy complet
 - Tests et CI/CD
 
-### 🔄 Phase 2 - En cours (55% complété)
+### ✅ Phase 2 - Complétée (100%)
 - ✅ Module de gestion des propriétés (100%)
 - ✅ Système de tarification dynamique (100%)
 - ✅ Documentation API complète (100%)
-- ❌ Calendrier de disponibilité (0%)
-- ❌ Module de réservations (0%)
-- ❌ Analytics et rapports (0%)
+- ✅ Calendrier de disponibilité (100%)
+- ✅ Module de réservations (100%)
+- ✅ Analytics et rapports (100%)
 
 ## Development Commands
 
@@ -58,6 +58,50 @@ npm run typecheck     # Type checking
 ```
 
 ## 🚨 Points Critiques du Développement
+
+### ⚠️ Corrections importantes suite aux tests
+1. **Validation Fastify**: Ne jamais utiliser directement les schémas Zod dans les handlers Fastify. Toujours utiliser `z.object().parse()` dans le handler.
+2. **IDs Prisma**: Les IDs générés par Prisma sont des CUIDs, pas des UUIDs. Utiliser `z.string().min(1)` au lieu de `z.string().uuid()`.
+3. **Noms de champs corrects**:
+   - Property: `surfaceArea` (pas `area`)
+   - Booking: `total` (pas `totalPrice`)  
+   - PropertyImage: `order` (pas `position`)
+   - Property.periods (pas `pricingPeriods`)
+4. **Statuts en majuscules**: Toujours `PUBLISHED`, `CONFIRMED`, etc. (jamais en minuscules)
+5. **Authentication**: Utiliser `fastify.authenticate` dans preHandler (pas `authenticateUser`)
+6. **Tenant ID**: Utiliser `getTenantId(request)` depuis @villa-saas/utils
+7. **PricingService**: Pas de méthode `getPriceForDate`, utiliser `calculatePrice` avec la période complète
+
+### ⚠️ IMPORTANT : Authentification Fastify
+```typescript
+// ❌ JAMAIS - authenticateUser n'existe pas
+preHandler: [authenticateUser]
+
+// ✅ TOUJOURS - Utiliser fastify.authenticate
+preHandler: [fastify.authenticate]
+```
+
+### ⚠️ IMPORTANT : Validation avec Zod dans Fastify
+```typescript
+// ❌ JAMAIS - Ne pas passer les schémas Zod directement à Fastify
+fastify.post('/route', {
+  schema: {
+    body: zodSchema
+  }
+})
+
+// ✅ TOUJOURS - Valider manuellement dans le handler
+fastify.post('/route', {
+  preHandler: [fastify.authenticate]
+}, async (request, reply) => {
+  const validation = zodSchema.safeParse(request.body);
+  if (!validation.success) {
+    return reply.code(400).send({ error: validation.error });
+  }
+  const data = validation.data;
+  // ...
+})
+```
 
 ### 1. Monorepo avec npm workspaces
 - **Structure**: `apps/` pour les applications, `packages/` pour le code partagé
@@ -250,12 +294,16 @@ Generate embeddings using OpenAI text-embedding-3-small model.
 
 ## Current Status
 
-Le projet est en développement actif (Phase 2) :
-- Backend API fonctionnel avec 30+ endpoints
-- Frontend avec dashboard propriétaire
-- Gestion complète des propriétés avec images
-- Système de tarification dynamique avec calendriers
-- Documentation API Swagger complète
+Le projet a terminé la Phase 2 avec succès (100% complétée) :
+- Backend API fonctionnel avec 50+ endpoints testés et opérationnels
+- Frontend avec dashboard propriétaire complet et intuitif
+- Gestion complète des propriétés avec images optimisées
+- Système de tarification dynamique avec périodes et calendrier interactif
+- Calendrier de disponibilité avec synchronisation iCal (Airbnb, Booking.com)
+- Module de réservations complet avec calcul de prix automatique
+- Analytics et rapports avec dashboard, métriques et export CSV
+- Documentation API Swagger complète et à jour
+- Tests d'intégration complets (100% des endpoints passent)
 
 ## 📝 Patterns de Code Importants
 
@@ -310,6 +358,47 @@ const form = useForm<z.infer<typeof schema>>({
 3. **PropertyImage sans tenantId** : Isolation via la relation avec Property
 4. **CORS pour images statiques** : Headers ajoutés dans le plugin static
 5. **Géocodage Nominatim** : Pas de User-Agent depuis le navigateur
+6. **Authentification Fastify** : Utiliser `fastify.authenticate` au lieu de `authenticateUser`
+7. **Validation Fastify avec Zod** : Ne pas utiliser Zod directement dans les schémas Fastify
+8. **Périodes tarifaires chevauchantes** : Autorisées avec système de priorités
+9. **IDs non-UUID** : Prisma génère des CUIDs, adapter la validation avec `z.string().min(1)`
+10. **Champs inexistants corrigés** : coverImage → images, position → order, pricingPeriods → periods
+11. **PricingService refactoré** : Suppression de getPriceForDate, utilisation de calculatePrice
+12. **Statuts toujours en majuscules** : PUBLISHED, CONFIRMED, COMPLETED (jamais en minuscules)
+
+## 🔴 Règles CRITIQUES de Développement
+
+### 1. Routes API Frontend OBLIGATOIRE
+```typescript
+// ✅ TOUJOURS avec /api/
+apiClient.get('/api/properties')
+apiClient.post('/api/bookings')
+
+// ❌ JAMAIS sans /api/
+apiClient.get('/properties')
+apiClient.post('/bookings')
+```
+
+### 2. Gestion des données undefined
+```typescript
+// ✅ TOUJOURS vérifier
+const { data } = await service.getData();
+if (data) {
+  setExportUrl(data.url);
+}
+
+// ❌ JAMAIS directement
+setExportUrl(data.url); // Erreur si data undefined
+```
+
+### 3. TypeScript Array.from pour Set
+```typescript
+// ✅ CORRECT pour la compatibilité
+const uniqueIds = Array.from(new Set(items.map(i => i.id)));
+
+// ❌ INCORRECT - Erreur de build
+const uniqueIds = [...new Set(items.map(i => i.id))];
+```
 
 ## 📋 Checklist Nouveau Module
 
@@ -317,17 +406,19 @@ Lors de l'ajout d'un nouveau module :
 
 1. **Backend** :
    - [ ] Créer le fichier routes dans `modules/[module]/`
-   - [ ] Ajouter les schémas Zod pour validation
+   - [ ] Utiliser `fastify.authenticate` pour l'auth
+   - [ ] Valider avec Zod DANS le handler, pas dans le schema
    - [ ] Implémenter l'isolation multi-tenant
    - [ ] Enregistrer les routes dans `app.ts`
    - [ ] Ajouter la documentation Swagger
    - [ ] Créer les tests
 
 2. **Frontend** :
-   - [ ] Créer le service dans `services/`
+   - [ ] Créer le service dans `services/` avec routes `/api/`
    - [ ] Créer les types dans `types/`
    - [ ] Créer les composants dans `components/`
    - [ ] Ajouter les pages dans `app/dashboard/`
+   - [ ] Gérer les données undefined
    - [ ] Implémenter la gestion d'erreurs
    - [ ] Ajouter les toasts de feedback
 

@@ -34,7 +34,9 @@ export function IcalSync({ propertyId, onImport }: IcalSyncProps) {
   const loadExportUrl = async () => {
     try {
       const { data } = await availabilityService.getIcalExportUrl(propertyId);
-      setExportUrl(data.url);
+      if (data) {
+        setExportUrl(data.url);
+      }
     } catch (error) {
       toast({
         title: 'Erreur',
@@ -68,13 +70,15 @@ export function IcalSync({ propertyId, onImport }: IcalSyncProps) {
         url: importUrl
       });
 
-      toast({
-        title: 'Import terminé',
-        description: `${data.imported} événements importés, ${data.skipped} ignorés`,
-      });
+      if (data) {
+        toast({
+          title: 'Import terminé',
+          description: `${data.imported} événements importés, ${data.skipped} ignorés`,
+        });
 
-      if (data.errors.length > 0) {
-        console.error('Import errors:', data.errors);
+        if (data.errors && data.errors.length > 0) {
+          console.error('Import errors:', data.errors);
+        }
       }
 
       setImportUrl('');

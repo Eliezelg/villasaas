@@ -106,11 +106,11 @@ export function InteractivePricingCalendar({
       
       // Vérifier si toutes les dates appartiennent à la même période
       const dayInfos = range.map(d => getPriceForDate(d));
-      const periodIds = [...new Set(dayInfos.map(d => d.period?.id).filter(Boolean))];
+      const uniquePeriodIds = Array.from(new Set(dayInfos.map(d => d.period?.id).filter(Boolean)));
       
-      if (periodIds.length === 1 && periodIds[0]) {
+      if (uniquePeriodIds.length === 1 && uniquePeriodIds[0]) {
         // Toutes les dates sont dans la même période existante
-        const period = periods.find(p => p.id === periodIds[0]);
+        const period = periods.find(p => p.id === uniquePeriodIds[0]);
         setEditingPeriod(period);
       } else {
         setEditingPeriod(undefined);

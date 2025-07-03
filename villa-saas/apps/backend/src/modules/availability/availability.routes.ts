@@ -416,6 +416,29 @@ export default async function availabilityRoutes(fastify: FastifyInstance) {
       const tenantId = getTenantId(request);
       const { propertyId, startDate, endDate } = request.query;
 
+      // Valider les paramètres de requête
+      if (!propertyId || !startDate || !endDate) {
+        return reply.code(400).send({ 
+          error: 'Missing required parameters: propertyId, startDate, endDate' 
+        });
+      }
+
+      // Valider le format des dates
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return reply.code(400).send({ 
+          error: 'Invalid date format. Use ISO 8601 format (YYYY-MM-DD)' 
+        });
+      }
+
+      if (start >= end) {
+        return reply.code(400).send({ 
+          error: 'End date must be after start date' 
+        });
+      }
+
       // Vérifier que la propriété appartient au tenant
       const property = await fastify.prisma.property.findFirst({
         where: {
@@ -427,9 +450,6 @@ export default async function availabilityRoutes(fastify: FastifyInstance) {
       if (!property) {
         return reply.code(404).send({ error: 'Property not found' });
       }
-
-      const start = new Date(startDate);
-      const end = new Date(endDate);
 
       // Limiter à 365 jours maximum
       const maxDays = 365;

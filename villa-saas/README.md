@@ -2,6 +2,14 @@
 
 Villa SaaS est une solution complète multi-tenant pour la gestion de propriétés de location de vacances. Elle permet aux propriétaires de gérer leurs biens, tarifs, disponibilités et réservations.
 
+## 📚 Documentation
+
+Toute la documentation est organisée dans le dossier [`docs/`](./docs/):
+- [Documentation Overview](./docs/README.md) - Guide de la documentation
+- [Getting Started](./docs/guides/GETTING_STARTED.md) - Démarrage rapide
+- [API Documentation](./docs/api/API_DOCUMENTATION.md) - Référence API complète
+- [System Architecture](./docs/architecture/SYSTEM_ARCHITECTURE.md) - Architecture technique
+
 ## 🚀 État du Projet
 
 ### Phase 1 ✅ Complétée
@@ -12,13 +20,13 @@ Villa SaaS est une solution complète multi-tenant pour la gestion de propriét�
 - Multi-tenancy complet
 - Tests et CI/CD
 
-### Phase 2 🔄 En cours (50%)
+### Phase 2 ✅ Complétée (100%)
 - ✅ Module de gestion des propriétés
 - ✅ Système de tarification dynamique
 - ✅ Documentation API complète
-- ❌ Calendrier de disponibilité (à faire)
-- ❌ Module de réservations (à faire)
-- ❌ Analytics et rapports (à faire)
+- ✅ Calendrier de disponibilité
+- ✅ Module de réservations
+- ✅ Analytics et rapports
 
 ## 🛠 Technologies
 
@@ -152,11 +160,31 @@ npm run db:studio
 
 ### 💰 Système de Tarification
 - **Périodes tarifaires**: Haute/basse saison avec priorités
+- **Périodes chevauchantes**: Support complet avec système de priorités
 - **Suppléments weekend**: Vendredi/samedi automatiques
 - **Réductions long séjour**: 5% (7+ nuits), 10% (28+ nuits)
 - **Durée minimum**: Par période configurable
 - **Calculateur dynamique**: Prix en temps réel avec décomposition
+- **Calendrier interactif**: Sélection de dates avec édition rapide
 - **Frais additionnels**: Ménage, caution, taxe de séjour
+
+### 📅 Calendrier de Disponibilité
+- **Vue multi-mois**: Affichage 3 mois avec navigation
+- **Gestion des périodes bloquées**: Maintenance, usage personnel
+- **Synchronisation iCal**: Import/export avec Airbnb, Booking.com
+- **Règles de réservation**: Jours d'arrivée/départ configurables
+- **Visualisation complète**: Prix, disponibilité et règles sur un seul calendrier
+- **API temps réel**: Vérification instantanée de la disponibilité
+
+### 📊 Module de Réservations
+- **Création manuelle**: Interface intuitive pour créer des réservations
+- **Calcul automatique**: Prix calculé en temps réel avec toutes les règles
+- **Vérification instantanée**: Disponibilité vérifiée avant création
+- **Gestion des statuts**: Workflow complet (en attente, confirmé, annulé)
+- **Actions rapides**: Confirmer ou annuler en un clic
+- **Vue détaillée**: Toutes les informations sur une page
+- **Notes internes**: Suivi personnalisé des clients
+- **Filtres avancés**: Recherche par propriété, statut, dates, client
 
 ### 📚 Documentation API
 - **Swagger UI**: Interface interactive à `/documentation`
@@ -210,22 +238,24 @@ npm run test:coverage
 - **Postman**: Importer `apps/backend/postman-collection.json`
 - **Plans de développement**: Voir `PHASE_1_PLAN.md` et `PHASE_2_PLAN.md`
 
-## 🚧 Prochaines Étapes (Phase 2 - Suite)
+### 📊 Analytics et Rapports
+- **Dashboard principal**: Vue d'ensemble avec KPIs en temps réel
+- **Métriques disponibles**:
+  - Taux d'occupation mensuel et annuel
+  - Revenus totaux et moyens (par nuit, par réservation)
+  - Top propriétés par performance
+  - Sources de réservations
+  - Durée moyenne de séjour
+- **Visualisations**: Graphiques interactifs avec Recharts
+- **Export de données**: CSV avec toutes les métriques
+- **Filtres**: Par période, par propriété
+- **API complète**: 4 endpoints dédiés aux analytics
 
-1. **Calendrier de disponibilité**
-   - Vue mensuelle interactive
-   - Blocage de dates
-   - Synchronisation iCal
+## 📈 État d'avancement global
 
-2. **Module de réservations**
-   - Création et gestion
-   - Statuts et workflow
-   - Communications clients
-
-3. **Analytics et rapports**
-   - Taux d'occupation
-   - Revenus et performances
-   - Export de données
+- **Phase 1** : ✅ 100% complétée
+- **Phase 2** : ✅ 100% complétée
+- **Phase 3** : ⏳ À venir (Sites de réservation publics)
 
 ## 🤝 Contribution
 

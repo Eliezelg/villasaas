@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Home, Building2, Calendar, Users, Settings, LogOut } from 'lucide-react'
+import { Home, Building2, Calendar, Users, Settings, LogOut, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth.store'
 
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'Tableau de bord', href: '/dashboard', icon: Home },
   { name: 'Propriétés', href: '/dashboard/properties', icon: Building2 },
   { name: 'Réservations', href: '/dashboard/bookings', icon: Calendar },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Utilisateurs', href: '/dashboard/users', icon: Users },
   { name: 'Paramètres', href: '/dashboard/settings', icon: Settings },
 ]

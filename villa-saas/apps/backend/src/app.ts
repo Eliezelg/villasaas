@@ -20,6 +20,8 @@ import { propertyImageRoutes } from './modules/properties/images.routes';
 import { periodRoutes } from './modules/periods/periods.routes';
 import { pricingRoutes } from './modules/pricing/pricing.routes';
 import availabilityRoutes from './modules/availability/availability.routes';
+import { bookingRoutes } from './modules/bookings/booking.routes';
+import { analyticsRoutes } from './modules/analytics/analytics.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -68,6 +70,8 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(periodRoutes, { prefix: '/api/periods' });
   await app.register(pricingRoutes, { prefix: '/api/pricing' });
   await app.register(availabilityRoutes, { prefix: '/api/availability' });
+  await app.register(bookingRoutes, { prefix: '/api' });
+  await app.register(analyticsRoutes, { prefix: '/api/analytics' });
 
   return app;
 }

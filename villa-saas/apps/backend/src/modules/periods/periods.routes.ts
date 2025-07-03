@@ -7,7 +7,7 @@ const createPeriodSchema = z.object({
   name: z.string().min(1).max(100),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-  priority: z.number().int().default(0),
+  priority: z.number().int().default(0), // Higher priority periods override lower ones
   basePrice: z.number().positive(),
   weekendPremium: z.number().min(0).default(0),
   minNights: z.number().int().min(1).default(1),
@@ -112,41 +112,8 @@ export async function periodRoutes(fastify: FastifyInstance): Promise<void> {
       }
     }
 
-    // Vérifier les chevauchements
-    const overlapping = await fastify.prisma.period.findFirst({
-      where: {
-        tenantId,
-        propertyId: data.propertyId,
-        isActive: true,
-        OR: [
-          {
-            AND: [
-              { startDate: { lte: data.startDate } },
-              { endDate: { gte: data.startDate } },
-            ],
-          },
-          {
-            AND: [
-              { startDate: { lte: data.endDate } },
-              { endDate: { gte: data.endDate } },
-            ],
-          },
-          {
-            AND: [
-              { startDate: { gte: data.startDate } },
-              { endDate: { lte: data.endDate } },
-            ],
-          },
-        ],
-      },
-    });
-
-    if (overlapping) {
-      return reply.status(400).send({ 
-        error: 'Cette période chevauche avec une période existante',
-        overlappingPeriod: overlapping,
-      });
-    }
+    // Note: Les chevauchements sont autorisés car le système utilise les priorités
+    // La période avec la priorité la plus élevée sera appliquée
 
     const period = await fastify.prisma.period.create({
       data: addTenantToData(data, tenantId),
@@ -175,47 +142,8 @@ export async function periodRoutes(fastify: FastifyInstance): Promise<void> {
       return reply.status(404).send({ error: 'Period not found' });
     }
 
-    // Si les dates changent, vérifier les chevauchements
-    if (data.startDate || data.endDate) {
-      const startDate = data.startDate || existingPeriod.startDate;
-      const endDate = data.endDate || existingPeriod.endDate;
-
-      const overlapping = await fastify.prisma.period.findFirst({
-        where: {
-          id: { not: id },
-          tenantId,
-          propertyId: existingPeriod.propertyId,
-          isActive: true,
-          OR: [
-            {
-              AND: [
-                { startDate: { lte: startDate } },
-                { endDate: { gte: startDate } },
-              ],
-            },
-            {
-              AND: [
-                { startDate: { lte: endDate } },
-                { endDate: { gte: endDate } },
-              ],
-            },
-            {
-              AND: [
-                { startDate: { gte: startDate } },
-                { endDate: { lte: endDate } },
-              ],
-            },
-          ],
-        },
-      });
-
-      if (overlapping) {
-        return reply.status(400).send({ 
-          error: 'Cette période chevauche avec une période existante',
-          overlappingPeriod: overlapping,
-        });
-      }
-    }
+    // Note: Les chevauchements sont autorisés car le système utilise les priorités
+    // La période avec la priorité la plus élevée sera appliquée
 
     const period = await fastify.prisma.period.update({
       where: { id },
