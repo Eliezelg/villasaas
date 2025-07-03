@@ -132,7 +132,7 @@ npm run build
 npm run db:studio
 
 # Mise à jour de la base de données
-./update-db.sh
+./scripts/update-db.sh
 ```
 
 ## 🎯 Fonctionnalités Implémentées

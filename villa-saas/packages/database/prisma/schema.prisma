@@ -44,10 +44,45 @@ model Tenant {
   emails        EmailTemplate[]
   integrations  Integration[]
   auditLogs     AuditLog[]
+  publicSite    PublicSite?
 
   @@index([email])
   @@index([subdomain])
   @@index([customDomain])
+}
+
+// ==================== SITES PUBLICS ====================
+
+model PublicSite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  tenantId String @unique
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Configuration domaine
+  domain        String?  @unique
+  subdomain     String?  @unique
+  isActive      Boolean  @default(false)
+  
+  // Personnalisation
+  theme         Json?    // Couleurs, fonts, etc.
+  logo          String?
+  favicon       String?
+  metadata      Json?    // SEO, analytics
+  
+  // Localisation
+  defaultLocale String   @default("fr")
+  locales       Json     @default("[\"fr\"]")
+  
+  // Analytics
+  googleAnalyticsId String?
+  facebookPixelId   String?
+  
+  @@index([domain])
+  @@index([subdomain])
+  @@index([tenantId])
 }
 
 // ==================== UTILISATEURS ====================

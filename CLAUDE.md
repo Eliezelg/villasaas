@@ -34,7 +34,7 @@ Villa SaaS - A multi-tenant vacation rental management platform currently in act
 npm install
 cp .env.example .env.local
 docker-compose up -d
-./update-db.sh
+./scripts/update-db.sh
 
 # Development
 npm run dev           # Run backend (dans apps/backend)
@@ -45,7 +45,7 @@ npm test              # All tests
 npm run test:watch    # Tests en mode watch
 
 # Database
-./update-db.sh        # Push schema changes + generate client
+./scripts/update-db.sh        # Push schema changes + generate client
 npm run db:studio     # Prisma Studio (dans packages/database)
 
 # Build & Deploy
@@ -169,7 +169,8 @@ villa-saas/
 │   ├── database/     # Prisma schema + client
 │   ├── types/        # Types TypeScript partagés
 │   └── utils/        # Utilitaires partagés
-├── update-db.sh      # Script mise à jour DB
+├── scripts/          # Scripts utilitaires
+│   └── update-db.sh  # Script mise à jour DB
 └── package.json      # Workspaces npm
 ```
 
@@ -425,5 +426,5 @@ Lors de l'ajout d'un nouveau module :
 3. **Database** :
    - [ ] Ajouter le modèle dans `schema.prisma`
    - [ ] Vérifier les index nécessaires
-   - [ ] Exécuter `./update-db.sh`
+   - [ ] Exécuter `./scripts/update-db.sh`
    - [ ] Tester avec Prisma Studio

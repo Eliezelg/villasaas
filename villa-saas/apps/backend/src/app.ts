@@ -22,6 +22,7 @@ import { pricingRoutes } from './modules/pricing/pricing.routes';
 import availabilityRoutes from './modules/availability/availability.routes';
 import { bookingRoutes } from './modules/bookings/booking.routes';
 import { analyticsRoutes } from './modules/analytics/analytics.routes';
+import { publicRoutes } from './modules/public/public.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -31,7 +32,35 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
 
   // Core plugins
   await app.register(cors, {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, cb) => {
+      // Permettre les requêtes depuis localhost avec n'importe quel port et sous-domaine
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3002',
+        /^http:\/\/[a-zA-Z0-9-]+\.localhost:3002$/,  // Sous-domaines de localhost:3002
+        /^http:\/\/localhost:\d+$/,  // N'importe quel port localhost
+      ];
+      
+      // Si pas d'origine (ex: Postman), permettre
+      if (!origin) {
+        cb(null, true);
+        return;
+      }
+      
+      // Vérifier si l'origine est autorisée
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (allowed instanceof RegExp) {
+          return allowed.test(origin);
+        }
+        return allowed === origin;
+      });
+      
+      if (isAllowed) {
+        cb(null, true);
+      } else {
+        cb(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
 
@@ -72,6 +101,9 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(availabilityRoutes, { prefix: '/api/availability' });
   await app.register(bookingRoutes, { prefix: '/api' });
   await app.register(analyticsRoutes, { prefix: '/api/analytics' });
+  
+  // Public routes (no auth required)
+  await app.register(publicRoutes, { prefix: '/api' });
 
   return app;
 }

@@ -113,7 +113,7 @@ const items = data?.items || [];  // ✅ Fallback sûr
 ### 10. Commandes essentielles
 ```bash
 # Mise à jour DB (après changement schema.prisma)
-./update-db.sh
+./scripts/update-db.sh
 
 # Développement
 npm run dev          # Dans chaque app
@@ -193,5 +193,5 @@ modules/[feature]/
 3. **Database**
    - [ ] Schema Prisma
    - [ ] Index sur les clés étrangères
-   - [ ] `./update-db.sh`
+   - [ ] `./scripts/update-db.sh`
    - [ ] Test avec Prisma Studio

@@ -1,0 +1,92 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  
+  // Support pour les domaines personnalisés
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          }
+        ]
+      }
+    ]
+  },
+  
+  // Configuration pour les images externes
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3001',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com',
+      }
+    ],
+    formats: ['image/avif', 'image/webp'],
+  },
+  
+  // Support i18n
+  i18n: {
+    locales: ['fr', 'en', 'es', 'de', 'it'],
+    defaultLocale: 'fr',
+    localeDetection: false,
+  },
+  
+  // Variables d'environnement côté client
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    NEXT_PUBLIC_BOOKING_URL: process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002',
+  },
+  
+  // Optimisations de build
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Support des domaines personnalisés via rewrites
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Gestion des sous-domaines pour les tenants
+        {
+          source: '/:path*',
+          has: [
+            {
+              type: 'host',
+              value: '(?<tenant>.*)\\.localhost:3002',
+            },
+          ],
+          destination: '/:path*?tenant=:tenant',
+        },
+      ],
+    }
+  },
+}
+
+module.exports = nextConfig

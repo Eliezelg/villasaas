@@ -47,7 +47,7 @@ This starts:
 
 ### 5. Set Up the Database
 ```bash
-./update-db.sh
+./scripts/update-db.sh
 ```
 
 This script:
@@ -101,7 +101,7 @@ villa-saas/
 ### Database Management
 ```bash
 # Update database schema
-./update-db.sh
+./scripts/update-db.sh
 
 # Open Prisma Studio
 cd packages/database && npm run db:studio
