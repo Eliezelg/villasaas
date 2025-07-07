@@ -11,6 +11,8 @@ import { fr } from 'date-fns/locale'
 import { ArrowLeft, Calendar, Users, CreditCard, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { StripeWrapper } from '@/components/payment/stripe-wrapper'
+import { StripePaymentForm } from '@/components/payment/stripe-payment-form'
 
 interface Property {
   id: string
@@ -74,6 +76,7 @@ export default function BookingPage() {
   const [currentStep, setCurrentStep] = useState<BookingStep>('details')
   const [loading, setLoading] = useState(true)
   const [calculating, setCalculating] = useState(false)
+  const [paymentIntentClientSecret, setPaymentIntentClientSecret] = useState<string | null>(null)
   
   const propertyId = params.propertyId as string
   const checkIn = searchParams.get('checkIn')
@@ -148,12 +151,66 @@ export default function BookingPage() {
     e.preventDefault()
     
     if (currentStep === 'details') {
-      // TODO: Valider les données
-      setCurrentStep('payment')
-    } else if (currentStep === 'payment') {
-      // TODO: Traiter le paiement avec Stripe
-      // Pour l'instant, on simule
-      setCurrentStep('confirmation')
+      // Valider les données
+      if (!formData.guestFirstName || !formData.guestLastName || !formData.guestEmail || !formData.guestPhone) {
+        return
+      }
+      
+      // Créer l'intention de paiement et la réservation
+      try {
+        // D'abord créer l'intention de paiement
+        const paymentResponse = await apiClient.request('/api/public/payments/create-intent', {
+          method: 'POST',
+          body: JSON.stringify({
+            amount: pricing?.total || 0,
+            currency: 'EUR',
+            metadata: {
+              propertyId,
+              checkIn: new Date(checkIn!).toISOString(),
+              checkOut: new Date(checkOut!).toISOString(),
+              guestEmail: formData.guestEmail,
+              guestName: `${formData.guestFirstName} ${formData.guestLastName}`,
+              tenantId: tenant?.id || '',
+            }
+          })
+        })
+        
+        if (paymentResponse.data?.clientSecret) {
+          // Créer la réservation avec le paymentIntentId
+          // Convertir les dates au format ISO datetime
+          const checkInDate = new Date(checkIn!)
+          const checkOutDate = new Date(checkOut!)
+          
+          const bookingResponse = await apiClient.createBooking({
+            propertyId,
+            checkIn: checkInDate.toISOString(),
+            checkOut: checkOutDate.toISOString(),
+            adults: formData.adults,
+            children: formData.children,
+            infants: formData.infants,
+            pets: formData.pets,
+            guestFirstName: formData.guestFirstName,
+            guestLastName: formData.guestLastName,
+            guestEmail: formData.guestEmail,
+            guestPhone: formData.guestPhone,
+            guestCountry: formData.guestCountry,
+            guestAddress: formData.guestAddress,
+            specialRequests: formData.specialRequests,
+            paymentIntentId: paymentResponse.data.paymentIntentId,
+          })
+          
+          if (bookingResponse.data) {
+            setPaymentIntentClientSecret(paymentResponse.data.clientSecret)
+            setCurrentStep('payment')
+          } else {
+            console.error('Failed to create booking')
+          }
+        } else {
+          console.error('Failed to create payment intent')
+        }
+      } catch (error) {
+        console.error('Error creating payment:', error)
+      }
     }
   }
 
@@ -425,23 +482,20 @@ export default function BookingPage() {
               </Card>
             )}
 
-            {currentStep === 'payment' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Paiement sécurisé</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <CreditCard className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      L'intégration Stripe sera ajoutée ici
-                    </p>
-                    <Button onClick={() => setCurrentStep('confirmation')} className="mt-6">
-                      Simuler le paiement
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {currentStep === 'payment' && paymentIntentClientSecret && (
+              <StripeWrapper clientSecret={paymentIntentClientSecret}>
+                <StripePaymentForm
+                  amount={pricing?.total || 0}
+                  currency="EUR"
+                  onSuccess={() => {
+                    // Le paiement sera confirmé via le webhook
+                    setCurrentStep('confirmation')
+                  }}
+                  onError={(error) => {
+                    console.error('Payment error:', error)
+                  }}
+                />
+              </StripeWrapper>
             )}
 
             {currentStep === 'confirmation' && (

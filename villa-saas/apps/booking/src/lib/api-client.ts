@@ -15,7 +15,7 @@ class ApiClient {
     this.baseURL = API_URL
   }
   
-  private async request<T = any>(
+  async request<T = any>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
@@ -105,6 +105,21 @@ class ApiClient {
       `/api/public/availability?propertyId=${propertyId}&startDate=${startDate}&endDate=${endDate}`
     )
   }
+
+  async getAvailabilityCalendar(propertyId: string, startDate: string, endDate: string) {
+    return this.request<{
+      propertyId: string;
+      startDate: string;
+      endDate: string;
+      dates: Array<{
+        date: string;
+        available: boolean;
+        price?: number;
+        minNights?: number;
+        reason?: 'booked' | 'blocked' | 'past';
+      }>;
+    }>(`/api/public/availability-calendar?propertyId=${propertyId}&startDate=${startDate}&endDate=${endDate}`)
+  }
   
   async calculatePrice(data: {
     propertyId: string
@@ -164,3 +179,9 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient()
+
+// Type helper to ensure arrays
+export function ensureArray<T>(value: T | T[] | null | undefined): T[] {
+  if (!value) return []
+  return Array.isArray(value) ? value : [value]
+}

@@ -1,0 +1,94 @@
+{
+    "bookingConfirmation": {
+        "subject": "Confirmation de votre réservation {{reference}}",
+        "title": "Réservation confirmée !",
+        "greeting": "Bonjour {{guestName}},",
+        "intro": "Nous sommes heureux de confirmer votre réservation. Voici les détails :",
+        "details": {
+            "title": "Détails de la réservation",
+            "reference": "Référence",
+            "property": "Propriété",
+            "checkIn": "Arrivée",
+            "checkOut": "Départ",
+            "guests": "Voyageurs",
+            "total": "Montant total"
+        },
+        "thankYou": "Nous avons hâte de vous accueillir !",
+        "footer": "Cet email a été envoyé par {{tenantName}}. Si vous n'êtes pas à l'origine de cette réservation, veuillez ignorer cet email."
+    },
+    "paymentFailed": {
+        "subject": "Échec du paiement pour votre réservation {{reference}}",
+        "title": "Échec du paiement",
+        "greeting": "Bonjour {{guestName}},",
+        "intro": "Nous n'avons pas pu traiter le paiement pour votre réservation. Voici les détails de votre réservation :",
+        "warning": "⚠️ Votre réservation sera automatiquement annulée dans 24 heures si le paiement n'est pas effectué.",
+        "retryButton": "Réessayer le paiement",
+        "contact": "Si vous rencontrez des difficultés, n'hésitez pas à nous contacter.",
+        "footer": "Cet email a été envoyé par {{tenantName}}. Si vous n'êtes pas à l'origine de cette réservation, veuillez ignorer cet email."
+    },
+    "bookingCancelled": {
+        "subject": "Annulation de votre réservation {{reference}}",
+        "title": "Réservation annulée",
+        "greeting": "Bonjour {{guestName}},",
+        "intro": "Votre réservation a été annulée suite à l'échec du paiement.",
+        "details": {
+            "title": "Détails de la réservation annulée",
+            "reference": "Référence",
+            "property": "Propriété",
+            "checkIn": "Arrivée prévue",
+            "checkOut": "Départ prévu"
+        },
+        "newBooking": "Vous pouvez effectuer une nouvelle réservation à tout moment sur notre site.",
+        "footer": "Cet email a été envoyé par {{tenantName}}."
+    },
+    "ownerNotification": {
+        "subject": "Nouvelle réservation : {{propertyName}}",
+        "title": "Nouvelle réservation",
+        "greeting": "Bonjour,",
+        "intro": "Une nouvelle réservation a été effectuée pour votre propriété.",
+        "details": {
+            "title": "Détails de la réservation",
+            "reference": "Référence",
+            "property": "Propriété",
+            "guest": "Client",
+            "checkIn": "Arrivée",
+            "checkOut": "Départ",
+            "guests": "Voyageurs",
+            "total": "Montant total"
+        },
+        "footer": "Cet email a été envoyé par {{tenantName}}."
+    },
+    "checkInReminder": {
+        "subject": "Rappel : Votre arrivée approche - {{propertyName}}",
+        "title": "Votre arrivée approche !",
+        "greeting": "Bonjour {{guestName}},",
+        "intro": "Nous avons hâte de vous accueillir demain à {{propertyName}}.",
+        "checkInTime": "Heure d'arrivée : à partir de 16h00",
+        "instructions": "Vous recevrez les instructions détaillées pour votre arrivée dans un prochain email.",
+        "contact": "Si vous avez des questions, n'hésitez pas à nous contacter.",
+        "footer": "Cet email a été envoyé par {{tenantName}}."
+    },
+    "checkInInstructions": {
+        "subject": "Instructions d'arrivée - {{propertyName}}",
+        "title": "Instructions pour votre arrivée",
+        "greeting": "Bonjour {{guestName}},",
+        "intro": "Voici toutes les informations nécessaires pour votre arrivée :",
+        "address": "Adresse",
+        "accessCode": "Code d'accès",
+        "wifiPassword": "Mot de passe WiFi",
+        "checkOut": "Heure de départ : avant 10h00",
+        "emergency": "En cas d'urgence",
+        "enjoyStay": "Nous vous souhaitons un excellent séjour !",
+        "footer": "Cet email a été envoyé par {{tenantName}}."
+    },
+    "reviewRequest": {
+        "subject": "Comment s'est passé votre séjour à {{propertyName}} ?",
+        "title": "Votre avis compte !",
+        "greeting": "Bonjour {{guestName}},",
+        "intro": "Nous espérons que vous avez passé un excellent séjour à {{propertyName}}.",
+        "request": "Votre avis est précieux pour nous et aide les futurs voyageurs. Pourriez-vous prendre quelques minutes pour partager votre expérience ?",
+        "reviewButton": "Laisser un avis",
+        "thankYou": "Merci pour votre confiance et à bientôt !",
+        "footer": "Cet email a été envoyé par {{tenantName}}."
+    }
+}

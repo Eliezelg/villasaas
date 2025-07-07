@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { getTenantId } from '@villa-saas/utils';
 import { BookingService } from './booking.service';
+import { createEmailService } from '../../services/email.service';
 
 // Schémas de validation
 const createBookingSchema = z.object({
@@ -479,13 +480,52 @@ export async function bookingRoutes(fastify: FastifyInstance) {
               name: true,
               address: true,
               city: true,
-              images: { select: { id: true, url: true, order: true } }
+              images: { 
+                select: { 
+                  id: true, 
+                  url: true, 
+                  urls: true,
+                  order: true 
+                } 
+              }
             }
           }
         }
       });
 
-      // TODO: Envoyer email de confirmation
+      // Récupérer les informations du tenant
+      const tenant = await fastify.prisma.tenant.findUnique({
+        where: { id: tenantId },
+        select: {
+          name: true,
+          logo: true,
+          subdomain: true
+        }
+      });
+
+      // Envoyer email de confirmation
+      try {
+        const emailService = createEmailService(fastify);
+        await emailService.sendBookingConfirmation({
+          to: updated.guestEmail,
+          bookingReference: updated.reference,
+          guestName: `${updated.guestFirstName} ${updated.guestLastName}`,
+          propertyName: updated.property.name,
+          checkIn: updated.checkIn.toLocaleDateString('fr-FR'),
+          checkOut: updated.checkOut.toLocaleDateString('fr-FR'),
+          guests: updated.adults + updated.children,
+          totalAmount: updated.total,
+          currency: updated.currency,
+          propertyImage: updated.property.images?.[0]?.urls?.large || updated.property.images?.[0]?.url,
+          tenantName: tenant?.name,
+          tenantLogo: tenant?.logo || undefined,
+          tenantSubdomain: tenant?.subdomain,
+          locale: updated.guestCountry === 'GB' || updated.guestCountry === 'US' ? 'en' : 'fr'
+        });
+      } catch (emailError) {
+        // Log l'erreur mais ne pas faire échouer la confirmation
+        fastify.log.error({ emailError }, 'Failed to send confirmation email after booking confirmation');
+      }
 
       return reply.send(updated);
     }

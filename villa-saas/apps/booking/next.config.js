@@ -1,3 +1,7 @@
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -46,17 +50,16 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       }
     ],
     formats: ['image/avif', 'image/webp'],
   },
   
-  // Support i18n
-  i18n: {
-    locales: ['fr', 'en', 'es', 'de', 'it'],
-    defaultLocale: 'fr',
-    localeDetection: false,
-  },
+  // Support i18n is now handled by next-intl
   
   // Variables d'environnement côté client
   env: {
@@ -89,4 +92,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withNextIntl(nextConfig)

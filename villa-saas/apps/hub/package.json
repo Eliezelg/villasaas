@@ -1,0 +1,47 @@
+{
+  "name": "@villa-saas/hub",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3003",
+    "build": "next build",
+    "start": "next start -p 3003",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "15.3.5",
+    "@villa-saas/database": "file:../../packages/database",
+    "@villa-saas/types": "file:../../packages/types",
+    "@villa-saas/utils": "file:../../packages/utils",
+    "@villa-saas/i18n": "file:../../packages/i18n",
+    "@hookform/resolvers": "^3.3.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.412.0",
+    "react-hook-form": "^7.52.0",
+    "tailwind-merge": "^2.3.0",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.4",
+    "openai": "^4.52.1",
+    "ai": "^3.2.19",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.5",
+    "@eslint/eslintrc": "^3"
+  }
+}

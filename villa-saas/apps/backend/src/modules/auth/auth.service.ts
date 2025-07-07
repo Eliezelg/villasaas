@@ -140,9 +140,14 @@ export class AuthService {
     }
 
     // Supprimer l'ancien refresh token
-    await this.fastify.prisma.refreshToken.delete({
-      where: { id: storedToken.id },
-    });
+    try {
+      await this.fastify.prisma.refreshToken.delete({
+        where: { id: storedToken.id },
+      });
+    } catch (error) {
+      // Le token a peut-être déjà été supprimé par une requête concurrente
+      this.fastify.log.warn('Refresh token already deleted or not found');
+    }
 
     // Générer de nouveaux tokens
     const tokens = await this.generateTokens(storedToken.user);

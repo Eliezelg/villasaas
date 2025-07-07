@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { differenceInDays } from 'date-fns';
 import { PricingService } from '../../services/pricing.service';
+import { validatePromoCode } from '../../services/promocode.service';
 
 // Schémas de validation
 const publicPropertyQuerySchema = z.object({
@@ -63,10 +64,14 @@ const publicBookingSchema = z.object({
   guestAddress: z.string().optional(),
   specialRequests: z.string().optional(),
   paymentIntentId: z.string().optional(),
+  promoCode: z.string().optional(),
 });
 
 export async function publicRoutes(fastify: FastifyInstance) {
   const pricingService = new PricingService(fastify.prisma);
+  
+  // Rate limiter pour la vérification des réservations
+  const bookingVerifyLimiter = new Map<string, { attempts: number; resetAt: number }>();
 
   // Obtenir les infos d'un tenant par domaine
   fastify.get('/public/tenant-by-domain/:domain', async (request, reply) => {
@@ -567,6 +572,534 @@ export async function publicRoutes(fastify: FastifyInstance) {
     } catch (error) {
       fastify.log.error(error);
       return reply.code(500).send({ error: 'Failed to check availability' });
+    }
+  });
+
+  // Créer une réservation publique
+  fastify.post('/public/bookings', {
+    schema: {
+      description: 'Créer une nouvelle réservation',
+      tags: ['public'],
+    }
+  }, async (request, reply) => {
+    const validation = publicBookingSchema.safeParse(request.body);
+    if (!validation.success) {
+      return reply.code(400).send({ error: validation.error });
+    }
+
+    const data = validation.data;
+    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    if (!tenantSubdomain) {
+      return reply.code(400).send({ error: 'Tenant not specified' });
+    }
+
+    try {
+      const tenant = await fastify.prisma.tenant.findFirst({
+        where: { subdomain: tenantSubdomain }
+      });
+
+      if (!tenant) {
+        return reply.code(404).send({ error: 'Tenant not found' });
+      }
+
+      // Vérifier que la propriété appartient au tenant
+      const property = await fastify.prisma.property.findFirst({
+        where: {
+          id: data.propertyId,
+          tenantId: tenant.id,
+          status: 'PUBLISHED',
+        },
+      });
+
+      if (!property) {
+        return reply.code(404).send({ error: 'Property not found' });
+      }
+
+      // Vérifier la disponibilité
+      const checkInDate = new Date(data.checkIn);
+      const checkOutDate = new Date(data.checkOut);
+      
+      const conflictingBooking = await fastify.prisma.booking.findFirst({
+        where: {
+          propertyId: data.propertyId,
+          status: { in: ['CONFIRMED', 'PENDING'] },
+          OR: [
+            {
+              AND: [
+                { checkIn: { lte: checkOutDate } },
+                { checkOut: { gte: checkInDate } }
+              ]
+            }
+          ]
+        }
+      });
+
+      if (conflictingBooking) {
+        return reply.code(409).send({ error: 'Dates not available' });
+      }
+
+      // Calculer le prix total
+      const pricing = await pricingService.calculatePrice({
+        propertyId: data.propertyId,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        guests: data.adults + data.children,
+        tenantId: tenant.id,
+      });
+
+      // Valider le code promo si fourni
+      let promoCodeDiscount = 0;
+      let promoCodeId: string | null = null;
+      
+      if (data.promoCode) {
+        const promoValidation = await validatePromoCode({
+          code: data.promoCode,
+          tenantId: tenant.id,
+          propertyId: data.propertyId,
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          totalAmount: pricing.subtotal,
+          nights: pricing.nights,
+        });
+
+        if (!promoValidation.valid) {
+          return reply.code(400).send({ error: promoValidation.error });
+        }
+
+        promoCodeDiscount = promoValidation.discountAmount || 0;
+        promoCodeId = promoValidation.promoCodeId || null;
+      }
+
+      // Recalculer le total avec la réduction
+      const finalTotal = pricing.total - promoCodeDiscount;
+
+      // Générer une référence unique
+      const reference = `BK${Date.now().toString(36).toUpperCase()}`;
+
+      // Créer la réservation
+      const booking = await fastify.prisma.booking.create({
+        data: {
+          tenantId: tenant.id,
+          propertyId: data.propertyId,
+          reference,
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          adults: data.adults,
+          children: data.children,
+          infants: data.infants,
+          pets: data.pets,
+          guestFirstName: data.guestFirstName,
+          guestLastName: data.guestLastName,
+          guestEmail: data.guestEmail,
+          guestPhone: data.guestPhone,
+          guestCountry: data.guestCountry,
+          guestAddress: data.guestAddress,
+          specialRequests: data.specialRequests,
+          nights: pricing.nights,
+          accommodationTotal: pricing.totalAccommodation,
+          cleaningFee: pricing.cleaningFee,
+          touristTax: pricing.touristTax,
+          discountAmount: (pricing.longStayDiscount || 0) + promoCodeDiscount,
+          discountCode: data.promoCode,
+          promoCodeId: promoCodeId,
+          subtotal: pricing.subtotal,
+          total: finalTotal,
+          currency: 'EUR',
+          status: 'PENDING',
+          paymentStatus: 'PENDING',
+          stripePaymentId: data.paymentIntentId,
+          commissionRate: 0.15, // 15% commission
+          commissionAmount: finalTotal * 0.15,
+          payoutAmount: finalTotal * 0.85,
+        },
+        include: {
+          property: {
+            select: {
+              name: true,
+              city: true,
+              country: true,
+            }
+          }
+        }
+      });
+
+      // L'email de confirmation sera envoyé après le paiement réussi via le webhook Stripe
+
+      return booking;
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.code(500).send({ error: 'Failed to create booking' });
+    }
+  });
+
+  // Vérifier une réservation avec email + code
+  fastify.post('/public/bookings/verify', {
+    schema: {
+      description: 'Vérifier une réservation avec email et code',
+      tags: ['public'],
+    }
+  }, async (request, reply) => {
+    const validation = z.object({
+      email: z.string().email(),
+      reference: z.string().min(1),
+    }).safeParse(request.body);
+
+    if (!validation.success) {
+      return reply.code(400).send({ error: validation.error });
+    }
+
+    const { email, reference } = validation.data;
+    const clientIp = request.ip;
+    
+    // Vérifier le rate limiting
+    const limiterKey = `${clientIp}:${email}`;
+    const now = Date.now();
+    const limiter = bookingVerifyLimiter.get(limiterKey);
+    
+    if (limiter) {
+      if (now < limiter.resetAt) {
+        if (limiter.attempts >= 5) {
+          return reply.code(429).send({ error: 'Too many attempts. Please try again later.' });
+        }
+        limiter.attempts++;
+      } else {
+        // Reset le compteur
+        bookingVerifyLimiter.set(limiterKey, { attempts: 1, resetAt: now + 300000 }); // 5 minutes
+      }
+    } else {
+      bookingVerifyLimiter.set(limiterKey, { attempts: 1, resetAt: now + 300000 });
+    }
+    
+    try {
+      // Chercher la réservation
+      const booking = await fastify.prisma.booking.findFirst({
+        where: {
+          guestEmail: email.toLowerCase(),
+          reference: reference.toUpperCase(),
+          status: {
+            notIn: ['DRAFT'] // Exclure les brouillons
+          }
+        },
+        include: {
+          property: {
+            include: {
+              images: true,
+              address: true,
+            }
+          },
+          tenant: {
+            select: {
+              name: true,
+              logo: true,
+              contactEmail: true,
+              contactPhone: true,
+            }
+          }
+        }
+      });
+      
+      if (!booking) {
+        return reply.code(404).send({ error: 'Booking not found' });
+      }
+      
+      // Générer un token temporaire pour l'accès
+      const token = await fastify.jwt.sign(
+        { 
+          bookingId: booking.id,
+          email: booking.guestEmail,
+          type: 'booking-access'
+        },
+        { expiresIn: '1h' } // Token valide 1 heure
+      );
+      
+      // Nettoyer les infos sensibles
+      const safeBooking = {
+        ...booking,
+        tenant: {
+          name: booking.tenant.name,
+          logo: booking.tenant.logo,
+          contactEmail: booking.tenant.contactEmail,
+          contactPhone: booking.tenant.contactPhone,
+        }
+      };
+      
+      return {
+        booking: safeBooking,
+        token
+      };
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.code(500).send({ error: 'Failed to verify booking' });
+    }
+  });
+
+  // Récupérer les détails d'une réservation avec token
+  fastify.get('/public/bookings/:id', {
+    schema: {
+      description: 'Récupérer les détails d\'une réservation',
+      tags: ['public'],
+    }
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const authHeader = request.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    
+    try {
+      // Vérifier le token
+      const decoded = await fastify.jwt.verify(token) as any;
+      
+      if (decoded.type !== 'booking-access' || decoded.bookingId !== id) {
+        return reply.code(403).send({ error: 'Invalid token' });
+      }
+      
+      // Récupérer la réservation
+      const booking = await fastify.prisma.booking.findUnique({
+        where: { id },
+        include: {
+          property: {
+            include: {
+              images: true,
+              address: true,
+              amenities: true,
+            }
+          },
+          tenant: {
+            select: {
+              name: true,
+              logo: true,
+              contactEmail: true,
+              contactPhone: true,
+              website: true,
+            }
+          }
+        }
+      });
+      
+      if (!booking) {
+        return reply.code(404).send({ error: 'Booking not found' });
+      }
+      
+      return booking;
+    } catch (error) {
+      fastify.log.error(error);
+      if (error instanceof Error && error.message.includes('jwt')) {
+        return reply.code(401).send({ error: 'Invalid or expired token' });
+      }
+      return reply.code(500).send({ error: 'Failed to get booking details' });
+    }
+  });
+
+  // Obtenir le calendrier de disponibilité public
+  fastify.get('/public/availability-calendar', {
+    schema: {
+      description: 'Obtenir le calendrier de disponibilité publique',
+      tags: ['public'],
+    }
+  }, async (request, reply) => {
+    const { propertyId, startDate, endDate } = request.query as {
+      propertyId: string;
+      startDate: string;
+      endDate: string;
+    };
+    
+    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    if (!tenantSubdomain) {
+      return reply.code(400).send({ error: 'Tenant not specified' });
+    }
+
+    if (!propertyId || !startDate || !endDate) {
+      return reply.code(400).send({ error: 'Missing required parameters' });
+    }
+
+    try {
+      const tenant = await fastify.prisma.tenant.findFirst({
+        where: { subdomain: tenantSubdomain }
+      });
+
+      if (!tenant) {
+        return reply.code(404).send({ error: 'Tenant not found' });
+      }
+
+      // Vérifier que la propriété appartient au tenant et est publiée
+      const property = await fastify.prisma.property.findFirst({
+        where: {
+          id: propertyId,
+          tenantId: tenant.id,
+          status: 'PUBLISHED',
+        }
+      });
+
+      if (!property) {
+        return reply.code(404).send({ error: 'Property not found' });
+      }
+
+      // Valider les dates
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return reply.code(400).send({ error: 'Invalid date format' });
+      }
+
+      if (start >= end) {
+        return reply.code(400).send({ error: 'End date must be after start date' });
+      }
+
+      // Limiter à 365 jours
+      const maxDays = 365;
+      const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysDiff > maxDays) {
+        return reply.code(400).send({ error: `Maximum ${maxDays} days allowed` });
+      }
+
+      // Récupérer les réservations confirmées et en attente
+      const bookings = await fastify.prisma.booking.findMany({
+        where: {
+          propertyId,
+          tenantId: tenant.id,
+          status: { in: ['CONFIRMED', 'PENDING'] },
+          OR: [
+            {
+              AND: [
+                { checkIn: { lte: end } },
+                { checkOut: { gte: start } }
+              ]
+            }
+          ]
+        },
+        select: {
+          checkIn: true,
+          checkOut: true,
+          status: true
+        }
+      });
+
+      // Récupérer les périodes bloquées
+      const blockedPeriods = await fastify.prisma.blockedPeriod.findMany({
+        where: {
+          propertyId,
+          OR: [
+            {
+              AND: [
+                { startDate: { lte: end } },
+                { endDate: { gte: start } }
+              ]
+            }
+          ]
+        },
+        select: {
+          startDate: true,
+          endDate: true,
+          reason: true
+        }
+      });
+
+      // Récupérer les périodes tarifaires
+      const periods = await fastify.prisma.period.findMany({
+        where: {
+          tenantId: tenant.id,
+          isActive: true,
+          OR: [
+            { propertyId },
+            { propertyId: null, isGlobal: true }
+          ],
+          AND: [
+            { startDate: { lte: end } },
+            { endDate: { gte: start } }
+          ]
+        },
+        orderBy: { priority: 'desc' }
+      });
+
+      // Construire le calendrier jour par jour
+      const dates = [];
+      const current = new Date(start);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      while (current <= end) {
+        const dateStr = current.toISOString().split('T')[0];
+        const dayOfWeek = current.getDay();
+        let available = true;
+        let reason: 'booked' | 'blocked' | 'past' | undefined;
+
+        // Vérifier si c'est dans le passé
+        if (current < today) {
+          available = false;
+          reason = 'past';
+        }
+
+        // Vérifier les réservations
+        for (const booking of bookings) {
+          if (current >= booking.checkIn && current < booking.checkOut) {
+            available = false;
+            reason = 'booked';
+            break;
+          }
+        }
+
+        // Vérifier les périodes bloquées
+        if (available) {
+          for (const blocked of blockedPeriods) {
+            if (current >= blocked.startDate && current <= blocked.endDate) {
+              available = false;
+              reason = 'blocked';
+              break;
+            }
+          }
+        }
+
+        // Calculer le prix pour cette date
+        let price = property.basePrice;
+        let minNights = property.minNights;
+
+        // Appliquer les périodes tarifaires
+        for (const period of periods) {
+          if (current >= period.startDate && current <= period.endDate) {
+            price = period.basePrice;
+            if (period.minNights !== null) {
+              minNights = period.minNights;
+            }
+            // Appliquer le supplément weekend
+            if ((dayOfWeek === 5 || dayOfWeek === 6) && period.weekendPremium) {
+              price += period.weekendPremium;
+            }
+            break; // Prendre la première période (plus haute priorité)
+          }
+        }
+
+        // Appliquer le supplément weekend de la propriété si aucune période
+        if ((dayOfWeek === 5 || dayOfWeek === 6) && property.weekendPremium) {
+          price += property.weekendPremium;
+        }
+
+        dates.push({
+          date: dateStr,
+          available,
+          price: available ? price : undefined,
+          minNights: available ? minNights : undefined,
+          reason
+        });
+
+        current.setDate(current.getDate() + 1);
+      }
+
+      return {
+        propertyId,
+        startDate,
+        endDate,
+        dates
+      };
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.code(500).send({ error: 'Failed to fetch availability calendar' });
     }
   });
 }

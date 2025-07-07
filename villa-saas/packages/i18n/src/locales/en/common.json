@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Home",
+    "properties": "Properties",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign up",
+    "dashboard": "Dashboard"
+  },
+  "actions": {
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "book": "Book",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "backToHome": "Back to home"
+  },
+  "labels": {
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "address": "Address",
+    "city": "City",
+    "country": "Country",
+    "postalCode": "Postal code",
+    "language": "Language",
+    "currency": "Currency"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "noResults": "No results found",
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "invalidPhone": "Invalid phone number",
+    "notFound": "Page not found"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "cookies": "Cookie settings"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "properties": "Propriétés",
+    "about": "À propos",
+    "contact": "Contact",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "dashboard": "Tableau de bord"
+  },
+  "actions": {
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "book": "Réserver",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "continue": "Continuer",
+    "backToHome": "Retour à l'accueil"
+  },
+  "labels": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "city": "Ville",
+    "country": "Pays",
+    "postalCode": "Code postal",
+    "language": "Langue",
+    "currency": "Devise"
+  },
+  "messages": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Opération réussie",
+    "noResults": "Aucun résultat trouvé",
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Email invalide",
+    "invalidPhone": "Numéro de téléphone invalide",
+    "notFound": "Page non trouvée"
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "cookies": "Gestion des cookies"
+  }
+}

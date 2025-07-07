@@ -2,6 +2,7 @@
   "name": "villa-saas",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.9.2",
   "description": "Villa SaaS - Plateforme de gestion de locations de vacances",
   "scripts": {
     "dev": "turbo dev",
@@ -16,9 +17,11 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "@types/node-fetch": "^2.6.12",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
+    "node-fetch": "^2.7.0",
     "prettier": "^3.2.4",
     "turbo": "latest",
     "typescript": "^5.3.3"

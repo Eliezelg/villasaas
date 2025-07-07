@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isAfter, isBefore, addMonths, subMonths, differenceInDays } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
+import { cn, formatPrice } from '@/lib/utils'
 import { apiClient } from '@/lib/api-client'
-import { formatPrice } from '@/lib/utils'
+import * as gtag from '@/lib/gtag'
 
 interface AvailabilityCalendarProps {
   propertyId: string
@@ -21,7 +21,7 @@ interface DayData {
   price: number
   isBlocked?: boolean
   isBooked?: boolean
-  reason?: string
+  reason?: 'booked' | 'blocked' | 'past'
 }
 
 interface PricingPeriod {
@@ -60,49 +60,46 @@ export function AvailabilityCalendar({
     const monthEnd = endOfMonth(currentMonth)
     
     try {
-      // Charger les disponibilités
-      const availabilityResponse = await apiClient.getPropertyAvailability(
+      // Charger les disponibilités du mois avec le nouvel endpoint
+      const response = await apiClient.getAvailabilityCalendar(
         propertyId,
-        monthStart.toISOString(),
-        monthEnd.toISOString()
+        format(monthStart, 'yyyy-MM-dd'),
+        format(monthEnd, 'yyyy-MM-dd')
       )
       
-      // Charger les périodes tarifaires
-      const propertyResponse = await apiClient.getProperty(propertyId)
-      if (propertyResponse.data?.periods) {
-        setPeriods(propertyResponse.data.periods)
+      if (response.data) {
+        const dayData: DayData[] = response.data.dates.map(day => ({
+          date: new Date(day.date),
+          available: day.available,
+          price: day.price || basePrice,
+          isBlocked: day.reason === 'blocked',
+          isBooked: day.reason === 'booked',
+          reason: day.reason
+        }))
+        
+        setMonthData(dayData)
       }
-      
-      // Construire les données du mois
-      const days = eachDayOfInterval({ start: monthStart, end: monthEnd })
-      const dayData: DayData[] = days.map(date => {
-        // Trouver la période applicable
-        const applicablePeriod = periods.find(period => {
-          const periodStart = new Date(period.startDate)
-          const periodEnd = new Date(period.endDate)
-          return date >= periodStart && date <= periodEnd
-        })
-        
-        const price = applicablePeriod?.basePrice || basePrice
-        
-        return {
-          date,
-          available: true, // TODO: Implémenter la vraie logique de disponibilité
-          price,
-          isBlocked: false,
-          isBooked: false
-        }
-      })
-      
-      setMonthData(dayData)
     } catch (error) {
-      console.error('Error loading month data:', error)
+      console.error('Error loading availability calendar:', error)
+      // En cas d'erreur, utiliser les données par défaut
+      const days = eachDayOfInterval({ start: monthStart, end: monthEnd })
+      const dayData: DayData[] = days.map(date => ({
+        date,
+        available: true,
+        price: basePrice,
+        isBlocked: false,
+        isBooked: false
+      }))
+      setMonthData(dayData)
     } finally {
       setLoading(false)
     }
   }
 
   function handleDateClick(date: Date) {
+    // Track calendar interaction
+    gtag.trackCalendarInteraction(propertyId)
+    
     // Si pas de check-in sélectionné, ou si on clique sur une date avant le check-in
     if (!selectedCheckIn || isBefore(date, selectedCheckIn)) {
       setSelectedCheckIn(date)
@@ -231,7 +228,11 @@ export function AvailabilityCalendar({
                 isSelected && "bg-primary text-primary-foreground hover:bg-primary/90",
                 isInRange && "bg-primary/10",
                 isDisabled && "cursor-not-allowed opacity-50",
-                !isDisabled && isCurrentMonth && "cursor-pointer"
+                !isDisabled && isCurrentMonth && "cursor-pointer",
+                // Styles pour les dates non disponibles
+                dayData.isBooked && isCurrentMonth && "bg-red-100 text-red-900 opacity-60",
+                dayData.isBlocked && isCurrentMonth && "bg-gray-100 text-gray-500 opacity-60",
+                dayData.reason === 'past' && "opacity-30"
               )}
             >
               <div className="text-sm">{format(date, 'd')}</div>
@@ -250,6 +251,14 @@ export function AvailabilityCalendar({
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-primary rounded" />
           <span>Sélectionné</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-red-100 rounded border border-red-200" />
+          <span>Réservé</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-gray-100 rounded border border-gray-200" />
+          <span>Non disponible</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-primary/10 rounded" />

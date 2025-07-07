@@ -1,0 +1,27 @@
+{
+  "name": "Villa Booking",
+  "short_name": "Villa",
+  "description": "Réservez votre villa de rêve pour des vacances inoubliables",
+  "start_url": "/fr",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "lifestyle"],
+  "lang": "fr",
+  "dir": "ltr"
+}

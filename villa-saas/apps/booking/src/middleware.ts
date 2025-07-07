@@ -1,13 +1,21 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import createMiddleware from 'next-intl/middleware'
+import { locales } from '@villa-saas/i18n'
 
 // Cache pour stocker les mappings domaine -> tenant
 const tenantCache = new Map<string, { tenantId: string; subdomain: string; timestamp: number }>()
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
+// Créer le middleware i18n
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale: 'fr',
+  localeDetection: false
+})
+
 export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
-  const url = request.nextUrl.clone()
   
   // Extraire le sous-domaine ou domaine personnalisé
   let tenant = null
@@ -15,8 +23,10 @@ export async function middleware(request: NextRequest) {
   // Pour le développement local avec sous-domaines
   if (hostname.includes('localhost:3002')) {
     const subdomain = hostname.split('.')[0]
-    if (subdomain && subdomain !== 'localhost') {
+    if (subdomain && subdomain !== 'localhost' && !subdomain.includes(':')) {
       tenant = subdomain
+    } else {
+      tenant = 'demo' // Tenant par défaut
     }
   } else {
     // Pour la production avec domaines personnalisés
@@ -55,13 +65,15 @@ export async function middleware(request: NextRequest) {
     }
   }
   
-  // Si pas de tenant trouvé, rediriger vers une page d'erreur
-  if (!tenant && !url.pathname.startsWith('/_next') && !url.pathname.startsWith('/api')) {
-    return NextResponse.rewrite(new URL('/404', request.url))
+  // Si pas de tenant trouvé, utiliser 'demo' par défaut
+  if (!tenant) {
+    tenant = 'demo'
   }
+
+  // D'abord exécuter le middleware i18n
+  const response = intlMiddleware(request)
   
-  // Ajouter le tenant aux headers pour qu'il soit accessible dans les pages
-  const response = NextResponse.next()
+  // Ensuite ajouter les headers du tenant
   if (tenant) {
     response.headers.set('x-tenant', tenant)
     // Aussi l'ajouter aux cookies pour le client

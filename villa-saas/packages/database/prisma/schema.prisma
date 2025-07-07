@@ -45,6 +45,7 @@ model Tenant {
   integrations  Integration[]
   auditLogs     AuditLog[]
   publicSite    PublicSite?
+  promoCodes    PromoCode[]
 
   @@index([email])
   @@index([subdomain])
@@ -113,8 +114,10 @@ model User {
   sessions      Session[]
 
   // Relations
-  bookings   Booking[]
-  auditLogs  AuditLog[]
+  bookings       Booking[]
+  auditLogs      AuditLog[]
+  mobileSessions MobileSession[]
+  loyaltyProgram LoyaltyProgram?
 
   @@unique([email, tenantId])
   @@index([tenantId])
@@ -219,6 +222,10 @@ model Property {
   blockedPeriods   BlockedPeriod[]
   periods          Period[]
   reviews          Review[]
+  mlPredictions    MLPrediction[]
+  propertyEmbedding PropertyEmbedding?
+  smartDevices     SmartDevice[]
+  analytics        PropertyAnalytics[]
   
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -348,6 +355,8 @@ model Booking {
   extraFees          Json  @default("[]") // Frais additionnels
   discountAmount     Float @default(0)
   discountCode       String?
+  promoCodeId        String?
+  promoCode          PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
   subtotal           Float
   total              Float
   currency           String @default("EUR")
@@ -378,8 +387,9 @@ model Booking {
   internalNotes    String? @db.Text
 
   // Relations
-  payments  Payment[]
-  reviews   Review[]
+  payments              Payment[]
+  reviews               Review[]
+  blockchainTransactions BlockchainTransaction[]
   
   @@index([tenantId])
   @@index([propertyId])
@@ -564,6 +574,27 @@ enum EmailType {
   WELCOME_GUEST
 }
 
+model EmailLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  // Multi-tenancy
+  tenantId String
+  
+  recipient String
+  subject   String
+  template  String
+  status    String   // sent, failed, bounced
+  
+  metadata  Json?
+  sentAt    DateTime?
+  error     String?
+  
+  @@index([tenantId])
+  @@index([status])
+  @@index([createdAt])
+}
+
 // ==================== INTÉGRATIONS ====================
 
 model Integration {
@@ -640,4 +671,265 @@ model SearchQuery {
   resultCount      Int
   
   @@index([createdAt])
+}
+
+// ==================== CODES PROMOTIONNELS ====================
+
+model PromoCode {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Code unique
+  code         String   @unique
+  description  String?
+  
+  // Type de réduction
+  discountType DiscountType // PERCENTAGE ou FIXED_AMOUNT
+  discountValue Float       // Pourcentage (0-100) ou montant fixe
+  
+  // Conditions
+  minAmount    Float?       // Montant minimum de réservation
+  minNights    Int?         // Nombre minimum de nuits
+  propertyIds  String[]     // Propriétés éligibles (vide = toutes)
+  
+  // Période de validité
+  validFrom    DateTime
+  validUntil   DateTime
+  
+  // Limites d'utilisation
+  maxUses      Int?         // Nombre max d'utilisations (null = illimité)
+  maxUsesPerUser Int?       // Max par utilisateur
+  currentUses  Int          @default(0)
+  
+  // Statut
+  isActive     Boolean      @default(true)
+  
+  // Relations
+  bookings     Booking[]
+  
+  @@index([code])
+  @@index([tenantId])
+  @@index([validFrom, validUntil])
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// ==================== PHASE 4 - IA & INNOVATIONS ====================
+
+// Conversations IA
+model AIConversation {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  userId        String?
+  sessionId     String   // Pour les utilisateurs non connectés
+  
+  messages      Json[]   // Historique de la conversation
+  context       Json     // Contexte et préférences extraites
+  
+  // Résultats
+  searchResults Json[]   // Propriétés suggérées
+  bookingId     String?  // Si conversion en réservation
+  
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+// Prédictions ML
+model MLPrediction {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  type          PredictionType
+  targetDate    DateTime
+  prediction    Json     // Valeurs prédites
+  confidence    Float    // Score de confiance 0-1
+  actualValue   Float?   // Valeur réelle (pour comparaison)
+  
+  @@index([propertyId])
+  @@index([type])
+  @@index([targetDate])
+}
+
+enum PredictionType {
+  PRICE_OPTIMAL
+  DEMAND_FORECAST
+  OCCUPANCY_RATE
+  REVENUE_PROJECTION
+}
+
+// Embeddings pour recherche sémantique
+model PropertyEmbedding {
+  id            String   @id @default(cuid())
+  propertyId    String   @unique
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  embedding     Float[]  // Vecteur de dimension 1536 (OpenAI)
+  model         String   // Modèle utilisé (ex: text-embedding-3-small)
+  updatedAt     DateTime @default(now())
+  
+  @@index([propertyId])
+}
+
+// Sessions mobiles
+model MobileSession {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  deviceId      String
+  platform      String   // ios, android
+  appVersion    String
+  osVersion     String
+  
+  pushToken     String?  @unique
+  lastSync      DateTime @default(now())
+  isActive      Boolean  @default(true)
+  
+  @@index([userId])
+  @@index([deviceId])
+}
+
+// Dispositifs IoT
+model SmartDevice {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  type          DeviceType
+  manufacturer  String
+  model         String
+  serialNumber  String?
+  
+  // Connexion
+  apiEndpoint   String?
+  credentials   Json?    // Chiffré
+  
+  // État
+  status        Json     // État actuel du dispositif
+  lastSeen      DateTime
+  isOnline      Boolean  @default(false)
+  
+  @@index([propertyId])
+  @@index([type])
+}
+
+enum DeviceType {
+  SMART_LOCK
+  THERMOSTAT
+  CAMERA
+  SMOKE_DETECTOR
+  NOISE_MONITOR
+  ENERGY_METER
+}
+
+// Transactions blockchain
+model BlockchainTransaction {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  
+  bookingId     String
+  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  type          BlockchainTxType
+  network       String   // ethereum, polygon, etc.
+  txHash        String   @unique
+  
+  // Détails
+  fromAddress   String
+  toAddress     String
+  amount        String   // En wei
+  gasUsed       String?
+  
+  // Statut
+  status        String   // pending, confirmed, failed
+  confirmations Int      @default(0)
+  confirmedAt   DateTime?
+  
+  @@index([bookingId])
+  @@index([txHash])
+  @@index([status])
+}
+
+enum BlockchainTxType {
+  DEPOSIT_LOCK
+  DEPOSIT_RELEASE
+  PAYMENT
+  REFUND
+  SMART_CONTRACT_CALL
+}
+
+// Programme de fidélité
+model LoyaltyProgram {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  points        Int      @default(0)
+  tier          LoyaltyTier @default(BRONZE)
+  
+  // Statistiques
+  totalBookings Int      @default(0)
+  totalSpent    Float    @default(0)
+  
+  // NFTs
+  nftTokenIds   String[] // IDs des NFTs possédés
+  
+  @@index([userId])
+  @@index([tier])
+}
+
+enum LoyaltyTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+// Analytics avancés
+model PropertyAnalytics {
+  id            String   @id @default(cuid())
+  date          DateTime @db.Date
+  
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  // Métriques
+  views         Int      @default(0)
+  searches      Int      @default(0)
+  bookings      Int      @default(0)
+  revenue       Float    @default(0)
+  
+  // Sources
+  sourceData    Json     // Détail par source (direct, search, social...)
+  
+  // Comparaisons
+  marketAverage Json?    // Données moyennes du marché
+  
+  @@unique([propertyId, date])
+  @@index([propertyId])
+  @@index([date])
 }

@@ -28,6 +28,32 @@ Toute la documentation est organisée dans le dossier [`docs/`](./docs/):
 - ✅ Module de réservations
 - ✅ Analytics et rapports
 
+### Phase 3 ✅ Complétée (100%)
+- ✅ Sites de réservation publics multi-tenant
+- ✅ Détection automatique du tenant par sous-domaine
+- ✅ Calendrier de disponibilité interactif
+- ✅ Tunnel de réservation multi-étapes
+- ✅ Moteur de recherche avancé avec filtres
+- ✅ Intégration Stripe pour les paiements
+- ✅ Intégration AWS S3 pour le stockage d'images
+- ✅ Système d'emails transactionnels (Resend)
+- ✅ Internationalisation (i18n) avec next-intl
+- ✅ Portail client avec authentification email + code
+- ✅ PWA et fonctionnalités offline
+- ✅ SEO optimisé (sitemap, Schema.org, meta tags)
+- ✅ Marketing & Analytics (GA4, Facebook Pixel)
+- ✅ Système de codes promotionnels
+
+### Phase 4 🚀 En cours (5%)
+- ✅ Hub AI - Plateforme intelligente de voyage
+- ✅ Assistant conversationnel avec GPT-4
+- ✅ Recherche sémantique avec embeddings
+- ✅ Modèles de données pour ML et IA
+- 🔄 Applications mobiles natives (React Native)
+- 📅 Revenue Management Suite avec ML
+- 📅 Intégration IoT et Smart Home
+- 📅 Programme de fidélité blockchain
+
 ## 🛠 Technologies
 
 ### Backend
@@ -37,7 +63,9 @@ Toute la documentation est organisée dans le dossier [`docs/`](./docs/):
 - **Cache**: Redis
 - **Auth**: JWT avec refresh tokens
 - **Docs**: Swagger/OpenAPI
-- **Images**: Sharp pour l'optimisation
+- **Images**: Sharp pour l'optimisation + AWS S3
+- **Emails**: Resend + React Email
+- **Paiements**: Stripe Connect
 
 ### Frontend
 - **Framework**: Next.js 14 (App Router)
@@ -45,6 +73,7 @@ Toute la documentation est organisée dans le dossier [`docs/`](./docs/):
 - **Forms**: React Hook Form + Zod
 - **State**: Zustand
 - **Maps**: OpenStreetMap/Nominatim
+- **i18n**: next-intl (FR/EN)
 
 ## 📋 Prérequis
 - Node.js 20+
@@ -107,7 +136,9 @@ npm run dev
 
 ## 🌐 URLs
 
-- **Frontend**: http://localhost:3000
+- **Dashboard Admin**: http://localhost:3000
+- **Site de Réservation**: http://localhost:3002 (ou http://demo.localhost:3002)
+- **Hub AI**: http://localhost:3003
 - **Backend API**: http://localhost:3001
 - **API Documentation**: http://localhost:3001/documentation
 - **PostgreSQL**: localhost:5433
@@ -251,11 +282,49 @@ npm run test:coverage
 - **Filtres**: Par période, par propriété
 - **API complète**: 4 endpoints dédiés aux analytics
 
+### 🌐 Sites de Réservation Publics (Phase 3 - Complétée)
+- **Multi-tenant**: Chaque propriétaire a son propre site avec sous-domaine
+- **Booking app**: Application Next.js dédiée sur le port 3002
+- **Internationalisation**: Support multilingue FR/EN avec next-intl
+- **Tunnel de réservation**: 
+  - Recherche avancée avec filtres multiples
+  - Calendrier interactif pour sélection des dates
+  - Formulaire multi-étapes (dates → infos → paiement)
+  - Paiement sécurisé via Stripe
+- **Emails transactionnels**:
+  - Confirmation de réservation automatique
+  - Templates React Email personnalisables
+  - Service Resend pour l'envoi fiable
+- **Stockage S3**:
+  - Upload direct vers AWS S3
+  - Redimensionnement automatique (4 tailles)
+- **Portail Client**:
+  - Authentification sécurisée avec email + code de réservation
+  - Consultation des détails de réservation
+  - JWT temporaire pour accès sécurisé
+- **PWA & Offline**:
+  - Service Worker pour fonctionnement hors ligne
+  - Manifest pour installation sur mobile
+  - Cache intelligent des ressources
+- **SEO & Marketing**:
+  - Sitemap dynamique généré automatiquement
+  - Schema.org pour un meilleur référencement
+  - Meta tags optimisés par page
+  - Google Analytics 4 intégré
+  - Facebook Pixel pour remarketing
+- **Codes Promotionnels**:
+  - Création et gestion depuis le dashboard admin
+  - Validation en temps réel lors de la réservation
+  - Support pourcentage ou montant fixe
+  - Conditions multiples (montant min, durée min, propriétés)
+  - URLs CDN pour performance optimale
+  - Script de migration pour images existantes
+
 ## 📈 État d'avancement global
 
 - **Phase 1** : ✅ 100% complétée
 - **Phase 2** : ✅ 100% complétée
-- **Phase 3** : ⏳ À venir (Sites de réservation publics)
+- **Phase 3** : ✅ 100% complétée
 
 ## 🤝 Contribution
 
