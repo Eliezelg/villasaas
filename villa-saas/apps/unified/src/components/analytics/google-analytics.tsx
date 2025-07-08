@@ -1,0 +1,1 @@
+../booking/analytics/google-analytics.tsx

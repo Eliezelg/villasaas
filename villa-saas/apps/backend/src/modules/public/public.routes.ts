@@ -733,6 +733,67 @@ export async function publicRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // Récupérer une réservation par payment intent ID
+  fastify.get('/public/bookings/by-payment-intent/:paymentIntentId', {
+    schema: {
+      description: 'Récupérer une réservation par payment intent ID',
+      tags: ['public'],
+    }
+  }, async (request, reply) => {
+    const { paymentIntentId } = request.params as { paymentIntentId: string };
+    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    if (!tenantSubdomain) {
+      return reply.code(400).send({ error: 'Tenant not specified' });
+    }
+
+    try {
+      const tenant = await fastify.prisma.tenant.findFirst({
+        where: { subdomain: tenantSubdomain }
+      });
+
+      if (!tenant) {
+        return reply.code(404).send({ error: 'Tenant not found' });
+      }
+
+      const booking = await fastify.prisma.booking.findFirst({
+        where: {
+          stripePaymentId: paymentIntentId,
+          tenantId: tenant.id,
+        },
+        select: {
+          id: true,
+          reference: true,
+          status: true,
+          paymentStatus: true,
+          checkIn: true,
+          checkOut: true,
+          guestFirstName: true,
+          guestLastName: true,
+          guestEmail: true,
+          total: true,
+          currency: true,
+          property: {
+            select: {
+              name: true,
+              city: true,
+              country: true,
+            }
+          }
+        }
+      });
+
+      if (!booking) {
+        return reply.code(404).send({ error: 'Booking not found' });
+      }
+
+      return booking;
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.code(500).send({ error: 'Failed to fetch booking' });
+    }
+  });
+
   // Vérifier une réservation avec email + code
   fastify.post('/public/bookings/verify', {
     schema: {

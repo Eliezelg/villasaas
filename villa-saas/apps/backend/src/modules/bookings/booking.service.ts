@@ -9,6 +9,8 @@ export interface BookingPriceCalculation {
   touristTax: number;
   extraFees: any[];
   discountAmount: number;
+  optionsTotal: number;
+  depositAmount: number;
   subtotal: number;
   total: number;
   breakdown: {
@@ -16,6 +18,13 @@ export interface BookingPriceCalculation {
     price: number;
     isWeekend: boolean;
   }[];
+  selectedOptions?: Array<{
+    optionId: string;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }>;
 }
 
 export class BookingService {
@@ -31,7 +40,8 @@ export class BookingService {
     propertyId: string,
     checkIn: Date,
     checkOut: Date,
-    guests: { adults: number; children: number; infants: number; pets: number }
+    guests: { adults: number; children: number; infants: number; pets: number },
+    selectedOptions?: Array<{ optionId: string; quantity: number }>
   ): Promise<BookingPriceCalculation> {
     // Récupérer la propriété avec ses périodes de tarification
     const property = await this.prisma.property.findUnique({
@@ -71,7 +81,10 @@ export class BookingService {
       checkIn,
       checkOut,
       guests: guests.adults + guests.children,
-      tenantId: property.tenantId
+      adults: guests.adults,
+      children: guests.children,
+      tenantId: property.tenantId,
+      selectedOptions
     });
     
     // Utiliser le breakdown du pricing service
@@ -85,19 +98,12 @@ export class BookingService {
     
     accommodationTotal = pricingDetails.totalAccommodation;
 
-    // Appliquer les réductions long séjour
-    let discountAmount = 0;
-    if (nights >= 28) {
-      discountAmount = accommodationTotal * 0.10; // 10% pour 28+ nuits
-    } else if (nights >= 7) {
-      discountAmount = accommodationTotal * 0.05; // 5% pour 7+ nuits
-    }
-
-    // Frais additionnels
-    const cleaningFee = property.cleaningFee || 0;
-    
-    // Taxe de séjour (exemple simple : 1€ par adulte par nuit)
-    const touristTax = guests.adults * nights * 1;
+    // Utiliser les détails du service de pricing
+    const discountAmount = pricingDetails.longStayDiscount;
+    const cleaningFee = pricingDetails.cleaningFee;
+    const touristTax = pricingDetails.touristTax;
+    const optionsTotal = pricingDetails.optionsTotal;
+    const depositAmount = pricingDetails.depositAmount;
     
     // Frais supplémentaires (animaux, etc.)
     const extraFees: any[] = [];
@@ -111,7 +117,7 @@ export class BookingService {
     const extraFeesTotal = extraFees.reduce((sum, fee) => sum + fee.amount, 0);
 
     // Calculs finaux
-    const subtotal = accommodationTotal + cleaningFee + touristTax + extraFeesTotal;
+    const subtotal = accommodationTotal + cleaningFee + touristTax + extraFeesTotal + optionsTotal;
     const total = subtotal - discountAmount;
 
     return {
@@ -121,9 +127,12 @@ export class BookingService {
       touristTax,
       extraFees,
       discountAmount,
+      optionsTotal,
+      depositAmount,
       subtotal,
       total,
-      breakdown
+      breakdown,
+      selectedOptions: pricingDetails.selectedOptions
     };
   }
 

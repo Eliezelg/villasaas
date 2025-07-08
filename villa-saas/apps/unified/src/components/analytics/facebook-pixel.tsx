@@ -1,0 +1,1 @@
+../booking/analytics/facebook-pixel.tsx

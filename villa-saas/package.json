@@ -6,6 +6,7 @@
   "description": "Villa SaaS - Plateforme de gestion de locations de vacances",
   "scripts": {
     "dev": "turbo dev",
+    "dev:unified": "npm run dev -w @villa-saas/unified",
     "build": "turbo build",
     "test": "turbo test",
     "lint": "turbo lint",

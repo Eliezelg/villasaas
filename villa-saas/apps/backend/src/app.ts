@@ -14,13 +14,14 @@ import swaggerPlugin from './plugins/swagger';
 import stripePlugin from './plugins/stripe';
 import s3Plugin from './plugins/s3';
 import resendPlugin from './plugins/resend';
+import websocketPlugin from './plugins/websocket';
 
 import { healthRoutes } from './modules/health/health.routes';
 import { authRoutes } from './modules/auth/auth.routes';
 import { tenantRoutes } from './modules/tenants/tenants.routes';
 import { userRoutes } from './modules/users/users.routes';
 import { propertyRoutes } from './modules/properties/properties.routes';
-import { propertyImageRoutes } from './modules/properties/images.routes';
+// import { propertyImageRoutes } from './modules/properties/images.routes';
 import { propertyImageS3Routes } from './modules/properties/images-s3.routes';
 import { periodRoutes } from './modules/periods/periods.routes';
 import { pricingRoutes } from './modules/pricing/pricing.routes';
@@ -31,6 +32,9 @@ import { publicRoutes } from './modules/public/public.routes';
 import { paymentsRoutes } from './modules/payments/payments.routes';
 import { promocodesRoutes } from './modules/promocodes/promocodes.routes';
 import { publicPromoCodesRoutes } from './modules/public/promocodes.public.routes';
+import { messagingRoutes } from './modules/messaging/messaging.routes';
+import { autoResponseRoutes } from './modules/messaging/auto-response.routes';
+import { bookingOptionsRoutes } from './modules/booking-options/booking-options.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -45,6 +49,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       const allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:3002',
+        /^http:\/\/[a-zA-Z0-9-]+\.localhost:3000$/,  // Sous-domaines de localhost:3000 (app unifiée)
         /^http:\/\/[a-zA-Z0-9-]+\.localhost:3002$/,  // Sous-domaines de localhost:3002
         /^http:\/\/localhost:\d+$/,  // N'importe quel port localhost
       ];
@@ -106,6 +111,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(resendPlugin);
   await app.register(authPlugin);
   await app.register(staticPlugin);
+  await app.register(websocketPlugin);
 
   // Routes
   await app.register(healthRoutes, { prefix: '/health' });
@@ -122,6 +128,9 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(analyticsRoutes, { prefix: '/api/analytics' });
   await app.register(paymentsRoutes, { prefix: '/api' });
   await app.register(promocodesRoutes, { prefix: '/api' });
+  await app.register(messagingRoutes, { prefix: '/api/messaging' });
+  await app.register(autoResponseRoutes, { prefix: '/api/messaging/auto-response' });
+  await app.register(bookingOptionsRoutes, { prefix: '/api' });
   
   // Public routes (no auth required)
   await app.register(publicRoutes, { prefix: '/api' });

@@ -23,6 +23,10 @@ const createBookingSchema = z.object({
   specialRequests: z.string().optional(),
   source: z.string().optional(),
   externalId: z.string().optional(),
+  selectedOptions: z.array(z.object({
+    optionId: z.string().min(1),
+    quantity: z.number().int().positive()
+  })).optional(),
 });
 
 const updateBookingSchema = z.object({

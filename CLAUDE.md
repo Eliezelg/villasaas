@@ -4,10 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Villa SaaS - A multi-tenant vacation rental management platform currently in active development (Phase 2). The project consists of three main applications:
-- **Dashboard**: Admin interface for property owners to manage listings ✅ En développement
-- **Booking sites**: Public-facing booking websites with custom domains per property owner 🔄 À venir
-- **Hub**: Future AI-powered marketplace for travelers 🔄 À venir
+Villa SaaS - A multi-tenant vacation rental management platform currently in active development. The project consists of two main applications:
+- **Backend**: API Fastify + TypeScript pour la gestion des données ✅ Opérationnel
+- **Unified**: Application Next.js unifiée remplaçant Dashboard, Booking sites et Hub ✅ En développement
 
 ## Current Development Status
 
@@ -27,6 +26,11 @@ Villa SaaS - A multi-tenant vacation rental management platform currently in act
 - ✅ Module de réservations (100%)
 - ✅ Analytics et rapports (100%)
 
+### 🚀 Phase 3 - En cours
+- 🔄 Migration vers application Unified
+- 🔄 Interface unifiée pour Dashboard, Booking et Hub
+- 🔄 Support multi-domaines pour les sites de réservation
+
 ## Development Commands
 
 ```bash
@@ -38,7 +42,7 @@ docker-compose up -d
 
 # Development
 npm run dev           # Run backend (dans apps/backend)
-npm run dev           # Run frontend (dans apps/web)
+npm run dev           # Run unified app (dans apps/unified)
 
 # Testing
 npm test              # All tests
@@ -164,7 +168,7 @@ const image = await prisma.propertyImage.create({
 villa-saas/
 ├── apps/
 │   ├── backend/      # API Fastify + TypeScript
-│   └── web/          # Frontend Next.js 14
+│   └── unified/      # Application Next.js unifiée (Dashboard + Booking + Hub)
 ├── packages/
 │   ├── database/     # Prisma schema + client
 │   ├── types/        # Types TypeScript partagés
@@ -295,9 +299,9 @@ Generate embeddings using OpenAI text-embedding-3-small model.
 
 ## Current Status
 
-Le projet a terminé la Phase 2 avec succès (100% complétée) :
+Le projet a terminé la Phase 2 avec succès (100% complétée) et est maintenant en Phase 3 :
 - Backend API fonctionnel avec 50+ endpoints testés et opérationnels
-- Frontend avec dashboard propriétaire complet et intuitif
+- Application Unified en développement remplaçant les 3 apps séparées
 - Gestion complète des propriétés avec images optimisées
 - Système de tarification dynamique avec périodes et calendrier interactif
 - Calendrier de disponibilité avec synchronisation iCal (Airbnb, Booking.com)
@@ -305,6 +309,18 @@ Le projet a terminé la Phase 2 avec succès (100% complétée) :
 - Analytics et rapports avec dashboard, métriques et export CSV
 - Documentation API Swagger complète et à jour
 - Tests d'intégration complets (100% des endpoints passent)
+
+### Architecture Unified App
+
+L'application Unified combine :
+- **Dashboard** : Interface d'administration pour les propriétaires
+- **Booking** : Sites de réservation publics avec domaines personnalisés
+- **Hub** : Future marketplace AI pour les voyageurs
+
+La distinction se fait par :
+- Le domaine d'accès (admin.villa-saas.com vs custom-domain.com)
+- L'authentification (propriétaires vs visiteurs publics)
+- Le contexte de l'application (mode dashboard vs mode booking)
 
 ## 📝 Patterns de Code Importants
 
@@ -366,6 +382,7 @@ const form = useForm<z.infer<typeof schema>>({
 10. **Champs inexistants corrigés** : coverImage → images, position → order, pricingPeriods → periods
 11. **PricingService refactoré** : Suppression de getPriceForDate, utilisation de calculatePrice
 12. **Statuts toujours en majuscules** : PUBLISHED, CONFIRMED, COMPLETED (jamais en minuscules)
+13. **API Client 204 No Content** : Gérer les réponses sans body pour éviter les erreurs JSON
 
 ## 🔴 Règles CRITIQUES de Développement
 
@@ -378,6 +395,18 @@ apiClient.post('/api/bookings')
 // ❌ JAMAIS sans /api/
 apiClient.get('/properties')
 apiClient.post('/bookings')
+```
+
+### 4. Gestion des réponses 204 No Content
+```typescript
+// ✅ TOUJOURS vérifier le status 204 avant de parser JSON
+if (response.status === 204) {
+  return { data: null };
+}
+const data = await response.json();
+
+// ❌ JAMAIS parser directement sans vérifier
+const data = await response.json(); // Erreur si 204
 ```
 
 ### 2. Gestion des données undefined
@@ -414,14 +443,15 @@ Lors de l'ajout d'un nouveau module :
    - [ ] Ajouter la documentation Swagger
    - [ ] Créer les tests
 
-2. **Frontend** :
+2. **Frontend (Unified App)** :
    - [ ] Créer le service dans `services/` avec routes `/api/`
    - [ ] Créer les types dans `types/`
    - [ ] Créer les composants dans `components/`
-   - [ ] Ajouter les pages dans `app/dashboard/`
+   - [ ] Ajouter les pages dans `app/` selon le contexte (dashboard/booking/hub)
    - [ ] Gérer les données undefined
    - [ ] Implémenter la gestion d'erreurs
    - [ ] Ajouter les toasts de feedback
+   - [ ] Gérer les contextes multi-apps (dashboard vs booking vs hub)
 
 3. **Database** :
    - [ ] Ajouter le modèle dans `schema.prisma`

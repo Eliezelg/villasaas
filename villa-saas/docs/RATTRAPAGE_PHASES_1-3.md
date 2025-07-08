@@ -76,7 +76,28 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 ### ❌ FONCTIONNALITÉS MANQUANTES (25%)
 
-#### 1. **MODULE MESSAGERIE TEMPS RÉEL** 🚨 Priorité Haute
+#### 1. **PAGE D'INSCRIPTION TENANT (ONBOARDING)** 🚨 Priorité Critique
+**Écart:** Aucune interface web pour créer un nouveau tenant - seulement l'API
+
+**À implémenter:**
+- [ ] Page de landing pour les nouveaux propriétaires
+- [ ] Formulaire d'inscription multi-étapes
+- [ ] Validation email avec code de vérification
+- [ ] Configuration initiale du tenant (logo, couleurs)
+- [ ] Onboarding guidé après inscription
+- [ ] Connexion automatique au dashboard admin
+- [ ] Demo interactive des fonctionnalités
+- [ ] Support multi-langue (FR/EN)
+
+**Pages à créer:**
+- `/` - Landing page avec CTA inscription
+- `/signup` - Formulaire d'inscription tenant
+- `/onboarding` - Configuration initiale guidée
+- `/verify-email` - Vérification email
+
+**Effort estimé:** 1 semaine
+
+#### 2. **MODULE MESSAGERIE TEMPS RÉEL** 🚨 Priorité Haute
 **Écart:** Le cahier des charges prévoit une messagerie instantanée complète avec WebSocket
 
 **À implémenter:**
@@ -91,7 +112,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 2 semaines
 
-#### 2. **APPLICATIONS MOBILES NATIVES** 🚨 Priorité Haute
+#### 3. **APPLICATIONS MOBILES NATIVES** 🚨 Priorité Haute
 **Écart:** Aucune app mobile native n'est développée
 
 **Application Propriétaire (iOS/Android):**
@@ -112,7 +133,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 6-8 semaines (React Native)
 
-#### 3. **CHANNEL MANAGER COMPLET** 🟡 Priorité Moyenne
+#### 4. **CHANNEL MANAGER COMPLET** 🟡 Priorité Moyenne
 **Écart:** Synchronisation avec OTAs non implémentée
 
 **À implémenter:**
@@ -125,7 +146,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 4 semaines
 
-#### 4. **GESTION DES ACCÈS ET SERRURES CONNECTÉES** 🟡 Priorité Moyenne
+#### 5. **GESTION DES ACCÈS ET SERRURES CONNECTÉES** 🟡 Priorité Moyenne
 **Écart:** Système de check-in digital manquant
 
 **À implémenter:**
@@ -137,7 +158,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 2 semaines
 
-#### 5. **SYSTÈME DE NOTIFICATIONS MULTI-CANAL** 🟡 Priorité Moyenne
+#### 6. **SYSTÈME DE NOTIFICATIONS MULTI-CANAL** 🟡 Priorité Moyenne
 **Écart:** Notifications limitées aux emails
 
 **À implémenter:**
@@ -150,7 +171,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 1 semaine
 
-#### 6. **EMAILS TRANSACTIONNELS MANQUANTS** 🟢 Priorité Basse
+#### 7. **EMAILS TRANSACTIONNELS MANQUANTS** 🟢 Priorité Basse
 **Écart:** 4 templates email TODO dans le code
 
 **À implémenter:**
@@ -161,7 +182,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 2 jours
 
-#### 7. **MARKETPLACE DE SERVICES** 🟢 Priorité Basse
+#### 8. **MARKETPLACE DE SERVICES** 🟢 Priorité Basse
 **Écart:** Écosystème de services non développé
 
 **À implémenter:**
@@ -173,7 +194,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 3 semaines
 
-#### 8. **PROGRAMME DE FIDÉLITÉ** 🟢 Priorité Basse
+#### 9. **PROGRAMME DE FIDÉLITÉ** 🟢 Priorité Basse
 **Écart:** Système de points non implémenté
 
 **À implémenter:**
@@ -185,7 +206,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 2 semaines
 
-#### 9. **FONCTIONNALITÉS PWA AVANCÉES** 🟢 Priorité Basse
+#### 10. **FONCTIONNALITÉS PWA AVANCÉES** 🟢 Priorité Basse
 **Écart:** PWA basique seulement
 
 **À implémenter:**
@@ -197,7 +218,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 **Effort estimé:** 1 semaine
 
-#### 10. **TESTS END-TO-END** 🟡 Priorité Moyenne
+#### 11. **TESTS END-TO-END** 🟡 Priorité Moyenne
 **Écart:** Aucun test E2E implémenté
 
 **À implémenter:**
@@ -214,9 +235,10 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 ## 📋 PLAN DE RATTRAPAGE PRIORISÉ
 
 ### Sprint 1 (2 semaines) - Fondations Critiques
-1. **Messagerie WebSocket** - Base temps réel
-2. **Notifications multi-canal** - Infrastructure
-3. **Emails manquants** - Templates essentiels
+1. **Page inscription tenant** - Onboarding complet
+2. **Messagerie WebSocket** - Base temps réel
+3. **Notifications multi-canal** - Infrastructure
+4. **Emails manquants** - Templates essentiels
 
 ### Sprint 2 (4 semaines) - Mobile First
 1. **App mobile Propriétaire** - MVP React Native
@@ -239,6 +261,7 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 
 | Module | Effort | Coût Dev (150€/jour) | Priorité |
 |--------|--------|---------------------|----------|
+| Page inscription tenant | 5j | 750€ | Critique |
 | Messagerie temps réel | 10j | 1,500€ | Haute |
 | Apps mobiles natives | 40j | 6,000€ | Haute |
 | Channel Manager | 20j | 3,000€ | Moyenne |
@@ -247,16 +270,17 @@ La Phase 2 est complète avec même des fonctionnalités supplémentaires :
 | Services marketplace | 15j | 2,250€ | Basse |
 | Programme fidélité | 10j | 1,500€ | Basse |
 | Tests E2E | 5j | 750€ | Moyenne |
-| **TOTAL** | **115j** | **17,250€** | - |
+| **TOTAL** | **120j** | **18,000€** | - |
 
 ---
 
 ## 🎯 RECOMMANDATIONS
 
 ### Priorités Immédiates (Must-Have)
-1. **Messagerie temps réel** - Différenciateur clé vs concurrence
-2. **Applications mobiles** - 70% des réservations sont mobiles
-3. **Channel Manager basique** - Airbnb/Booking minimum
+1. **Page inscription tenant** - Point d'entrée indispensable pour nouveaux clients
+2. **Messagerie temps réel** - Différenciateur clé vs concurrence
+3. **Applications mobiles** - 70% des réservations sont mobiles
+4. **Channel Manager basique** - Airbnb/Booking minimum
 
 ### Quick Wins (2-3 jours max)
 1. Compléter les 4 emails manquants
@@ -283,4 +307,4 @@ Le projet Villa SaaS est dans un excellent état avec une base technique très s
 **Recommandation finale:** Lancer en production avec l'état actuel tout en développant en parallèle les fonctionnalités manquantes selon les priorités définies.
 
 **Temps total de rattrapage estimé:** 13 semaines avec une équipe de 2-3 développeurs
-**Budget total:** ~17,250€ (peut être réduit en se concentrant sur les priorités hautes)
+**Budget total:** ~18,000€ (peut être réduit en se concentrant sur les priorités hautes)

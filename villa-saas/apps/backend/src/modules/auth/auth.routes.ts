@@ -191,4 +191,118 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
 
     reply.send(user);
   });
+
+  // Verify email
+  fastify.post('/verify-email', {
+    schema: {
+      body: {
+        type: 'object',
+        oneOf: [
+          {
+            required: ['token'],
+            properties: {
+              token: { type: 'string' },
+            },
+          },
+          {
+            required: ['email', 'code'],
+            properties: {
+              email: { type: 'string', format: 'email' },
+              code: { type: 'string', pattern: '^[0-9]{6}$' },
+            },
+          },
+        ],
+      },
+    },
+  }, async (request, reply) => {
+    const body = request.body as { token?: string; email?: string; code?: string };
+
+    try {
+      let user;
+
+      if (body.token) {
+        // Vérification par token (lien email)
+        const decoded = fastify.jwt.verify(body.token) as { userId: string; type: string };
+        
+        if (decoded.type !== 'email-verification') {
+          reply.status(400).send({ error: 'Invalid token type' });
+          return;
+        }
+
+        user = await fastify.prisma.user.update({
+          where: { id: decoded.userId },
+          data: { emailVerified: true },
+        });
+      } else if (body.email && body.code) {
+        // Vérification par code
+        // TODO: Implémenter la vérification par code
+        // Pour l'instant, on simule la vérification
+        user = await fastify.prisma.user.findFirst({
+          where: { email: body.email },
+        });
+
+        if (!user) {
+          reply.status(404).send({ error: 'User not found' });
+          return;
+        }
+
+        // Simuler la vérification du code
+        if (body.code === '123456') {
+          user = await fastify.prisma.user.update({
+            where: { id: user.id },
+            data: { emailVerified: true },
+          });
+        } else {
+          reply.status(400).send({ error: 'Invalid verification code' });
+          return;
+        }
+      } else {
+        reply.status(400).send({ error: 'Invalid request' });
+        return;
+      }
+
+      reply.send({ message: 'Email verified successfully', user });
+    } catch (error: any) {
+      if (error.name === 'JsonWebTokenError') {
+        reply.status(400).send({ error: 'Invalid or expired token' });
+      } else {
+        throw error;
+      }
+    }
+  });
+
+  // Resend verification email
+  fastify.post('/resend-verification', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['email'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { email } = request.body as { email: string };
+
+    const user = await fastify.prisma.user.findFirst({
+      where: { email },
+    });
+
+    if (!user) {
+      // Ne pas révéler si l'utilisateur existe ou non
+      reply.send({ message: 'If the email exists, a verification code has been sent' });
+      return;
+    }
+
+    if (user.emailVerified) {
+      reply.status(400).send({ error: 'Email already verified' });
+      return;
+    }
+
+    // TODO: Envoyer l'email avec le code de vérification
+    // Pour l'instant, on simule l'envoi
+
+    reply.send({ message: 'Verification code sent' });
+  });
 }

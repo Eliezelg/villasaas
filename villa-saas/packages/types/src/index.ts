@@ -83,3 +83,6 @@ export interface CreatePropertyData {
 export interface UpdatePropertyData extends Partial<CreatePropertyData> {
   status?: PropertyStatus;
 }
+
+// Export booking options types
+export * from './booking-options';

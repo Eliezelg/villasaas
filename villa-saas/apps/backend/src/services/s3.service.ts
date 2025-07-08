@@ -20,7 +20,7 @@ export class S3Service {
 
   constructor(s3: S3Client) {
     this.s3 = s3;
-    this.bucketName = process.env.AWS_S3_BUCKET || 'villa-saas-images';
+    this.bucketName = process.env.AWS_S3_BUCKET || 'familink-test';
     this.cdnDomain = process.env.AWS_CDN_DOMAIN;
   }
 
@@ -55,36 +55,47 @@ export class S3Service {
     for (const size of sizes) {
       let processedImage: Buffer;
       
-      if (size.name === 'original') {
-        // Pour l'original, on optimise juste la qualité
-        processedImage = await sharp(file)
-          .jpeg({ quality: size.quality, progressive: true })
-          .toBuffer();
-      } else {
-        // Pour les autres tailles, on redimensionne
-        processedImage = await sharp(file)
-          .resize(size.width, size.height, { 
-            fit: 'cover',
-            withoutEnlargement: true 
-          })
-          .jpeg({ quality: size.quality, progressive: true })
-          .toBuffer();
+      try {
+        if (size.name === 'original') {
+          // Pour l'original, on optimise juste la qualité
+          processedImage = await sharp(file)
+            .jpeg({ quality: size.quality, progressive: true })
+            .toBuffer();
+        } else {
+          // Pour les autres tailles, on redimensionne
+          processedImage = await sharp(file)
+            .resize(size.width, size.height, { 
+              fit: 'cover',
+              withoutEnlargement: true 
+            })
+            .jpeg({ quality: size.quality, progressive: true })
+            .toBuffer();
+        }
+        console.log(`Processed image ${size.name}: ${processedImage.length} bytes`);
+      } catch (sharpError) {
+        console.error(`Sharp processing failed for ${size.name}:`, sharpError);
+        throw new Error(`Image processing failed: ${sharpError.message}`);
       }
 
       const key = `${baseKey}-${size.name}.jpg`;
       
       // Upload vers S3
-      await this.s3.send(new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
-        Body: processedImage,
-        ContentType: 'image/jpeg',
-        CacheControl: 'public, max-age=31536000', // 1 an
-        Metadata: {
-          'x-amz-meta-size': size.name,
-          'x-amz-meta-width': size.width.toString(),
-        }
-      }));
+      try {
+        await this.s3.send(new PutObjectCommand({
+          Bucket: this.bucketName,
+          Key: key,
+          Body: processedImage,
+          ContentType: 'image/jpeg',
+          CacheControl: 'public, max-age=31536000', // 1 an
+          Metadata: {
+            'x-amz-meta-size': size.name,
+            'x-amz-meta-width': size.width.toString(),
+          }
+        }));
+      } catch (uploadError) {
+        console.error(`Failed to upload ${key}:`, uploadError);
+        throw uploadError;
+      }
 
       // Générer l'URL (CDN ou S3 direct)
       urls[size.name] = this.getPublicUrl(key);
@@ -137,7 +148,7 @@ export class S3Service {
     if (this.cdnDomain) {
       return `https://${this.cdnDomain}/${key}`;
     }
-    return `https://${this.bucketName}.s3.${process.env.AWS_REGION || 'eu-west-3'}.amazonaws.com/${key}`;
+    return `https://${this.bucketName}.s3.${process.env.AWS_REGION || 'eu-central-1'}.amazonaws.com/${key}`;
   }
 
   /**

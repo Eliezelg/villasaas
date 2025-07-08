@@ -167,4 +167,65 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
 
     reply.status(204).send();
   });
+
+  // Get current user
+  fastify.get('/me', {
+    preHandler: [fastify.authenticate],
+  }, async (request, reply) => {
+    const user = await fastify.prisma.user.findUnique({
+      where: { id: request.user!.userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        phone: true,
+        isActive: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      reply.status(404).send({ error: 'User not found' });
+      return;
+    }
+
+    reply.send(user);
+  });
+
+  // Update current user
+  fastify.patch('/me', {
+    preHandler: [fastify.authenticate],
+  }, async (request, reply) => {
+    const userId = request.user!.userId;
+    const { firstName, lastName, phone, onboardingCompleted } = request.body as any;
+
+    const user = await fastify.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(firstName && { firstName }),
+        ...(lastName && { lastName }),
+        ...(phone !== undefined && { phone }),
+        ...(onboardingCompleted !== undefined && { 
+          metadata: {
+            onboardingCompleted,
+            onboardingDate: new Date().toISOString(),
+          }
+        }),
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        phone: true,
+        metadata: true,
+      },
+    });
+
+    reply.send(user);
+  });
 }

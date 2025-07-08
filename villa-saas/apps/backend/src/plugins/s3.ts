@@ -10,7 +10,7 @@ declare module 'fastify' {
 
 async function s3Plugin(fastify: FastifyInstance) {
   const s3Config = {
-    region: process.env.AWS_REGION || 'eu-west-3',
+    region: process.env.AWS_REGION || 'eu-central-1',
     credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY ? {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

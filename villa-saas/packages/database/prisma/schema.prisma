@@ -46,6 +46,11 @@ model Tenant {
   auditLogs     AuditLog[]
   publicSite    PublicSite?
   promoCodes    PromoCode[]
+  conversations Conversation[]
+  autoResponseTemplates AutoResponseTemplate[]
+  autoResponseRules    AutoResponseRule[]
+  bookingOptions BookingOption[]
+  paymentConfiguration PaymentConfiguration?
 
   @@index([email])
   @@index([subdomain])
@@ -118,6 +123,11 @@ model User {
   auditLogs      AuditLog[]
   mobileSessions MobileSession[]
   loyaltyProgram LoyaltyProgram?
+  
+  // Messagerie
+  conversationParticipants ConversationParticipant[]
+  messages                 Message[]
+  messageReads            MessageRead[]
 
   @@unique([email, tenantId])
   @@index([tenantId])
@@ -213,6 +223,15 @@ model Property {
   // Recherche IA
   searchableContent String? @db.Text
   embedding         Float[] @default([]) // Vector pour similarité sémantique
+  
+  // Custom Pages Configuration
+  customPages       Json?    // { location: true, activities: true, services: true, reviews: true }
+  
+  // Custom Pages Content
+  locationContent   Json?    // { description: { fr: "", en: "" }, nearbyPlaces: [...] }
+  roomsContent      Json?    // [ { name: { fr: "", en: "" }, description: { fr: "", en: "" }, beds: [...], amenities: [...] } ]
+  activitiesContent Json?    // [ { name: { fr: "", en: "" }, description: { fr: "", en: "" }, distance: number, price: string, category: string } ]
+  servicesContent   Json?    // { included: [...], optional: [...], onRequest: [...] }
 
   // Médias
   images           PropertyImage[]
@@ -226,6 +245,9 @@ model Property {
   propertyEmbedding PropertyEmbedding?
   smartDevices     SmartDevice[]
   analytics        PropertyAnalytics[]
+  conversations    Conversation[]
+  autoResponseRules AutoResponseRule[]
+  bookingOptions   PropertyBookingOption[]
   
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -361,6 +383,9 @@ model Booking {
   total              Float
   currency           String @default("EUR")
 
+  // Options réservées
+  selectedOptions    BookingSelectedOption[]
+
   // Paiement
   paymentStatus   PaymentStatus @default(PENDING)
   stripePaymentId String?
@@ -390,6 +415,7 @@ model Booking {
   payments              Payment[]
   reviews               Review[]
   blockchainTransactions BlockchainTransaction[]
+  conversations         Conversation[]
   
   @@index([tenantId])
   @@index([propertyId])
@@ -593,6 +619,328 @@ model EmailLog {
   @@index([tenantId])
   @@index([status])
   @@index([createdAt])
+}
+
+// ==================== MESSAGERIE ====================
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Propriété concernée (optionnel si conversation générale)
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  // Réservation liée (optionnel)
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  // Participants
+  participants ConversationParticipant[]
+  
+  // Messages
+  messages Message[]
+  
+  // Chatbot
+  chatbotSession ChatbotSession?
+
+  // Métadonnées
+  subject     String?
+  lastMessage String? @db.Text
+  lastMessageAt DateTime?
+  unreadCount Int @default(0)
+  status      ConversationStatus @default(ACTIVE)
+  
+  // Tags et catégories
+  tags        String[]
+  priority    ConversationPriority @default(NORMAL)
+
+  @@index([tenantId])
+  @@index([propertyId])
+  @@index([bookingId])
+  @@index([status])
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // Participant peut être un user enregistré ou un invité
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Pour les invités non enregistrés
+  guestEmail String?
+  guestName  String?
+  
+  // Statut du participant
+  role       ParticipantRole @default(MEMBER)
+  lastSeen   DateTime?
+  isTyping   Boolean @default(false)
+  unreadCount Int @default(0)
+
+  @@unique([conversationId, userId])
+  @@unique([conversationId, guestEmail])
+  @@index([conversationId])
+  @@index([userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // Expéditeur
+  senderId    String?
+  sender      User?    @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  senderEmail String?  // Pour les invités
+  senderName  String?
+
+  // Contenu
+  content     String @db.Text
+  type        MessageType @default(TEXT)
+  
+  // Pièces jointes
+  attachments MessageAttachment[]
+  
+  // Métadonnées
+  metadata    Json?
+  
+  // Statut
+  status      MessageStatus @default(SENT)
+  readBy      MessageRead[]
+  editedAt    DateTime?
+  deletedAt   DateTime?
+
+  // Pour les messages vocaux
+  duration    Int? // Durée en secondes
+  transcription String? @db.Text
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+model MessageAttachment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  type      AttachmentType
+  name      String
+  url       String
+  size      Int
+  mimeType  String
+
+  @@index([messageId])
+}
+
+model MessageRead {
+  id        String   @id @default(cuid())
+  
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  readAt    DateTime @default(now())
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+// Types pour la messagerie
+enum ConversationStatus {
+  ACTIVE
+  ARCHIVED
+  CLOSED
+}
+
+enum ConversationPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ParticipantRole {
+  OWNER
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+  SYSTEM
+  LOCATION
+}
+
+enum MessageStatus {
+  SENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum AttachmentType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  OTHER
+}
+
+// ==================== RÉPONSES AUTOMATIQUES ====================
+
+model AutoResponseTemplate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Informations du template
+  name        String
+  description String?
+  category    AutoResponseCategory
+  trigger     AutoResponseTrigger
+  
+  // Contenu
+  content     Json    // Multilingue {fr: string, en: string}
+  variables   String[] // Variables disponibles ex: ["{property_name}", "{guest_name}"]
+  
+  // Conditions
+  conditions  Json?   // Conditions pour déclencher (horaires, mots-clés, etc.)
+  priority    Int     @default(0) // Plus haute priorité = appliqué en premier
+  
+  // Statut
+  isActive    Boolean @default(true)
+  
+  // Analytics
+  usageCount  Int     @default(0)
+  lastUsedAt  DateTime?
+
+  @@index([tenantId])
+  @@index([category])
+  @@index([trigger])
+  @@index([isActive])
+}
+
+model AutoResponseRule {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Règle
+  name        String
+  description String?
+  
+  // Déclencheurs
+  triggers    Json    // Exemples: {keywords: ["prix", "tarif"], time: {from: "18:00", to: "09:00"}}
+  
+  // Actions
+  actions     Json    // {type: "send_template", templateId: "...", delay: 0}
+  
+  // Conditions
+  propertyId  String? // Appliquer seulement pour cette propriété
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  
+  // Statut
+  isActive    Boolean @default(true)
+  priority    Int     @default(0)
+
+  @@index([tenantId])
+  @@index([propertyId])
+  @@index([isActive])
+}
+
+model ChatbotSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  // État de la session
+  context     Json    // Contexte de la conversation (propriété, dates, invités, etc.)
+  state       ChatbotState @default(GREETING)
+  language    String  @default("fr")
+  
+  // Historique des échanges pour l'IA
+  history     Json    @default("[]") // Messages échangés avec l'IA
+  
+  // Métriques
+  messagesCount Int @default(0)
+  resolved      Boolean @default(false)
+  handedOff     Boolean @default(false) // Transféré à un humain
+
+  @@unique([conversationId])
+  @@index([state])
+}
+
+enum AutoResponseCategory {
+  GREETING              // Salutation initiale
+  AVAILABILITY         // Questions sur disponibilité
+  PRICING              // Questions sur les prix
+  AMENITIES           // Questions sur les équipements
+  CHECK_IN_OUT        // Procédures d'arrivée/départ
+  LOCATION            // Questions sur l'emplacement
+  BOOKING_CONFIRM     // Confirmation de réservation
+  BOOKING_REMINDER    // Rappels
+  THANK_YOU           // Remerciements
+  FAQ                 // Questions fréquentes
+  OUT_OF_OFFICE       // Hors bureau
+  CUSTOM              // Personnalisé
+}
+
+enum AutoResponseTrigger {
+  NEW_CONVERSATION    // Nouvelle conversation
+  KEYWORD            // Mots-clés détectés
+  TIME_BASED         // Basé sur l'heure
+  NO_RESPONSE        // Pas de réponse après X temps
+  BOOKING_CREATED    // Réservation créée
+  BOOKING_UPCOMING   // Réservation proche
+  AFTER_STAY         // Après le séjour
+  MANUAL             // Déclenchement manuel
+}
+
+enum ChatbotState {
+  GREETING           // Salutation initiale
+  COLLECTING_INFO    // Collecte d'informations
+  CHECKING_AVAILABILITY // Vérification disponibilité
+  PROVIDING_INFO     // Fourniture d'informations
+  BOOKING_ASSIST     // Aide à la réservation
+  WAITING_HUMAN      // En attente d'un humain
+  RESOLVED           // Résolu
 }
 
 // ==================== INTÉGRATIONS ====================
@@ -932,4 +1280,184 @@ model PropertyAnalytics {
   @@unique([propertyId, date])
   @@index([propertyId])
   @@index([date])
+}
+
+// ==================== OPTIONS DE RÉSERVATION ====================
+
+model BookingOption {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Informations de base
+  name        Json    // Multilingue { fr: "Ménage quotidien", en: "Daily cleaning" }
+  description Json?   // Multilingue
+  category    OptionCategory
+  
+  // Configuration du prix
+  pricingType      OptionPricingType // PER_PERSON, PER_GROUP, FIXED
+  pricePerUnit     Float
+  pricingPeriod    OptionPricingPeriod // PER_DAY, PER_STAY
+  
+  // Règles
+  isMandatory      Boolean @default(false)
+  minQuantity      Int     @default(0)
+  maxQuantity      Int?    // null = illimité
+  
+  // Conditions d'application
+  minGuests        Int?    // Nombre minimum d'invités pour que l'option soit disponible
+  maxGuests        Int?    // Nombre maximum d'invités
+  minNights        Int?    // Nombre minimum de nuits
+  availableSeasons Json?   // Saisons où l'option est disponible
+  
+  // Statut
+  isActive         Boolean @default(true)
+  order            Int     @default(0) // Ordre d'affichage
+  
+  // Relations
+  properties       PropertyBookingOption[]
+  selectedOptions  BookingSelectedOption[]
+  
+  @@index([tenantId])
+  @@index([category])
+  @@index([isActive])
+}
+
+// Relation entre propriété et option
+model PropertyBookingOption {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  optionId String
+  option   BookingOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  
+  // Override des paramètres pour cette propriété
+  customPrice      Float?
+  customMinQuantity Int?
+  customMaxQuantity Int?
+  isEnabled        Boolean @default(true)
+  
+  @@unique([propertyId, optionId])
+  @@index([propertyId])
+  @@index([optionId])
+}
+
+// Options sélectionnées dans une réservation
+model BookingSelectedOption {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  optionId String
+  option   BookingOption @relation(fields: [optionId], references: [id])
+  
+  // Détails de la sélection
+  quantity    Int
+  unitPrice   Float    // Prix unitaire au moment de la réservation
+  totalPrice  Float    // Prix total (quantity * unitPrice * nights si applicable)
+  
+  // Snapshot des infos au moment de la réservation
+  optionName  String   // Nom dans la langue du client
+  pricingType String   // Type de tarification utilisé
+  
+  @@index([bookingId])
+  @@index([optionId])
+}
+
+enum OptionCategory {
+  CLEANING          // Services de ménage
+  CATERING         // Restauration, petit-déjeuner, etc.
+  TRANSPORT        // Navette, location véhicule
+  ACTIVITIES       // Activités et excursions
+  EQUIPMENT        // Location matériel (vélos, kayak, etc.)
+  WELLNESS         // Spa, massage, etc.
+  CHILDCARE        // Garde d'enfants, lit bébé
+  PET              // Services pour animaux
+  COMFORT          // Packs confort (draps premium, etc.)
+  OTHER            // Autres services
+}
+
+enum OptionPricingType {
+  PER_PERSON       // Prix par personne
+  PER_GROUP        // Prix pour le groupe entier
+  FIXED            // Prix fixe
+}
+
+enum OptionPricingPeriod {
+  PER_DAY          // Prix par jour
+  PER_STAY         // Prix pour tout le séjour
+}
+
+// ==================== CONFIGURATION AVANCÉE DES PAIEMENTS ====================
+
+model PaymentConfiguration {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenancy
+  tenantId String @unique
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Configuration de l'acompte
+  depositType      DepositType      // PERCENTAGE ou FIXED_AMOUNT
+  depositValue     Float            // Pourcentage (0-100) ou montant fixe
+  depositDueDate   DepositDueDate   // AT_BOOKING ou DAYS_BEFORE_CHECKIN
+  depositDueDays   Int?             // Nombre de jours avant check-in si applicable
+  
+  // Configuration de la taxe de séjour
+  touristTaxEnabled     Boolean @default(false)
+  touristTaxType        TouristTaxType? // PER_PERSON_PER_NIGHT, PERCENTAGE, etc.
+  touristTaxAdultPrice  Float?  // Prix par adulte
+  touristTaxChildPrice  Float?  // Prix par enfant
+  touristTaxChildAge    Int?    // Âge limite pour être considéré comme enfant
+  touristTaxPeriod      TouristTaxPeriod? // PER_NIGHT ou PER_STAY
+  touristTaxMaxNights   Int?    // Nombre max de nuits taxées
+  
+  // Frais de service
+  serviceFeeEnabled     Boolean @default(false)
+  serviceFeeType        FeeType? // PERCENTAGE ou FIXED_AMOUNT
+  serviceFeeValue       Float?
+  
+  // Règles de paiement
+  allowPartialPayment   Boolean @default(true)
+  balanceDueDays        Int     @default(7) // Solde dû X jours avant check-in
+  
+  @@index([tenantId])
+}
+
+enum DepositType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum DepositDueDate {
+  AT_BOOKING          // À la réservation
+  DAYS_BEFORE_CHECKIN // X jours avant l'arrivée
+}
+
+enum TouristTaxType {
+  PER_PERSON_PER_NIGHT
+  PERCENTAGE_OF_ACCOMMODATION
+  FIXED_PER_STAY
+  TIERED_BY_PROPERTY_TYPE
+}
+
+enum TouristTaxPeriod {
+  PER_NIGHT
+  PER_STAY
+}
+
+enum FeeType {
+  PERCENTAGE
+  FIXED_AMOUNT
 }

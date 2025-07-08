@@ -1,0 +1,446 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { bookingOptionsService } from '@/services/booking-options.service';
+
+const formSchema = z.object({
+  name: z.object({
+    fr: z.string().min(1, 'Le nom en français est requis'),
+    en: z.string().optional(),
+  }),
+  description: z.object({
+    fr: z.string().optional(),
+    en: z.string().optional(),
+  }),
+  category: z.enum([
+    'CLEANING',
+    'CATERING',
+    'TRANSPORT',
+    'ACTIVITIES',
+    'EQUIPMENT',
+    'WELLNESS',
+    'CHILDCARE',
+    'PET',
+    'COMFORT',
+    'OTHER',
+  ]),
+  pricingType: z.enum(['PER_PERSON', 'PER_GROUP', 'FIXED']),
+  pricePerUnit: z.coerce.number().positive('Le prix doit être positif'),
+  pricingPeriod: z.enum(['PER_DAY', 'PER_STAY']),
+  isMandatory: z.boolean().default(false),
+  minQuantity: z.coerce.number().int().min(0).default(0),
+  maxQuantity: z.coerce.number().int().positive().optional(),
+  minGuests: z.coerce.number().int().positive().optional(),
+  maxGuests: z.coerce.number().int().positive().optional(),
+  minNights: z.coerce.number().int().positive().optional(),
+  isActive: z.boolean().default(true),
+  order: z.coerce.number().int().default(0),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export default function NewBookingOptionPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: { fr: '', en: '' },
+      description: { fr: '', en: '' },
+      category: 'OTHER',
+      pricingType: 'FIXED',
+      pricingPeriod: 'PER_STAY',
+      isMandatory: false,
+      minQuantity: 0,
+      isActive: true,
+      order: 0,
+    },
+  });
+
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    try {
+      await bookingOptionsService.createOption(data);
+      toast({
+        title: 'Succès',
+        description: 'Option créée avec succès',
+      });
+      router.push('/admin/dashboard/booking-options');
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de créer l\'option',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Nouvelle option</h1>
+        <p className="text-muted-foreground mt-2">
+          Créez une nouvelle option de réservation
+        </p>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Informations générales</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <Tabs defaultValue="fr" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="fr">Français</TabsTrigger>
+                  <TabsTrigger value="en">English</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="fr" className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name.fr"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom (FR) *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Ménage quotidien" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="description.fr"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description (FR)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Description de l'option..."
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="en" className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name.en"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom (EN)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Ex: Daily cleaning" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="description.en"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description (EN)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Option description..."
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+              </Tabs>
+
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Catégorie</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez une catégorie" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="CLEANING">Ménage</SelectItem>
+                        <SelectItem value="CATERING">Restauration</SelectItem>
+                        <SelectItem value="TRANSPORT">Transport</SelectItem>
+                        <SelectItem value="ACTIVITIES">Activités</SelectItem>
+                        <SelectItem value="EQUIPMENT">Équipement</SelectItem>
+                        <SelectItem value="WELLNESS">Bien-être</SelectItem>
+                        <SelectItem value="CHILDCARE">Enfants</SelectItem>
+                        <SelectItem value="PET">Animaux</SelectItem>
+                        <SelectItem value="COMFORT">Confort</SelectItem>
+                        <SelectItem value="OTHER">Autre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Tarification</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="pricingType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type de tarification</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="PER_PERSON">Par personne</SelectItem>
+                          <SelectItem value="PER_GROUP">Par groupe</SelectItem>
+                          <SelectItem value="FIXED">Prix fixe</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="pricingPeriod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Période de facturation</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="PER_DAY">Par jour</SelectItem>
+                          <SelectItem value="PER_STAY">Par séjour</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="pricePerUnit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prix unitaire (€)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Prix de base avant application du type et de la période
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Règles et contraintes</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <FormField
+                control={form.control}
+                name="isMandatory"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Option obligatoire</FormLabel>
+                      <FormDescription>
+                        Les clients devront obligatoirement sélectionner cette option
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="minQuantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantité minimum</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="0" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="maxQuantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantité maximum</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="Illimité"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="minGuests"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre minimum d'invités</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="Aucun"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="minNights"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre minimum de nuits</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder="Aucun"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="isActive"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Option active</FormLabel>
+                      <FormDescription>
+                        L'option sera disponible pour les réservations
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/admin/dashboard/booking-options')}
+            >
+              Annuler
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Création...' : 'Créer l\'option'}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}

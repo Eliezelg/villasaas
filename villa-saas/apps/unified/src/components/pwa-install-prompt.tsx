@@ -1,0 +1,1 @@
+booking/pwa-install-prompt.tsx

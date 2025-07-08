@@ -8,6 +8,12 @@ const calculatePriceSchema = z.object({
   checkIn: z.string().datetime(),
   checkOut: z.string().datetime(),
   guests: z.number().int().positive(),
+  adults: z.number().int().positive().optional(),
+  children: z.number().int().min(0).optional(),
+  selectedOptions: z.array(z.object({
+    optionId: z.string(),
+    quantity: z.number().int().positive()
+  })).optional()
 });
 
 export async function pricingRoutes(fastify: FastifyInstance): Promise<void> {
@@ -25,6 +31,18 @@ export async function pricingRoutes(fastify: FastifyInstance): Promise<void> {
           checkIn: { type: 'string', format: 'date-time' },
           checkOut: { type: 'string', format: 'date-time' },
           guests: { type: 'integer', minimum: 1 },
+          adults: { type: 'integer', minimum: 1 },
+          children: { type: 'integer', minimum: 0 },
+          selectedOptions: { 
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                optionId: { type: 'string' },
+                quantity: { type: 'integer', minimum: 1 }
+              }
+            }
+          }
         },
       },
     },

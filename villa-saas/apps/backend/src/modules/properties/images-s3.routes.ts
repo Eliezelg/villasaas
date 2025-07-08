@@ -50,28 +50,86 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
       return reply.code(404).send({ error: 'Property not found' });
     }
 
-    // Gérer le multipart/form-data
-    const data = await request.file();
-    if (!data) {
-      return reply.code(400).send({ error: 'No file uploaded' });
+    let buffer: Buffer;
+    let mimeType: string;
+    let metadata: any = {};
+
+    // Vérifier le Content-Type pour déterminer comment traiter la requête
+    const contentType = request.headers['content-type'];
+    
+    if (contentType?.includes('multipart/form-data')) {
+      // Gérer le multipart/form-data
+      try {
+        const data = await request.file();
+        if (!data) {
+          return reply.code(400).send({ error: 'No file uploaded' });
+        }
+        buffer = await data.toBuffer();
+        mimeType = data.mimetype;
+        if (data.fields && data.fields.metadata) {
+          const metadataValue = data.fields.metadata;
+          if (typeof metadataValue === 'object' && metadataValue.value) {
+            // Fastify multipart retourne un objet avec une propriété 'value'
+            try {
+              metadata = JSON.parse(metadataValue.value);
+            } catch (e) {
+              metadata = {};
+            }
+          } else if (typeof metadataValue === 'string') {
+            try {
+              metadata = JSON.parse(metadataValue);
+            } catch (e) {
+              metadata = {};
+            }
+          }
+        }
+      } catch (multipartError) {
+        fastify.log.error('Multipart parsing error:', multipartError);
+        return reply.code(400).send({ error: 'Invalid multipart data' });
+      }
+    } else {
+      // Gérer le JSON avec base64
+      const { image, filename } = request.body as { image: string; filename: string };
+      
+      if (!image || !filename) {
+        return reply.code(400).send({ error: 'Image and filename are required' });
+      }
+
+      // Extraire le type MIME et les données base64
+      const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (!matches || matches.length !== 3) {
+        return reply.code(400).send({ error: 'Invalid base64 image format' });
+      }
+      
+      mimeType = matches[1];
+      const base64Data = matches[2];
+      buffer = Buffer.from(base64Data, 'base64');
     }
 
     try {
-      const buffer = await data.toBuffer();
-      const metadata = data.fields.metadata ? 
-        JSON.parse(data.fields.metadata as string) : {};
-
+      fastify.log.info(`Starting S3 upload for property ${propertyId}, mime: ${mimeType}, buffer size: ${buffer.length}`);
+      
       // Upload vers S3 avec génération des différentes tailles
-      const uploadResult = await s3Service.uploadImage(buffer, data.mimetype, {
+      const uploadResult = await s3Service.uploadImage(buffer, mimeType, {
         folder: `properties/${tenantId}/${propertyId}`,
       });
+      
+      fastify.log.info(`S3 upload successful: ${JSON.stringify(uploadResult)}`);
 
       // Obtenir l'ordre de la prochaine image
-      const lastImage = await fastify.prisma.propertyImage.findFirst({
+      const imageCount = await fastify.prisma.propertyImage.count({
+        where: { propertyId },
+      });
+      
+      // Obtenir le maximum actuel d'ordre pour éviter les conflits
+      const maxOrderImage = await fastify.prisma.propertyImage.findFirst({
         where: { propertyId },
         orderBy: { order: 'desc' },
+        select: { order: true },
       });
-      const nextOrder = (lastImage?.order || -1) + 1;
+      
+      // Utiliser le max + 1 ou le count si c'est plus grand (en cas de trous dans la séquence)
+      const nextOrder = Math.max((maxOrderImage?.order ?? -1) + 1, imageCount);
 
       // Sauvegarder en base de données
       const image = await fastify.prisma.propertyImage.create({
@@ -82,16 +140,19 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
           alt: metadata.alt || '',
           caption: metadata.caption,
           order: nextOrder,
-          isPrimary: nextOrder === 0,
+          isPrimary: imageCount === 0, // Première image est principale
         },
       });
 
       fastify.log.info(`Image uploaded for property ${propertyId}: ${uploadResult.key}`);
 
       return reply.send(image);
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.code(500).send({ error: 'Failed to upload image' });
+    } catch (error: any) {
+      fastify.log.error({ error, message: error?.message, stack: error?.stack }, 'S3 upload error');
+      return reply.code(500).send({ 
+        error: 'Failed to upload image',
+        message: error?.message || 'Unknown error'
+      });
     }
   });
 
