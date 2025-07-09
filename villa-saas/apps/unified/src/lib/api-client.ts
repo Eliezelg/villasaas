@@ -63,8 +63,13 @@ class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string) {
-    return this.request<T>(endpoint, { method: 'GET' });
+  async get<T>(endpoint: string, options?: { params?: Record<string, any> }) {
+    let url = endpoint;
+    if (options?.params) {
+      const queryString = new URLSearchParams(options.params).toString();
+      url = `${endpoint}?${queryString}`;
+    }
+    return this.request<T>(url, { method: 'GET' });
   }
 
   async post<T>(endpoint: string, body?: any) {

@@ -13,6 +13,14 @@ const createPaymentIntentSchema = z.object({
     guestEmail: z.string().email(),
     guestName: z.string(),
     tenantId: z.string(),
+    adults: z.number().optional(),
+    children: z.number().optional(),
+    infants: z.number().optional(),
+    pets: z.number().optional(),
+    selectedOptions: z.array(z.object({
+      optionId: z.string(),
+      quantity: z.number()
+    })).optional()
   }),
 });
 
@@ -70,9 +78,51 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
         return reply.code(404).send({ error: 'Property not found' });
       }
 
-      // Créer l'intention de paiement
+      // SÉCURITÉ: Calculer le montant côté serveur
+      const bookingService = new (await import('../bookings/booking.service')).BookingService(fastify.prisma);
+      
+      // Parser les dates
+      const checkIn = new Date(metadata.checkIn);
+      const checkOut = new Date(metadata.checkOut);
+      
+      // Extraire les informations des invités depuis les métadonnées
+      const guests = {
+        adults: metadata.adults || 2,
+        children: metadata.children || 0,
+        infants: metadata.infants || 0,
+        pets: metadata.pets || 0
+      };
+      
+      // Calculer le prix réel de la réservation
+      const priceCalculation = await bookingService.calculateBookingPrice(
+        metadata.propertyId,
+        checkIn,
+        checkOut,
+        guests,
+        metadata.selectedOptions
+      );
+      
+      // SÉCURITÉ: Vérifier que le montant envoyé correspond au montant calculé
+      const calculatedAmount = priceCalculation.total;
+      const tolerance = 0.01; // Tolérance de 1 centime pour les arrondis
+      
+      if (Math.abs(amount - calculatedAmount) > tolerance) {
+        fastify.log.error({
+          receivedAmount: amount,
+          calculatedAmount,
+          difference: Math.abs(amount - calculatedAmount)
+        }, 'Amount mismatch detected');
+        
+        return reply.code(400).send({ 
+          error: 'Invalid amount. Price verification failed.',
+          expected: calculatedAmount,
+          received: amount
+        });
+      }
+
+      // Créer l'intention de paiement avec le montant vérifié
       const paymentIntent = await fastify.stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Stripe utilise les centimes
+        amount: Math.round(calculatedAmount * 100), // Stripe utilise les centimes
         currency: currency.toLowerCase(),
         metadata: {
           ...metadata,
@@ -80,6 +130,16 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
           tenantName: tenant.name,
           propertyName: property.name,
           platform: 'villa-saas',
+          verifiedAmount: calculatedAmount.toString(),
+          priceBreakdown: JSON.stringify({
+            nights: priceCalculation.nights,
+            accommodationTotal: priceCalculation.accommodationTotal,
+            cleaningFee: priceCalculation.cleaningFee,
+            touristTax: priceCalculation.touristTax,
+            optionsTotal: priceCalculation.optionsTotal,
+            discountAmount: priceCalculation.discountAmount,
+            total: priceCalculation.total
+          })
         },
         // Pour Stripe Connect, on configurera plus tard le connected account
         // application_fee_amount: Math.round(amount * 0.1 * 100), // 10% commission
@@ -91,6 +151,7 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       return {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id,
+        verifiedAmount: calculatedAmount
       };
     } catch (error) {
       fastify.log.error(error);
@@ -198,6 +259,17 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       // Désactiver le parsing JSON car Stripe envoie du raw body
       rawBody: true,
     },
+    preValidation: async (request, reply) => {
+      // Capturer le raw body pour la validation de signature
+      const chunks = [];
+      request.raw.on('data', (chunk) => chunks.push(chunk));
+      await new Promise((resolve) => {
+        request.raw.on('end', () => {
+          request.rawBody = Buffer.concat(chunks).toString('utf8');
+          resolve(true);
+        });
+      });
+    },
     schema: {
       description: 'Webhook Stripe pour les événements de paiement',
       tags: ['public', 'payments'],
@@ -211,10 +283,15 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       return reply.code(500).send({ error: 'Webhook not configured' });
     }
 
+    if (!sig) {
+      fastify.log.error('Missing stripe-signature header');
+      return reply.code(400).send({ error: 'Missing signature' });
+    }
+
     let event: Stripe.Event;
 
     try {
-      // Vérifier la signature du webhook
+      // Vérifier la signature du webhook avec le raw body capturé
       event = fastify.stripe.webhooks.constructEvent(
         request.rawBody as string,
         sig,

@@ -146,7 +146,12 @@ export class S3Service {
    */
   private getPublicUrl(key: string): string {
     if (this.cdnDomain) {
-      return `https://${this.cdnDomain}/${key}`;
+      return `${this.cdnDomain}/${key}`;
+    }
+    // Pour R2, utiliser le domaine public par défaut
+    if (process.env.AWS_S3_ENDPOINT?.includes('r2.cloudflarestorage.com')) {
+      const accountId = process.env.AWS_S3_ENDPOINT.match(/https:\/\/([^.]+)/)?.[1];
+      return `https://pub-${accountId}.r2.dev/${key}`;
     }
     return `https://${this.bucketName}.s3.${process.env.AWS_REGION || 'eu-central-1'}.amazonaws.com/${key}`;
   }

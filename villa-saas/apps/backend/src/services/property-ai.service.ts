@@ -1,4 +1,5 @@
 import { Property } from '@villa-saas/database';
+import OpenAI from 'openai';
 
 export class PropertyAIService {
   /**
@@ -125,18 +126,31 @@ export class PropertyAIService {
   }
 
   /**
-   * Mock de génération d'embeddings (à remplacer par OpenAI)
+   * Génère un embedding vectoriel avec OpenAI
    */
   static async generateEmbedding(text: string): Promise<number[]> {
-    // TODO: Intégrer OpenAI text-embedding-3-small
-    // const response = await openai.embeddings.create({
-    //   model: "text-embedding-3-small",
-    //   input: text,
-    // });
-    // return response.data[0].embedding;
+    // Vérifier que la clé API est configurée
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('⚠️ OPENAI_API_KEY non configurée - embedding désactivé');
+      return [];
+    }
 
-    // Pour l'instant, retourne un vecteur vide
-    return [];
+    try {
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+      });
+
+      const response = await openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: text,
+      });
+
+      return response.data[0].embedding;
+    } catch (error) {
+      console.error('❌ Erreur génération embedding:', error);
+      // Retourner un vecteur vide en cas d'erreur pour ne pas bloquer
+      return [];
+    }
   }
 
   // Traductions des clés

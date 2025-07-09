@@ -71,8 +71,34 @@ export class AuthService {
     };
   }
 
-  async login(data: LoginDto) {
+  async login(data: LoginDto, ipAddress?: string) {
     const { email, password } = data;
+
+    // Protection contre le brute force
+    if (ipAddress && this.fastify.redis) {
+      const attemptsKey = `login_attempts:${email}:${ipAddress}`;
+      const attempts = await this.fastify.redis.incr(attemptsKey);
+      
+      if (attempts === 1) {
+        // Définir l'expiration sur la première tentative
+        await this.fastify.redis.expire(attemptsKey, 900); // 15 minutes
+      }
+      
+      if (attempts > 5) {
+        // Log de sécurité
+        await this.fastify.prisma.auditLog.create({
+          data: {
+            action: 'auth.login.blocked',
+            entity: 'user',
+            details: { email, ip: ipAddress, attempts },
+            ip: ipAddress,
+            tenantId: 'system', // Log système
+          }
+        });
+        
+        throw new Error('Too many failed attempts. Please try again later.');
+      }
+    }
 
     // Trouver l'utilisateur avec son tenant
     const user = await this.fastify.prisma.user.findFirst({
@@ -81,18 +107,57 @@ export class AuthService {
     });
 
     if (!user) {
+      // Log d'échec de connexion
+      if (ipAddress) {
+        await this.fastify.prisma.auditLog.create({
+          data: {
+            action: 'auth.login.failed',
+            entity: 'user',
+            details: { email, reason: 'user_not_found' },
+            ip: ipAddress,
+            tenantId: 'system',
+          }
+        });
+      }
       throw new Error('Invalid credentials');
     }
 
     // Vérifier le mot de passe
     const isValid = await verifyPassword(user.passwordHash, password);
     if (!isValid) {
+      // Log d'échec de connexion
+      await this.fastify.prisma.auditLog.create({
+        data: {
+          action: 'auth.login.failed',
+          entity: 'user',
+          entityId: user.id,
+          details: { email, reason: 'invalid_password' },
+          ip: ipAddress,
+          tenantId: user.tenantId,
+        }
+      });
       throw new Error('Invalid credentials');
     }
 
     // Vérifier que le compte est actif
     if (!user.isActive || !user.tenant.isActive) {
+      await this.fastify.prisma.auditLog.create({
+        data: {
+          action: 'auth.login.failed',
+          entity: 'user',
+          entityId: user.id,
+          details: { email, reason: 'account_disabled' },
+          ip: ipAddress,
+          tenantId: user.tenantId,
+        }
+      });
       throw new Error('Account is disabled');
+    }
+
+    // Réinitialiser les tentatives de connexion en cas de succès
+    if (ipAddress && this.fastify.redis) {
+      const attemptsKey = `login_attempts:${email}:${ipAddress}`;
+      await this.fastify.redis.del(attemptsKey);
     }
 
     // Générer les tokens
@@ -104,7 +169,22 @@ export class AuthService {
         userId: user.id,
         token: tokens.accessToken,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
+        lastActivity: new Date(),
+        ip: ipAddress,
       },
+    });
+
+    // Log de connexion réussie
+    await this.fastify.prisma.auditLog.create({
+      data: {
+        action: 'auth.login.success',
+        entity: 'user',
+        entityId: user.id,
+        details: { email },
+        ip: ipAddress,
+        tenantId: user.tenantId,
+        userId: user.id,
+      }
     });
 
     return {
@@ -136,21 +216,63 @@ export class AuthService {
     });
 
     if (!storedToken || storedToken.expiresAt < new Date()) {
+      // Log de sécurité pour token invalide
+      await this.fastify.prisma.auditLog.create({
+        data: {
+          action: 'auth.refresh.failed',
+          entity: 'refresh_token',
+          details: { reason: !storedToken ? 'token_not_found' : 'token_expired' },
+          tenantId: 'system',
+        }
+      });
       throw new Error('Invalid refresh token');
     }
 
-    // Supprimer l'ancien refresh token
-    try {
-      await this.fastify.prisma.refreshToken.delete({
-        where: { id: storedToken.id },
+    // Vérifier si le token a déjà été utilisé (protection contre le replay)
+    if (storedToken.usedAt) {
+      // Token déjà utilisé - potentielle attaque
+      await this.fastify.prisma.auditLog.create({
+        data: {
+          action: 'auth.refresh.replay_attack',
+          entity: 'refresh_token',
+          entityId: storedToken.id,
+          userId: storedToken.userId,
+          tenantId: storedToken.user.tenantId,
+          details: { 
+            tokenId: storedToken.id,
+            usedAt: storedToken.usedAt,
+            attemptedAt: new Date()
+          },
+        }
       });
-    } catch (error) {
-      // Le token a peut-être déjà été supprimé par une requête concurrente
-      this.fastify.log.warn('Refresh token already deleted or not found');
+      
+      // Révoquer tous les refresh tokens de l'utilisateur par sécurité
+      await this.fastify.prisma.refreshToken.deleteMany({
+        where: { userId: storedToken.userId }
+      });
+      
+      throw new Error('Token already used - security violation');
     }
+
+    // Marquer le token comme utilisé (rotation)
+    await this.fastify.prisma.refreshToken.update({
+      where: { id: storedToken.id },
+      data: { usedAt: new Date() }
+    });
 
     // Générer de nouveaux tokens
     const tokens = await this.generateTokens(storedToken.user);
+
+    // Log de succès
+    await this.fastify.prisma.auditLog.create({
+      data: {
+        action: 'auth.refresh.success',
+        entity: 'refresh_token',
+        entityId: storedToken.id,
+        userId: storedToken.userId,
+        tenantId: storedToken.user.tenantId,
+      }
+    });
 
     return tokens;
   }

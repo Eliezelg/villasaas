@@ -5,6 +5,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { getTenantId } from '@villa-saas/utils';
 import { optimizeImage, deleteImageVariants } from '../../utils/image-optimizer';
+import { validateFileUpload, sanitizeFilename, generateSecureFilename } from '../../utils/file-validator';
 
 const uploadDir = path.join(process.cwd(), 'uploads', 'properties');
 
@@ -65,14 +66,28 @@ export async function propertyImageRoutes(fastify: FastifyInstance): Promise<voi
     }
 
     // Extract base64 data
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+    const base64Match = image.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
+    if (!base64Match) {
+      reply.status(400).send({ error: 'Invalid image format' });
+      return;
+    }
+
+    const declaredMimeType = base64Match[1];
+    const base64Data = base64Match[2];
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // Generate unique filename
-    const ext = path.extname(filename);
-    const baseName = `${propertyId}_${crypto.randomBytes(8).toString('hex')}`;
-    const tempFilename = `${baseName}${ext}`;
-    const tempPath = path.join(uploadDir, tempFilename);
+    // Validate file before processing
+    const validationResult = await validateFileUpload(buffer, filename, declaredMimeType);
+    if (!validationResult.valid) {
+      reply.status(400).send({ error: validationResult.error });
+      return;
+    }
+
+    // Generate secure filename
+    const sanitizedFilename = sanitizeFilename(filename);
+    const secureFilename = generateSecureFilename(sanitizedFilename, propertyId);
+    const baseName = path.basename(secureFilename, path.extname(secureFilename));
+    const tempPath = path.join(uploadDir, secureFilename);
 
     // Save temporary file
     await fs.writeFile(tempPath, buffer);

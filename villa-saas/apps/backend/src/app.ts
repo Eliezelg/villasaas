@@ -45,14 +45,22 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // Core plugins
   await app.register(cors, {
     origin: (origin, cb) => {
-      // Permettre les requêtes depuis localhost avec n'importe quel port et sous-domaine
-      const allowedOrigins = [
+      // Configuration pour le développement
+      const devOrigins = [
         'http://localhost:3000',
         'http://localhost:3002',
         /^http:\/\/[a-zA-Z0-9-]+\.localhost:3000$/,  // Sous-domaines de localhost:3000 (app unifiée)
         /^http:\/\/[a-zA-Z0-9-]+\.localhost:3002$/,  // Sous-domaines de localhost:3002
         /^http:\/\/localhost:\d+$/,  // N'importe quel port localhost
       ];
+      
+      // Configuration pour la production
+      const prodOrigins = process.env.NODE_ENV === 'production' ? [
+        process.env.FRONTEND_URL,
+        ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || [])
+      ].filter(Boolean) : [];
+      
+      const allowedOrigins = [...devOrigins, ...prodOrigins];
       
       // Si pas d'origine (ex: Postman), permettre
       if (!origin) {
@@ -71,6 +79,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       if (isAllowed) {
         cb(null, true);
       } else {
+        app.log.warn(`CORS blocked origin: ${origin}`);
         cb(new Error('Not allowed by CORS'));
       }
     },
@@ -78,7 +87,37 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   });
 
   await app.register(helmet, {
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://js.stripe.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        imgSrc: ["'self'", "data:", "https:", "blob:", process.env.AWS_CDN_DOMAIN || ""].filter(Boolean),
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        connectSrc: ["'self'", "https://api.stripe.com", "wss:", process.env.FRONTEND_URL || ""].filter(Boolean),
+        frameAncestors: ["'none'"],
+        frameSrc: ["https://js.stripe.com", "https://hooks.stripe.com"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+      }
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    },
+    crossOriginEmbedderPolicy: process.env.NODE_ENV === 'production',
+    crossOriginOpenerPolicy: true,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    originAgentCluster: true,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    permittedCrossDomainPolicies: false,
+    dnsPrefetchControl: true,
+    frameguard: { action: 'deny' },
+    hidePoweredBy: true,
+    ieNoOpen: true,
+    noSniff: true,
+    xssFilter: true
   });
 
   await app.register(rateLimit, {

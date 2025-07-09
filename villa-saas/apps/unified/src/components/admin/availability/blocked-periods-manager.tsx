@@ -104,15 +104,22 @@ export function BlockedPeriodsManager({ propertyId, onUpdate }: BlockedPeriodsMa
 
   const handleSubmit = async (data: BlockedPeriodFormData) => {
     try {
+      // Convertir les dates au format ISO 8601 avec l'heure
+      const formattedData = {
+        ...data,
+        startDate: new Date(data.startDate).toISOString(),
+        endDate: new Date(data.endDate).toISOString()
+      };
+
       if (editingPeriod) {
-        await availabilityService.updateBlockedPeriod(editingPeriod.id, data);
+        await availabilityService.updateBlockedPeriod(editingPeriod.id, formattedData);
         toast({
           title: 'Succès',
           description: 'Période bloquée mise à jour'
         });
       } else {
         await availabilityService.createBlockedPeriod({
-          ...data,
+          ...formattedData,
           propertyId
         });
         toast({

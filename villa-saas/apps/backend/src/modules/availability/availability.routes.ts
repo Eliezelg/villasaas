@@ -5,7 +5,7 @@ import icalRoutes from './ical.routes';
 
 // Schémas de validation Zod pour les validations manuelles
 const blockedPeriodSchema = z.object({
-  propertyId: z.string().cuid(),
+  propertyId: z.string().min(1),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
   reason: z.string().optional(),
@@ -20,10 +20,10 @@ const updateBlockedPeriodSchema = z.object({
 });
 
 const checkAvailabilitySchema = z.object({
-  propertyId: z.string().cuid(),
+  propertyId: z.string().min(1),
   checkIn: z.string().datetime(),
   checkOut: z.string().datetime(),
-  excludeBookingId: z.string().cuid().optional()
+  excludeBookingId: z.string().min(1).optional()
 });
 
 export default async function availabilityRoutes(fastify: FastifyInstance) {
