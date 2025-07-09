@@ -24,7 +24,8 @@ export const publicPromoCodesRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(400).send({ error: validation.error })
     }
 
-    const tenantSubdomain = request.headers['x-tenant'] as string
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' })

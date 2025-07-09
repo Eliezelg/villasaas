@@ -190,7 +190,7 @@ export async function propertyRoutes(fastify: FastifyInstance): Promise<void> {
     }
   });
 
-  // Update property
+  // Update property (PATCH - partial update)
   fastify.patch('/:id', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
@@ -204,6 +204,31 @@ export async function propertyRoutes(fastify: FastifyInstance): Promise<void> {
         tenantId,
       },
       data,
+    });
+
+    reply.send(property);
+  });
+
+  // Update property (PUT - full update)
+  fastify.put('/:id', {
+    preHandler: [fastify.authenticate],
+  }, async (request, reply) => {
+    const tenantId = getTenantId(request);
+    const { id } = request.params as { id: string };
+    const data = request.body as any;
+
+    // For PUT, we should validate the full schema
+    const validation = createPropertySchema.partial().safeParse(data);
+    if (!validation.success) {
+      return reply.code(400).send({ error: validation.error });
+    }
+
+    const property = await fastify.prisma.property.update({
+      where: {
+        id,
+        tenantId,
+      },
+      data: validation.data,
     });
 
     reply.send(property);

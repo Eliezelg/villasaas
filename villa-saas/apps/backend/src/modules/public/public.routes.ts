@@ -219,7 +219,9 @@ export async function publicRoutes(fastify: FastifyInstance) {
       min: validation.data['priceRange[min]'],
       max: validation.data['priceRange[max]'],
     };
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });
@@ -365,7 +367,9 @@ export async function publicRoutes(fastify: FastifyInstance) {
     }
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });
@@ -424,7 +428,9 @@ export async function publicRoutes(fastify: FastifyInstance) {
     }
 
     const { propertyId, checkIn, checkOut, guests } = validation.data;
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });
@@ -481,7 +487,8 @@ export async function publicRoutes(fastify: FastifyInstance) {
       endDate: string;
     };
 
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });
@@ -588,7 +595,9 @@ export async function publicRoutes(fastify: FastifyInstance) {
     }
 
     const data = validation.data;
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });
@@ -741,7 +750,9 @@ export async function publicRoutes(fastify: FastifyInstance) {
     }
   }, async (request, reply) => {
     const { paymentIntentId } = request.params as { paymentIntentId: string };
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });
@@ -969,7 +980,8 @@ export async function publicRoutes(fastify: FastifyInstance) {
       endDate: string;
     };
     
-    const tenantSubdomain = request.headers['x-tenant'] as string;
+    // Check for tenant in header or query params
+    const tenantSubdomain = (request.headers['x-tenant'] as string) || (request.query as any).tenantId;
     
     if (!tenantSubdomain) {
       return reply.code(400).send({ error: 'Tenant not specified' });

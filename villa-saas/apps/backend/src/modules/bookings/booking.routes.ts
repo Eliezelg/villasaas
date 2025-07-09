@@ -446,6 +446,58 @@ export async function bookingRoutes(fastify: FastifyInstance) {
     }
   );
 
+  // Update booking status
+  fastify.patch<{
+    Params: { id: string },
+    Body: { status: string }
+  }>(
+    '/bookings/:id/status',
+    {
+      preHandler: [fastify.authenticate],
+      schema: {
+        description: 'Update booking status',
+        tags: ['bookings'],
+      }
+    },
+    async (request, reply) => {
+      const tenantId = getTenantId(request);
+      const { id } = request.params;
+      const { status } = request.body;
+
+      // Validate status
+      const validStatuses = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED', 'NO_SHOW'];
+      if (!validStatuses.includes(status)) {
+        return reply.code(400).send({ error: 'Invalid status' });
+      }
+
+      const booking = await fastify.prisma.booking.findFirst({
+        where: { id, tenantId }
+      });
+
+      if (!booking) {
+        return reply.code(404).send({ error: 'Booking not found' });
+      }
+
+      const updated = await fastify.prisma.booking.update({
+        where: { id },
+        data: { status },
+        include: {
+          property: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              city: true,
+              images: { select: { id: true, url: true, order: true } }
+            }
+          }
+        }
+      });
+
+      return reply.send(updated);
+    }
+  );
+
   // Confirmer une réservation
   fastify.post<{
     Params: { id: string }

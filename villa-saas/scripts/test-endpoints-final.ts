@@ -26,6 +26,7 @@ class FinalEndpointTester {
   private apiClient: AxiosInstance;
   private results: TestResult[] = [];
   private tenantId: string = '';
+  private tenantSubdomain: string = '';
   private userId: string = '';
   private cookies: string = '';
   private propertyId: string = '';
@@ -172,7 +173,8 @@ class FinalEndpointTester {
       });
 
       this.tenantId = tenant.id;
-      console.log(`✨ Created test tenant: ${this.tenantId}`);
+      this.tenantSubdomain = tenant.subdomain;
+      console.log(`✨ Created test tenant: ${this.tenantId} (${this.tenantSubdomain})`);
     } catch (error) {
       console.error('Failed to create test tenant:', error);
       throw error;
@@ -601,12 +603,12 @@ class FinalEndpointTester {
   private async testPublicEndpoints() {
     console.log('\n🌐 Testing Public Endpoints...');
 
-    // Public property search - need to add tenant headers
-    await this.testEndpoint('GET', `/api/public/properties?tenantId=${this.tenantId}`, {}, false);
+    // Public property search - use subdomain
+    await this.testEndpoint('GET', `/api/public/properties?tenantId=${this.tenantSubdomain}`, {}, false);
     
     // Public property details
     if (this.propertyId) {
-      await this.testEndpoint('GET', `/api/public/properties/${this.propertyId}?tenantId=${this.tenantId}`, {}, false);
+      await this.testEndpoint('GET', `/api/public/properties/${this.propertyId}?tenantId=${this.tenantSubdomain}`, {}, false);
     }
     
     // Public pricing calculation
@@ -614,8 +616,9 @@ class FinalEndpointTester {
       propertyId: this.propertyId,
       checkIn: '2025-06-01T00:00:00.000Z',
       checkOut: '2025-06-08T00:00:00.000Z',
-      guests: 4,
-      tenantId: this.tenantId,
+      adults: 2,
+      children: 2,
+      tenantId: this.tenantSubdomain,
     }, false);
   }
 
@@ -645,7 +648,7 @@ class FinalEndpointTester {
       await this.testEndpoint('POST', '/api/public/promo-codes/validate', {
         code: 'SUMMER2025',
         bookingTotal: 1000,
-        tenantId: this.tenantId,
+        tenantId: this.tenantSubdomain,
       }, false);
       
       // Delete promo code
