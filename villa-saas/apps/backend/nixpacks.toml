@@ -4,7 +4,8 @@ nixPkgs = ["nodejs_20"]
 
 [phases.install]
 dependsOn = ["setup"]
-cmds = ["npm ci --production=false"]
+# Utiliser npm install au lieu de npm ci car pas de package-lock.json local
+cmds = ["npm install --production=false"]
 
 [phases.build]
 dependsOn = ["install"]
