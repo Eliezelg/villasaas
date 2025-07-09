@@ -1,0 +1,17 @@
+# Configuration Nixpacks pour le backend
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = ["npm ci --production=false"]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"
+
+[variables]
+NODE_ENV = "production"
