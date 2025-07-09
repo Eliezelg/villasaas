@@ -12,6 +12,9 @@ export interface ApiResponse<T> {
 }
 
 class ApiClient {
+  private isRefreshing = false;
+  private refreshPromise: Promise<boolean> | null = null;
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -26,11 +29,34 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      let response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers,
         credentials: 'include', // IMPORTANT: Inclure les cookies dans les requêtes
       });
+
+      // If 401 and not already refreshing, try to refresh token
+      if (response.status === 401 && !this.isRefreshing && endpoint !== '/api/auth/refresh') {
+        this.isRefreshing = true;
+        
+        // If there's no refresh promise, create one
+        if (!this.refreshPromise) {
+          this.refreshPromise = this.refreshToken();
+        }
+        
+        const refreshSuccess = await this.refreshPromise;
+        this.isRefreshing = false;
+        this.refreshPromise = null;
+        
+        if (refreshSuccess) {
+          // Retry the original request
+          response = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers,
+            credentials: 'include',
+          });
+        }
+      }
 
       // Handle 204 No Content response
       if (response.status === 204) {
@@ -51,6 +77,22 @@ class ApiClient {
           message: error instanceof Error ? error.message : 'An error occurred',
         },
       };
+    }
+  }
+
+  private async refreshToken(): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.ok;
+    } catch {
+      return false;
     }
   }
 

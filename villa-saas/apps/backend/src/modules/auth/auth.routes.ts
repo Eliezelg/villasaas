@@ -58,7 +58,32 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       // Valider avec Zod pour une validation plus stricte
       const validatedData = registerSchema.parse(request.body);
       const result = await authService.register(validatedData);
-      reply.status(201).send(result);
+      
+      // Définir les cookies sécurisés pour les tokens
+      const isProduction = process.env.NODE_ENV === 'production';
+      
+      reply.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        path: '/',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      });
+      
+      reply.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      });
+      
+      // Ne pas envoyer les tokens dans la réponse JSON
+      const { accessToken, refreshToken, ...responseData } = result;
+      reply.status(201).send({
+        ...responseData,
+        message: 'Registration successful'
+      });
     } catch (error: any) {
       if (error.message === 'Email already registered') {
         reply.status(409).send({ error: 'Email already registered' });
@@ -119,7 +144,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: 'strict',
+        sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
         path: '/',
         maxAge: 15 * 60 * 1000, // 15 minutes en millisecondes
       });
@@ -127,7 +152,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: 'strict',
+        sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours en millisecondes
       });
@@ -152,13 +177,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   // Refresh token
   fastify.post('/refresh', {
     schema: {
-      body: {
-        type: 'object',
-        required: ['refreshToken'],
-        properties: {
-          refreshToken: { type: 'string' },
-        },
-      },
       response: {
         200: {
           type: 'object',
@@ -172,9 +190,39 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
   }, async (request, reply) => {
     try {
-      const body = request.body as { refreshToken: string };
-      const result = await authService.refreshToken(body.refreshToken);
-      reply.send(result);
+      // Récupérer le refresh token depuis le cookie
+      const refreshToken = request.cookies?.refresh_token;
+      
+      if (!refreshToken) {
+        return reply.status(401).send({ error: 'No refresh token provided' });
+      }
+      
+      const result = await authService.refreshToken(refreshToken);
+      
+      // Définir les nouveaux cookies
+      const isProduction = process.env.NODE_ENV === 'production';
+      
+      reply.cookie('access_token', result.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        path: '/',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      });
+      
+      reply.cookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+      });
+      
+      // Ne pas envoyer les tokens dans la réponse JSON
+      reply.send({
+        expiresIn: result.expiresIn,
+        message: 'Token refreshed successfully'
+      });
     } catch (error: any) {
       reply.status(401).send({ error: 'Invalid refresh token' });
     }
@@ -185,6 +233,11 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     await authService.logout(request.user!.userId);
+    
+    // Supprimer les cookies
+    reply.clearCookie('access_token', { path: '/' });
+    reply.clearCookie('refresh_token', { path: '/' });
+    
     reply.send({ message: 'Logged out successfully' });
   });
 

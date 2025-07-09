@@ -46,7 +46,7 @@ const formSchema = z.object({
     'TIERED_BY_PROPERTY_TYPE'
   ]).optional(),
   touristTaxAdultPrice: z.coerce.number().positive().optional(),
-  touristTaxChildPrice: z.coerce.number().positive().optional(),
+  touristTaxChildPrice: z.coerce.number().min(0, 'La valeur doit être positive ou nulle').optional(),
   touristTaxChildAge: z.coerce.number().int().positive().optional(),
   touristTaxPeriod: z.enum(['PER_NIGHT', 'PER_STAY']).optional(),
   touristTaxMaxNights: z.coerce.number().int().positive().optional(),
@@ -97,14 +97,14 @@ export default function PaymentConfigurationPage() {
           depositDueDays: data.depositDueDays || undefined,
           touristTaxEnabled: data.touristTaxEnabled,
           touristTaxType: data.touristTaxType || undefined,
-          touristTaxAdultPrice: data.touristTaxAdultPrice || undefined,
-          touristTaxChildPrice: data.touristTaxChildPrice || undefined,
-          touristTaxChildAge: data.touristTaxChildAge || undefined,
-          touristTaxPeriod: data.touristTaxPeriod || undefined,
-          touristTaxMaxNights: data.touristTaxMaxNights || undefined,
+          touristTaxAdultPrice: data.touristTaxAdultPrice ?? undefined,
+          touristTaxChildPrice: data.touristTaxChildPrice ?? undefined,
+          touristTaxChildAge: data.touristTaxChildAge ?? undefined,
+          touristTaxPeriod: data.touristTaxPeriod ?? undefined,
+          touristTaxMaxNights: data.touristTaxMaxNights ?? undefined,
           serviceFeeEnabled: data.serviceFeeEnabled,
           serviceFeeType: data.serviceFeeType || undefined,
-          serviceFeeValue: data.serviceFeeValue || undefined,
+          serviceFeeValue: data.serviceFeeValue ?? undefined,
           allowPartialPayment: data.allowPartialPayment,
           balanceDueDays: data.balanceDueDays,
         });
@@ -351,7 +351,7 @@ export default function PaymentConfigurationPage() {
                             <FormItem>
                               <FormLabel>Prix par enfant (€)</FormLabel>
                               <FormControl>
-                                <Input type="number" step="0.01" {...field} />
+                                <Input type="number" step="0.01" min="0" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

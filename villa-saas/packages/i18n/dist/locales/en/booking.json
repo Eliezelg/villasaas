@@ -14,6 +14,8 @@
         "results": "{count} properties found",
         "noResults": "No properties found",
         "tryDifferent": "Try modifying your search criteria",
+        "noProperties": "No properties available",
+        "contactOwner": "Please contact the owner for more information.",
         "sortBy": "Sort by",
         "sortOptions": {
             "relevance": "Relevance",

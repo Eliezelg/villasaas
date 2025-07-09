@@ -14,6 +14,8 @@
         "results": "{count} propriétés trouvées",
         "noResults": "Aucune propriété trouvée",
         "tryDifferent": "Essayez de modifier vos critères de recherche",
+        "noProperties": "Aucune propriété disponible",
+        "contactOwner": "Veuillez contacter le propriétaire pour plus d'informations.",
         "sortBy": "Trier par",
         "sortOptions": {
             "relevance": "Pertinence",

@@ -76,6 +76,8 @@ export declare const messages: {
                 results: string;
                 noResults: string;
                 tryDifferent: string;
+                noProperties: string;
+                contactOwner: string;
                 sortBy: string;
                 sortOptions: {
                     relevance: string;
@@ -441,6 +443,8 @@ export declare const messages: {
                 results: string;
                 noResults: string;
                 tryDifferent: string;
+                noProperties: string;
+                contactOwner: string;
                 sortBy: string;
                 sortOptions: {
                     relevance: string;

@@ -150,14 +150,6 @@ export function PropertyOptionsManager({ propertyId }: PropertyOptionsManagerPro
             </CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push('/admin/dashboard/payment-configuration')}
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Configuration des paiements
-            </Button>
             <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">

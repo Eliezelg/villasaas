@@ -35,6 +35,7 @@ const tabs = [
   { value: 'pricing', label: 'Tarification', href: '/pricing' },
   { value: 'availability', label: 'Disponibilités', href: '/availability' },
   { value: 'options', label: 'Options', href: '/options' },
+  { value: 'payments', label: 'Paiements', href: '/payments' },
   { value: 'content', label: 'Contenu', href: '/content' },
 ];
 
