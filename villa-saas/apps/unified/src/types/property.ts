@@ -48,6 +48,12 @@ export interface Property {
     bookings: number;
     images: number;
   };
+  // Content fields
+  customPages?: Record<string, boolean>;
+  activitiesContent?: any;
+  locationContent?: any;
+  roomsContent?: any;
+  servicesContent?: any;
 }
 
 export interface PropertyImage {
@@ -89,4 +95,9 @@ export interface CreatePropertyData {
 
 export interface UpdatePropertyData extends Partial<CreatePropertyData> {
   status?: PropertyStatus;
+  customPages?: Record<string, boolean>;
+  activitiesContent?: any;
+  locationContent?: any;
+  roomsContent?: any;
+  servicesContent?: any;
 }

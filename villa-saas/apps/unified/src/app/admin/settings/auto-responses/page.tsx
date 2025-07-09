@@ -62,8 +62,8 @@ export default function AutoResponsesPage() {
         messagingService.getAutoResponseRules(),
       ]);
       
-      setTemplates(templatesRes.data || []);
-      setRules(rulesRes.data || []);
+      setTemplates(Array.isArray(templatesRes.data) ? templatesRes.data : []);
+      setRules(Array.isArray(rulesRes.data) ? rulesRes.data : []);
     } catch (error) {
       toast.error('Erreur lors du chargement des données');
     } finally {
@@ -355,7 +355,7 @@ export default function AutoResponsesPage() {
         open={showRuleDialog}
         onOpenChange={setShowRuleDialog}
         rule={editingRule}
-        onSave={(data) => {
+        onSave={(data: any) => {
           // TODO: Implement save rule
           setShowRuleDialog(false);
         }}

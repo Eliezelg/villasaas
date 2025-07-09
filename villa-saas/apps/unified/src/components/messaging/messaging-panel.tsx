@@ -167,7 +167,7 @@ export function MessagingPanel({ propertyId, className, defaultOpen = false }: M
           {!selectedConversation ? (
             <ConversationsList
               onSelectConversation={handleSelectConversation}
-              selectedConversationId={selectedConversation?.id}
+              selectedConversationId={undefined}
               currentUserId={user?.id}
               propertyId={propertyId}
             />

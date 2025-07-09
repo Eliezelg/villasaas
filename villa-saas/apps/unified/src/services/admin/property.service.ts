@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import type { Property } from '@villa-saas/types';
+import type { Property } from '@villa-saas/database';
 
 export interface PropertyResponse {
   properties: Property[];
@@ -24,21 +24,46 @@ class PropertyService {
     const response = await apiClient.get<PropertyResponse>(
       `/properties?${queryParams.toString()}`
     );
+    
+    if (!response.data) {
+      return {
+        properties: [],
+        total: 0,
+        page: 1,
+        totalPages: 0
+      };
+    }
+    
     return response.data;
   }
 
   async getById(id: string): Promise<Property> {
     const response = await apiClient.get<Property>(`/properties/${id}`);
+    
+    if (!response.data) {
+      throw new Error('Property not found');
+    }
+    
     return response.data;
   }
 
   async create(data: any): Promise<Property> {
     const response = await apiClient.post<Property>('/properties', data);
+    
+    if (!response.data) {
+      throw new Error('Failed to create property');
+    }
+    
     return response.data;
   }
 
   async update(id: string, data: any): Promise<Property> {
     const response = await apiClient.put<Property>(`/properties/${id}`, data);
+    
+    if (!response.data) {
+      throw new Error('Failed to update property');
+    }
+    
     return response.data;
   }
 
@@ -48,6 +73,11 @@ class PropertyService {
 
   async updateStatus(id: string, status: string): Promise<Property> {
     const response = await apiClient.patch<Property>(`/properties/${id}/status`, { status });
+    
+    if (!response.data) {
+      throw new Error('Failed to update property status');
+    }
+    
     return response.data;
   }
 }

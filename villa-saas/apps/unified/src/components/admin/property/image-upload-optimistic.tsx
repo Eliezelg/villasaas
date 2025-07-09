@@ -21,7 +21,7 @@ export function ImageUpload({ propertyId, images: initialImages, onImagesChange 
     ...img,
     propertyId,
     createdAt: new Date().toISOString(),
-    urls: img.urls || undefined,
+    // Remove urls as it doesn't exist in PropertyImage type
   });
 
   const [images, setImages] = useState<PropertyImage[]>(

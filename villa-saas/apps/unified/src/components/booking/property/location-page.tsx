@@ -136,9 +136,9 @@ export function LocationPage({ property, locale }: LocationPageProps) {
         <div>
           <h2 className="text-2xl font-semibold mb-6">À proximité</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {property.locationContent?.nearbyPlaces?.length > 0 ? (
+            {property.locationContent?.nearbyPlaces && property.locationContent.nearbyPlaces.length > 0 ? (
               // Use custom nearby places
-              property.locationContent.nearbyPlaces.map((place, index) => {
+              property.locationContent.nearbyPlaces.map((place: any, index: number) => {
                 const displayDistance = place.distance >= 1000 
                   ? `${(place.distance / 1000).toFixed(1)} km`
                   : `${place.distance} m`

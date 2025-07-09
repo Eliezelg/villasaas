@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { getTenantId } from '@villa-saas/utils';
-import * as ical from 'ical-generator';
-import { parse as parseIcal } from 'ical';
+import ical from 'ical-generator';
+import * as icalParser from 'ical';
 
 export default async function icalRoutes(fastify: FastifyInstance) {
   // Exporter le calendrier iCal
@@ -61,16 +61,14 @@ export default async function icalRoutes(fastify: FastifyInstance) {
 
       // Ajouter les réservations au calendrier
       for (const booking of bookings) {
-        calendar.createEvent({
+        const event = calendar.createEvent({
           start: booking.checkIn,
           end: booking.checkOut,
           summary: `Réservation ${booking.reference}`,
           description: `${booking.guestFirstName} ${booking.guestLastName} - ${booking.adults + booking.children} personnes`,
-          location: `${property.address}, ${property.city}`,
-          status: booking.status === 'CONFIRMED' ? 'CONFIRMED' : 'TENTATIVE',
-          busystatus: 'BUSY',
-          uid: booking.id
+          location: `${property.address}, ${property.city}`
         });
+        event.uid(booking.id);
       }
 
       // Récupérer les périodes bloquées
@@ -81,15 +79,13 @@ export default async function icalRoutes(fastify: FastifyInstance) {
 
       // Ajouter les périodes bloquées
       for (const blocked of blockedPeriods) {
-        calendar.createEvent({
+        const event = calendar.createEvent({
           start: blocked.startDate,
           end: blocked.endDate,
           summary: blocked.reason || 'Indisponible',
-          description: blocked.notes || '',
-          status: 'CONFIRMED',
-          busystatus: 'BUSY',
-          uid: `blocked-${blocked.id}`
+          description: blocked.notes || ''
         });
+        event.uid(`blocked-${blocked.id}`);
       }
 
       // Retourner le calendrier
@@ -144,7 +140,7 @@ export default async function icalRoutes(fastify: FastifyInstance) {
         } catch (error) {
           return reply.code(400).send({ 
             error: 'Failed to fetch iCal from URL',
-            details: error.message 
+            details: error instanceof Error ? error.message : 'Unknown error' 
           });
         }
       } else {
@@ -154,11 +150,11 @@ export default async function icalRoutes(fastify: FastifyInstance) {
       // Parser le contenu iCal
       let events;
       try {
-        events = parseIcal(icalContent);
+        events = icalParser.parseICS(icalContent);
       } catch (error) {
         return reply.code(400).send({ 
           error: 'Invalid iCal format',
-          details: error.message 
+          details: error instanceof Error ? error.message : 'Unknown error' 
         });
       }
 
@@ -168,11 +164,11 @@ export default async function icalRoutes(fastify: FastifyInstance) {
 
       // Traiter chaque événement
       for (const [uid, event] of Object.entries(events)) {
-        if (event.type !== 'VEVENT') continue;
+        if (!event || (event as any).type !== 'VEVENT') continue;
 
         try {
-          const startDate = new Date(event.start);
-          const endDate = new Date(event.end);
+          const startDate = new Date((event as any).start);
+          const endDate = new Date((event as any).end);
 
           // Vérifier si c'est une date valide
           if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
@@ -217,13 +213,13 @@ export default async function icalRoutes(fastify: FastifyInstance) {
               startDate,
               endDate,
               reason: 'Importé depuis iCal',
-              notes: event.summary || undefined
+              notes: (event as any).summary || undefined
             }
           });
 
           imported++;
         } catch (error) {
-          errors.push(`Error processing event ${uid}: ${error.message}`);
+          errors.push(`Error processing event ${uid}: ${error instanceof Error ? error.message : 'Unknown error'}`);
           skipped++;
         }
       }

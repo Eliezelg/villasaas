@@ -84,11 +84,12 @@ export function PropertyFilters({ onFiltersChange, isLoading }: PropertyFiltersP
 
   const toggleArrayFilter = (key: 'propertyType' | 'amenities' | 'atmosphere' | 'bedrooms', value: string | number) => {
     const currentValues = filters[key] || []
-    const newValues = currentValues.includes(value as any)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value as any]
+    const typedValues = currentValues as (string | number)[]
+    const newValues = typedValues.includes(value)
+      ? typedValues.filter(v => v !== value)
+      : [...typedValues, value]
     
-    updateFilter(key, newValues.length > 0 ? newValues : undefined)
+    updateFilter(key, newValues.length > 0 ? newValues as any : undefined)
   }
 
   const applyFilters = () => {

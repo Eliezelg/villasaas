@@ -133,7 +133,7 @@ export const useAuthStore = create<AuthState>()(
 
         set({
           user: data,
-          tenant: data.tenant,
+          // tenant is kept from login/register, not updated from /me endpoint
           isAuthenticated: true,
         });
       },

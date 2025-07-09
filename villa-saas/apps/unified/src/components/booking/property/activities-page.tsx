@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ExternalLink } from 'lucide-react'
 
 interface LocalActivity {
+  id?: string
   name: {
     fr: string
     en: string
@@ -29,6 +30,9 @@ interface LocalActivity {
     fr: string
     en: string
   }
+  rating?: number
+  contact?: string
+  highlights?: string[]
 }
 
 interface ActivitiesPageProps {
@@ -74,20 +78,32 @@ const categoryColors: Record<string, string> = {
 const defaultActivities: LocalActivity[] = [
   {
     id: '1',
-    name: 'Plage de Sable Fin',
-    category: 'Plages',
-    description: 'Magnifique plage de sable fin avec eaux cristallines, idéale pour la baignade et les sports nautiques.',
-    distance: '500m',
+    name: {
+      fr: 'Plage de Sable Fin',
+      en: 'Sandy Beach'
+    },
+    category: 'beach',
+    description: {
+      fr: 'Magnifique plage de sable fin avec eaux cristallines, idéale pour la baignade et les sports nautiques.',
+      en: 'Beautiful sandy beach with crystal clear waters, ideal for swimming and water sports.'
+    },
+    distance: 500,
     duration: 'Toute la journée',
     rating: 4.8,
     highlights: ['Baignade surveillée', 'Location de transats', 'Sports nautiques', 'Restaurants'],
   },
   {
     id: '2',
-    name: 'Marché Local',
-    category: 'Culture',
-    description: 'Marché traditionnel avec produits locaux, artisanat et spécialités régionales.',
-    distance: '1.2km',
+    name: {
+      fr: 'Marché Local',
+      en: 'Local Market'
+    },
+    category: 'cultural',
+    description: {
+      fr: 'Marché traditionnel avec produits locaux, artisanat et spécialités régionales.',
+      en: 'Traditional market with local products, crafts and regional specialties.'
+    },
+    distance: 1200,
     duration: '2-3 heures',
     price: 'Gratuit',
     rating: 4.5,
@@ -95,10 +111,16 @@ const defaultActivities: LocalActivity[] = [
   },
   {
     id: '3',
-    name: 'Randonnée Côtière',
-    category: 'Nature',
-    description: 'Sentier de randonnée offrant des vues spectaculaires sur la côte et la nature environnante.',
-    distance: '2.5km',
+    name: {
+      fr: 'Randonnée Côtière',
+      en: 'Coastal Hike'
+    },
+    category: 'hiking',
+    description: {
+      fr: 'Sentier de randonnée offrant des vues spectaculaires sur la côte et la nature environnante.',
+      en: 'Hiking trail offering spectacular views of the coast and surrounding nature.'
+    },
+    distance: 2500,
     duration: '3-4 heures',
     price: 'Gratuit',
     rating: 4.7,
@@ -106,10 +128,16 @@ const defaultActivities: LocalActivity[] = [
   },
   {
     id: '4',
-    name: 'Centre de Plongée',
-    category: 'Sports',
-    description: 'Centre certifié proposant baptêmes de plongée et explorations sous-marines.',
-    distance: '3km',
+    name: {
+      fr: 'Centre de Plongée',
+      en: 'Diving Center'
+    },
+    category: 'water_sports',
+    description: {
+      fr: 'Centre certifié proposant baptêmes de plongée et explorations sous-marines.',
+      en: 'Certified center offering diving baptisms and underwater explorations.'
+    },
+    distance: 3000,
     duration: 'Demi-journée',
     price: 'À partir de 60€',
     rating: 4.9,
@@ -118,10 +146,16 @@ const defaultActivities: LocalActivity[] = [
   },
   {
     id: '5',
-    name: 'Restaurant Gastronomique',
-    category: 'Gastronomie',
-    description: 'Restaurant étoilé proposant une cuisine raffinée avec vue sur mer.',
-    distance: '1.8km',
+    name: {
+      fr: 'Restaurant Gastronomique',
+      en: 'Gourmet Restaurant'
+    },
+    category: 'restaurant',
+    description: {
+      fr: 'Restaurant étoilé proposant une cuisine raffinée avec vue sur mer.',
+      en: 'Starred restaurant offering refined cuisine with sea view.'
+    },
+    distance: 1800,
     duration: '2-3 heures',
     price: 'Menu à partir de 45€',
     rating: 4.6,
@@ -130,10 +164,16 @@ const defaultActivities: LocalActivity[] = [
   },
   {
     id: '6',
-    name: 'Parc Aquatique',
-    category: 'Famille',
-    description: 'Grand parc aquatique avec toboggans, piscines et animations pour toute la famille.',
-    distance: '8km',
+    name: {
+      fr: 'Parc Aquatique',
+      en: 'Water Park'
+    },
+    category: 'entertainment',
+    description: {
+      fr: 'Grand parc aquatique avec toboggans, piscines et animations pour toute la famille.',
+      en: 'Large water park with slides, pools and entertainment for the whole family.'
+    },
+    distance: 8000,
     duration: 'Journée complète',
     price: 'Adulte 25€ / Enfant 18€',
     rating: 4.4,

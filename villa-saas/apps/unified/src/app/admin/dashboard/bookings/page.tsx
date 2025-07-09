@@ -108,9 +108,9 @@ export default function BookingsPage() {
 
   const loadProperties = async () => {
     try {
-      const { data } = await propertyService.list({ limit: 100 });
-      if (data?.properties) {
-        setProperties(data.properties);
+      const response = await propertyService.getAll({ limit: 100 });
+      if (response.properties) {
+        setProperties(response.properties);
       }
     } catch (error) {
       console.error('Error loading properties:', error);
@@ -120,7 +120,10 @@ export default function BookingsPage() {
   const loadBookings = async () => {
     try {
       setLoading(true);
-      const { data } = await bookingService.list(filters);
+      const { data } = await bookingService.list({
+        ...filters,
+        status: filters.status as Booking['status'] || undefined
+      });
       if (data) {
         setBookings(data.bookings);
         setPagination(data.pagination);

@@ -128,9 +128,9 @@ export default function NewBookingPage() {
 
   const loadProperties = async () => {
     try {
-      const { data } = await propertyService.list({ status: 'PUBLISHED', limit: 100 });
-      if (data?.properties) {
-        setProperties(data.properties);
+      const response = await propertyService.getAll({ status: 'PUBLISHED', limit: 100 });
+      if (response.properties) {
+        setProperties(response.properties);
       }
     } catch (error) {
       toast({

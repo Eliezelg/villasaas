@@ -14,7 +14,7 @@ import { analyticsService } from '@/services/analytics.service';
 import { propertyService } from '@/services/property.service';
 import { useToast } from '@/hooks/use-toast';
 import type { OverviewData, OccupancyData, RevenueData } from '@/services/analytics.service';
-import type { Property } from '@/types/property';
+import type { Property } from '@villa-saas/database';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -147,7 +147,11 @@ export default function AnalyticsPage() {
           
           <DatePickerWithRange
             date={dateRange}
-            onDateChange={setDateRange}
+            onDateChange={(newDateRange) => {
+              if (newDateRange) {
+                setDateRange(newDateRange);
+              }
+            }}
           />
           
           <Button onClick={handleExport} variant="outline">

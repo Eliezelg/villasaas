@@ -1,0 +1,154 @@
+[
+  {
+    "endpoint": "/api/tenants",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 75
+  },
+  {
+    "endpoint": "/api/auth/register",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 29
+  },
+  {
+    "endpoint": "/api/properties",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 21
+  },
+  {
+    "endpoint": "/api/bookings",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 21
+  },
+  {
+    "endpoint": "/api/pricing/calculate",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 25
+  },
+  {
+    "endpoint": "/api/availability/",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 29
+  },
+  {
+    "endpoint": "/api/availability/check",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 18
+  },
+  {
+    "endpoint": "/api/availability//block",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 22
+  },
+  {
+    "endpoint": "/api/availability//sync-ical",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 29
+  },
+  {
+    "endpoint": "/api/analytics/overview",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 22
+  },
+  {
+    "endpoint": "/api/analytics/revenue?startDate=2025-01-01T00:00:00Z&endDate=2025-12-31T23:59:59Z",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 24
+  },
+  {
+    "endpoint": "/api/analytics/occupancy",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 22
+  },
+  {
+    "endpoint": "/api/analytics/export",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 19
+  },
+  {
+    "endpoint": "/api/messaging",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 28
+  },
+  {
+    "endpoint": "/api/messaging/booking/",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 23
+  },
+  {
+    "endpoint": "/api/messaging/conversations",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 19
+  },
+  {
+    "endpoint": "/api/payments/create-session",
+    "method": "POST",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 20
+  },
+  {
+    "endpoint": "/api/payments/booking/",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 23
+  },
+  {
+    "endpoint": "/api/payments/transactions",
+    "method": "GET",
+    "status": "failed",
+    "statusCode": 404,
+    "error": "Request failed with status code 404",
+    "duration": 21
+  }
+]

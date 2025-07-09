@@ -231,7 +231,7 @@ export function PropertyOptionsManager({ propertyId }: PropertyOptionsManagerPro
                             type="number"
                             step="0.01"
                             placeholder={option.pricePerUnit.toString()}
-                            defaultValue={customPrice}
+                            defaultValue={customPrice ?? undefined}
                             disabled={saving === option.id}
                             className="mt-1"
                             onBlur={(e) => {

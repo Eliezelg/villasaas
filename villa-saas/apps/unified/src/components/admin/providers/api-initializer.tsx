@@ -1,17 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useAuthStore } from '@/store/auth.store'
-import { apiClient } from '@/lib/api-client'
-
+// This component is no longer needed as we're using HttpOnly cookies
+// Tokens are sent automatically with requests via the credentials: 'include' option
 export function ApiInitializer({ children }: { children: React.ReactNode }) {
-  const { accessToken } = useAuthStore()
-
-  useEffect(() => {
-    if (accessToken) {
-      apiClient.setAccessToken(accessToken)
-    }
-  }, [accessToken])
-
   return <>{children}</>
 }

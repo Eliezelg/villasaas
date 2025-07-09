@@ -1,0 +1,957 @@
+{
+  "summary": {
+    "totalTests": 19,
+    "successfulTests": 9,
+    "failedTests": 10,
+    "successRate": 47.37,
+    "timestamp": "2025-07-09T21:23:46.662Z"
+  },
+  "results": [
+    {
+      "endpoint": "/api/auth/register",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 201,
+      "duration": 1709,
+      "data": {
+        "user": {
+          "id": "cmcwgum540002u7l3o0q5d0e3",
+          "email": "Derrick_Kuhlman@yahoo.com",
+          "firstName": "Loretta",
+          "lastName": "Rippin",
+          "role": "OWNER"
+        },
+        "tenant": {
+          "id": "cmcwgum0t0000u7l3j06gyya3",
+          "name": "Loretta Rippin",
+          "subdomain": "west-and-sons"
+        },
+        "expiresIn": 900
+      }
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 1975,
+      "data": {
+        "user": {
+          "id": "cmcwgum540002u7l3o0q5d0e3",
+          "email": "Derrick_Kuhlman@yahoo.com",
+          "firstName": "Loretta",
+          "lastName": "Rippin",
+          "role": "OWNER"
+        },
+        "tenant": {
+          "id": "cmcwgum0t0000u7l3j06gyya3",
+          "name": "Loretta Rippin",
+          "subdomain": "west-and-sons"
+        },
+        "expiresIn": 900
+      }
+    },
+    {
+      "endpoint": "/api/auth/me",
+      "method": "GET",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 528,
+      "data": {
+        "id": "cmcwgum540002u7l3o0q5d0e3",
+        "email": "Derrick_Kuhlman@yahoo.com",
+        "firstName": "Loretta",
+        "lastName": "Rippin",
+        "role": "OWNER",
+        "tenant": {
+          "id": "cmcwgum0t0000u7l3j06gyya3",
+          "name": "Loretta Rippin",
+          "subdomain": "west-and-sons",
+          "customDomain": null
+        }
+      }
+    },
+    {
+      "endpoint": "/api/auth/refresh",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 679,
+      "data": {
+        "error": "Invalid refresh token"
+      },
+      "error": "Invalid refresh token"
+    },
+    {
+      "endpoint": "/api/auth/logout",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 754,
+      "data": {
+        "message": "Logged out successfully"
+      }
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 1957,
+      "data": {
+        "user": {
+          "id": "cmcwgum540002u7l3o0q5d0e3",
+          "email": "Derrick_Kuhlman@yahoo.com",
+          "firstName": "Loretta",
+          "lastName": "Rippin",
+          "role": "OWNER"
+        },
+        "tenant": {
+          "id": "cmcwgum0t0000u7l3j06gyya3",
+          "name": "Loretta Rippin",
+          "subdomain": "west-and-sons"
+        },
+        "expiresIn": 900
+      }
+    },
+    {
+      "endpoint": "/api/properties",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 10,
+      "data": {
+        "error": {
+          "issues": [
+            {
+              "code": "invalid_type",
+              "expected": "object",
+              "received": "array",
+              "path": [
+                "amenities"
+              ],
+              "message": "Expected object, received array"
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      "error": {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "object",
+            "received": "array",
+            "path": [
+              "amenities"
+            ],
+            "message": "Expected object, received array"
+          }
+        ],
+        "name": "ZodError"
+      }
+    },
+    {
+      "endpoint": "/api/analytics/overview",
+      "method": "GET",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 770,
+      "data": {
+        "totalBookings": 0,
+        "totalRevenue": 0,
+        "averageStayDuration": 0,
+        "occupancyRate": 0,
+        "topProperties": [],
+        "bookingSources": []
+      }
+    },
+    {
+      "endpoint": "/api/analytics/revenue",
+      "method": "GET",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 392,
+      "data": {
+        "totalRevenue": 0,
+        "averageRevenuePerNight": 0,
+        "averageRevenuePerBooking": 0,
+        "monthlyData": [
+          {
+            "month": "May",
+            "year": 2025,
+            "revenue": 0,
+            "bookings": 0
+          },
+          {
+            "month": "June",
+            "year": 2025,
+            "revenue": 0,
+            "bookings": 0
+          },
+          {
+            "month": "July",
+            "year": 2025,
+            "revenue": 0,
+            "bookings": 0
+          }
+        ]
+      }
+    },
+    {
+      "endpoint": "/api/analytics/occupancy",
+      "method": "GET",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 381,
+      "data": {
+        "totalDays": 0,
+        "occupiedDays": 0,
+        "occupancyRate": 0,
+        "monthlyData": []
+      }
+    },
+    {
+      "endpoint": "/api/analytics/top-properties",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 5,
+      "data": {
+        "message": "Route GET:/api/analytics/top-properties not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/analytics/booking-sources",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 3,
+      "data": {
+        "message": "Route GET:/api/analytics/booking-sources not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/public/properties?tenantId=cmcwgul6a0000u7jae3rs7bnh",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 7,
+      "data": {
+        "error": "Tenant not specified"
+      },
+      "error": "Tenant not specified"
+    },
+    {
+      "endpoint": "/api/public/pricing/calculate",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 9,
+      "data": {
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      "error": {
+        "issues": [
+          {
+            "code": "too_small",
+            "minimum": 1,
+            "type": "string",
+            "inclusive": true,
+            "exact": false,
+            "message": "String must contain at least 1 character(s)",
+            "path": [
+              "propertyId"
+            ]
+          }
+        ],
+        "name": "ZodError"
+      }
+    },
+    {
+      "endpoint": "/api/promo-codes",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 5,
+      "data": {
+        "message": "Route POST:/api/promo-codes not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/booking-options",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 8,
+      "data": {
+        "error": {
+          "issues": [
+            {
+              "expected": "'CLEANING' | 'CATERING' | 'TRANSPORT' | 'ACTIVITIES' | 'EQUIPMENT' | 'WELLNESS' | 'CHILDCARE' | 'PET' | 'COMFORT' | 'OTHER'",
+              "received": "undefined",
+              "code": "invalid_type",
+              "path": [
+                "category"
+              ],
+              "message": "Required"
+            },
+            {
+              "received": "PER_PERSON_PER_NIGHT",
+              "code": "invalid_enum_value",
+              "options": [
+                "PER_PERSON",
+                "PER_GROUP",
+                "FIXED"
+              ],
+              "path": [
+                "pricingType"
+              ],
+              "message": "Invalid enum value. Expected 'PER_PERSON' | 'PER_GROUP' | 'FIXED', received 'PER_PERSON_PER_NIGHT'"
+            },
+            {
+              "code": "invalid_type",
+              "expected": "number",
+              "received": "undefined",
+              "path": [
+                "pricePerUnit"
+              ],
+              "message": "Required"
+            },
+            {
+              "expected": "'PER_DAY' | 'PER_STAY'",
+              "received": "undefined",
+              "code": "invalid_type",
+              "path": [
+                "pricingPeriod"
+              ],
+              "message": "Required"
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      "error": {
+        "issues": [
+          {
+            "expected": "'CLEANING' | 'CATERING' | 'TRANSPORT' | 'ACTIVITIES' | 'EQUIPMENT' | 'WELLNESS' | 'CHILDCARE' | 'PET' | 'COMFORT' | 'OTHER'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "category"
+            ],
+            "message": "Required"
+          },
+          {
+            "received": "PER_PERSON_PER_NIGHT",
+            "code": "invalid_enum_value",
+            "options": [
+              "PER_PERSON",
+              "PER_GROUP",
+              "FIXED"
+            ],
+            "path": [
+              "pricingType"
+            ],
+            "message": "Invalid enum value. Expected 'PER_PERSON' | 'PER_GROUP' | 'FIXED', received 'PER_PERSON_PER_NIGHT'"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "number",
+            "received": "undefined",
+            "path": [
+              "pricePerUnit"
+            ],
+            "message": "Required"
+          },
+          {
+            "expected": "'PER_DAY' | 'PER_STAY'",
+            "received": "undefined",
+            "code": "invalid_type",
+            "path": [
+              "pricingPeriod"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      }
+    },
+    {
+      "endpoint": "/api/properties//booking-options",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 6,
+      "data": {
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      "error": {
+        "issues": [
+          {
+            "code": "too_small",
+            "minimum": 1,
+            "type": "string",
+            "inclusive": true,
+            "exact": false,
+            "message": "String must contain at least 1 character(s)",
+            "path": [
+              "propertyId"
+            ]
+          }
+        ],
+        "name": "ZodError"
+      }
+    },
+    {
+      "endpoint": "/health",
+      "method": "GET",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 379,
+      "data": {
+        "status": "ok",
+        "timestamp": "2025-07-09T21:23:46.126Z",
+        "uptime": 163.008087721,
+        "database": "ok",
+        "redis": "ok"
+      }
+    },
+    {
+      "endpoint": "/health/ready",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 3,
+      "data": {
+        "message": "Route GET:/health/ready not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    }
+  ],
+  "categorized": {
+    "Authentication": [
+      {
+        "endpoint": "/api/auth/register",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 201,
+        "duration": 1709,
+        "data": {
+          "user": {
+            "id": "cmcwgum540002u7l3o0q5d0e3",
+            "email": "Derrick_Kuhlman@yahoo.com",
+            "firstName": "Loretta",
+            "lastName": "Rippin",
+            "role": "OWNER"
+          },
+          "tenant": {
+            "id": "cmcwgum0t0000u7l3j06gyya3",
+            "name": "Loretta Rippin",
+            "subdomain": "west-and-sons"
+          },
+          "expiresIn": 900
+        }
+      },
+      {
+        "endpoint": "/api/auth/login",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 1975,
+        "data": {
+          "user": {
+            "id": "cmcwgum540002u7l3o0q5d0e3",
+            "email": "Derrick_Kuhlman@yahoo.com",
+            "firstName": "Loretta",
+            "lastName": "Rippin",
+            "role": "OWNER"
+          },
+          "tenant": {
+            "id": "cmcwgum0t0000u7l3j06gyya3",
+            "name": "Loretta Rippin",
+            "subdomain": "west-and-sons"
+          },
+          "expiresIn": 900
+        }
+      },
+      {
+        "endpoint": "/api/auth/me",
+        "method": "GET",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 528,
+        "data": {
+          "id": "cmcwgum540002u7l3o0q5d0e3",
+          "email": "Derrick_Kuhlman@yahoo.com",
+          "firstName": "Loretta",
+          "lastName": "Rippin",
+          "role": "OWNER",
+          "tenant": {
+            "id": "cmcwgum0t0000u7l3j06gyya3",
+            "name": "Loretta Rippin",
+            "subdomain": "west-and-sons",
+            "customDomain": null
+          }
+        }
+      },
+      {
+        "endpoint": "/api/auth/refresh",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 679,
+        "data": {
+          "error": "Invalid refresh token"
+        },
+        "error": "Invalid refresh token"
+      },
+      {
+        "endpoint": "/api/auth/logout",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 754,
+        "data": {
+          "message": "Logged out successfully"
+        }
+      },
+      {
+        "endpoint": "/api/auth/login",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 1957,
+        "data": {
+          "user": {
+            "id": "cmcwgum540002u7l3o0q5d0e3",
+            "email": "Derrick_Kuhlman@yahoo.com",
+            "firstName": "Loretta",
+            "lastName": "Rippin",
+            "role": "OWNER"
+          },
+          "tenant": {
+            "id": "cmcwgum0t0000u7l3j06gyya3",
+            "name": "Loretta Rippin",
+            "subdomain": "west-and-sons"
+          },
+          "expiresIn": 900
+        }
+      }
+    ],
+    "Properties": [
+      {
+        "endpoint": "/api/properties",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 10,
+        "data": {
+          "error": {
+            "issues": [
+              {
+                "code": "invalid_type",
+                "expected": "object",
+                "received": "array",
+                "path": [
+                  "amenities"
+                ],
+                "message": "Expected object, received array"
+              }
+            ],
+            "name": "ZodError"
+          }
+        },
+        "error": {
+          "issues": [
+            {
+              "code": "invalid_type",
+              "expected": "object",
+              "received": "array",
+              "path": [
+                "amenities"
+              ],
+              "message": "Expected object, received array"
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      {
+        "endpoint": "/api/properties//booking-options",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 6,
+        "data": {
+          "error": {
+            "issues": [
+              {
+                "code": "too_small",
+                "minimum": 1,
+                "type": "string",
+                "inclusive": true,
+                "exact": false,
+                "message": "String must contain at least 1 character(s)",
+                "path": [
+                  "propertyId"
+                ]
+              }
+            ],
+            "name": "ZodError"
+          }
+        },
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      }
+    ],
+    "Bookings": [],
+    "Pricing": [],
+    "Availability": [],
+    "Analytics": [
+      {
+        "endpoint": "/api/analytics/overview",
+        "method": "GET",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 770,
+        "data": {
+          "totalBookings": 0,
+          "totalRevenue": 0,
+          "averageStayDuration": 0,
+          "occupancyRate": 0,
+          "topProperties": [],
+          "bookingSources": []
+        }
+      },
+      {
+        "endpoint": "/api/analytics/revenue",
+        "method": "GET",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 392,
+        "data": {
+          "totalRevenue": 0,
+          "averageRevenuePerNight": 0,
+          "averageRevenuePerBooking": 0,
+          "monthlyData": [
+            {
+              "month": "May",
+              "year": 2025,
+              "revenue": 0,
+              "bookings": 0
+            },
+            {
+              "month": "June",
+              "year": 2025,
+              "revenue": 0,
+              "bookings": 0
+            },
+            {
+              "month": "July",
+              "year": 2025,
+              "revenue": 0,
+              "bookings": 0
+            }
+          ]
+        }
+      },
+      {
+        "endpoint": "/api/analytics/occupancy",
+        "method": "GET",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 381,
+        "data": {
+          "totalDays": 0,
+          "occupiedDays": 0,
+          "occupancyRate": 0,
+          "monthlyData": []
+        }
+      },
+      {
+        "endpoint": "/api/analytics/top-properties",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 5,
+        "data": {
+          "message": "Route GET:/api/analytics/top-properties not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/analytics/booking-sources",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 3,
+        "data": {
+          "message": "Route GET:/api/analytics/booking-sources not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Messaging": [],
+    "Payments": [],
+    "Public": [
+      {
+        "endpoint": "/api/public/properties?tenantId=cmcwgul6a0000u7jae3rs7bnh",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 7,
+        "data": {
+          "error": "Tenant not specified"
+        },
+        "error": "Tenant not specified"
+      },
+      {
+        "endpoint": "/api/public/pricing/calculate",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 9,
+        "data": {
+          "error": {
+            "issues": [
+              {
+                "code": "too_small",
+                "minimum": 1,
+                "type": "string",
+                "inclusive": true,
+                "exact": false,
+                "message": "String must contain at least 1 character(s)",
+                "path": [
+                  "propertyId"
+                ]
+              }
+            ],
+            "name": "ZodError"
+          }
+        },
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      }
+    ],
+    "PromoCode": [
+      {
+        "endpoint": "/api/promo-codes",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 5,
+        "data": {
+          "message": "Route POST:/api/promo-codes not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "BookingOptions": [
+      {
+        "endpoint": "/api/booking-options",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 8,
+        "data": {
+          "error": {
+            "issues": [
+              {
+                "expected": "'CLEANING' | 'CATERING' | 'TRANSPORT' | 'ACTIVITIES' | 'EQUIPMENT' | 'WELLNESS' | 'CHILDCARE' | 'PET' | 'COMFORT' | 'OTHER'",
+                "received": "undefined",
+                "code": "invalid_type",
+                "path": [
+                  "category"
+                ],
+                "message": "Required"
+              },
+              {
+                "received": "PER_PERSON_PER_NIGHT",
+                "code": "invalid_enum_value",
+                "options": [
+                  "PER_PERSON",
+                  "PER_GROUP",
+                  "FIXED"
+                ],
+                "path": [
+                  "pricingType"
+                ],
+                "message": "Invalid enum value. Expected 'PER_PERSON' | 'PER_GROUP' | 'FIXED', received 'PER_PERSON_PER_NIGHT'"
+              },
+              {
+                "code": "invalid_type",
+                "expected": "number",
+                "received": "undefined",
+                "path": [
+                  "pricePerUnit"
+                ],
+                "message": "Required"
+              },
+              {
+                "expected": "'PER_DAY' | 'PER_STAY'",
+                "received": "undefined",
+                "code": "invalid_type",
+                "path": [
+                  "pricingPeriod"
+                ],
+                "message": "Required"
+              }
+            ],
+            "name": "ZodError"
+          }
+        },
+        "error": {
+          "issues": [
+            {
+              "expected": "'CLEANING' | 'CATERING' | 'TRANSPORT' | 'ACTIVITIES' | 'EQUIPMENT' | 'WELLNESS' | 'CHILDCARE' | 'PET' | 'COMFORT' | 'OTHER'",
+              "received": "undefined",
+              "code": "invalid_type",
+              "path": [
+                "category"
+              ],
+              "message": "Required"
+            },
+            {
+              "received": "PER_PERSON_PER_NIGHT",
+              "code": "invalid_enum_value",
+              "options": [
+                "PER_PERSON",
+                "PER_GROUP",
+                "FIXED"
+              ],
+              "path": [
+                "pricingType"
+              ],
+              "message": "Invalid enum value. Expected 'PER_PERSON' | 'PER_GROUP' | 'FIXED', received 'PER_PERSON_PER_NIGHT'"
+            },
+            {
+              "code": "invalid_type",
+              "expected": "number",
+              "received": "undefined",
+              "path": [
+                "pricePerUnit"
+              ],
+              "message": "Required"
+            },
+            {
+              "expected": "'PER_DAY' | 'PER_STAY'",
+              "received": "undefined",
+              "code": "invalid_type",
+              "path": [
+                "pricingPeriod"
+              ],
+              "message": "Required"
+            }
+          ],
+          "name": "ZodError"
+        }
+      }
+    ],
+    "Health": [
+      {
+        "endpoint": "/health",
+        "method": "GET",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 379,
+        "data": {
+          "status": "ok",
+          "timestamp": "2025-07-09T21:23:46.126Z",
+          "uptime": 163.008087721,
+          "database": "ok",
+          "redis": "ok"
+        }
+      },
+      {
+        "endpoint": "/health/ready",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 3,
+        "data": {
+          "message": "Route GET:/health/ready not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Other": []
+  }
+}

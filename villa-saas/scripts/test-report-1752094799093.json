@@ -1,0 +1,704 @@
+{
+  "summary": {
+    "totalTests": 23,
+    "successfulTests": 3,
+    "failedTests": 20,
+    "successRate": 13.04,
+    "timestamp": "2025-07-09T20:59:59.093Z"
+  },
+  "results": [
+    {
+      "endpoint": "/api/auth/register",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 201,
+      "duration": 2103,
+      "data": {
+        "user": {
+          "id": "cmcwg03fq0002u76l1klosuhy",
+          "email": "Katharina.Fisher@yahoo.com",
+          "firstName": "Eva",
+          "lastName": "Hermann",
+          "role": "OWNER"
+        },
+        "tenant": {
+          "id": "cmcwg03bm0000u76l98j0yh9g",
+          "name": "Eva Hermann",
+          "subdomain": "mcclure-douglas"
+        },
+        "expiresIn": 900
+      }
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 1904,
+      "data": {
+        "user": {
+          "id": "cmcwg03fq0002u76l1klosuhy",
+          "email": "Katharina.Fisher@yahoo.com",
+          "firstName": "Eva",
+          "lastName": "Hermann",
+          "role": "OWNER"
+        },
+        "tenant": {
+          "id": "cmcwg03bm0000u76l98j0yh9g",
+          "name": "Eva Hermann",
+          "subdomain": "mcclure-douglas"
+        },
+        "expiresIn": 900
+      }
+    },
+    {
+      "endpoint": "/api/auth/me",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 4,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/auth/refresh",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 4,
+      "data": {
+        "error": "No refresh token provided"
+      },
+      "error": "No refresh token provided"
+    },
+    {
+      "endpoint": "/api/auth/logout",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 415,
+      "duration": 2,
+      "data": {
+        "error": "FastifyError",
+        "message": "Unsupported Media Type: application/x-www-form-urlencoded"
+      },
+      "error": "FastifyError"
+    },
+    {
+      "endpoint": "/api/auth/login",
+      "method": "POST",
+      "status": "success",
+      "statusCode": 200,
+      "duration": 1893,
+      "data": {
+        "user": {
+          "id": "cmcwg03fq0002u76l1klosuhy",
+          "email": "Katharina.Fisher@yahoo.com",
+          "firstName": "Eva",
+          "lastName": "Hermann",
+          "role": "OWNER"
+        },
+        "tenant": {
+          "id": "cmcwg03bm0000u76l98j0yh9g",
+          "name": "Eva Hermann",
+          "subdomain": "mcclure-douglas"
+        },
+        "expiresIn": 900
+      }
+    },
+    {
+      "endpoint": "/api/properties",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 3,
+      "data": {
+        "error": "Validation Error",
+        "message": "body/description must be object",
+        "validation": [
+          {
+            "instancePath": "/description",
+            "schemaPath": "#/properties/description/type",
+            "keyword": "type",
+            "params": {
+              "type": "object"
+            },
+            "message": "must be object"
+          }
+        ]
+      },
+      "error": "Validation Error"
+    },
+    {
+      "endpoint": "/api/bookings",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 2,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/pricing/calculate",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 2,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/pricing/quote",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route POST:/api/pricing/quote not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/availability/availability-calendar?propertyId=&startDate=2025-07-09T20:59:58.512Z&endDate=2025-10-09T20:59:58.512Z",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 1,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/availability/check-availability",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 1,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/availability/blocked-periods",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 0,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/availability/ical/export-url/",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 0,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/availability/ical/export/",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 371,
+      "data": {
+        "error": "Property not found"
+      },
+      "error": "Property not found"
+    },
+    {
+      "endpoint": "/api/analytics/overview",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 9,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/analytics/revenue",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 10,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/analytics/occupancy",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 4,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/analytics/performance",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 4,
+      "data": {
+        "message": "Route GET:/api/analytics/performance not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/analytics/export",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 6,
+      "data": {
+        "message": "Route POST:/api/analytics/export not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/public/properties",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 5,
+      "data": {
+        "error": "Tenant not specified"
+      },
+      "error": "Tenant not specified"
+    },
+    {
+      "endpoint": "/api/public/availability/check",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 3,
+      "data": {
+        "message": "Route POST:/api/public/availability/check not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/public/pricing/calculate",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 4,
+      "data": {
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      "error": {
+        "issues": [
+          {
+            "code": "too_small",
+            "minimum": 1,
+            "type": "string",
+            "inclusive": true,
+            "exact": false,
+            "message": "String must contain at least 1 character(s)",
+            "path": [
+              "propertyId"
+            ]
+          }
+        ],
+        "name": "ZodError"
+      }
+    }
+  ],
+  "categorized": {
+    "Authentication": [
+      {
+        "endpoint": "/api/auth/register",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 201,
+        "duration": 2103,
+        "data": {
+          "user": {
+            "id": "cmcwg03fq0002u76l1klosuhy",
+            "email": "Katharina.Fisher@yahoo.com",
+            "firstName": "Eva",
+            "lastName": "Hermann",
+            "role": "OWNER"
+          },
+          "tenant": {
+            "id": "cmcwg03bm0000u76l98j0yh9g",
+            "name": "Eva Hermann",
+            "subdomain": "mcclure-douglas"
+          },
+          "expiresIn": 900
+        }
+      },
+      {
+        "endpoint": "/api/auth/login",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 1904,
+        "data": {
+          "user": {
+            "id": "cmcwg03fq0002u76l1klosuhy",
+            "email": "Katharina.Fisher@yahoo.com",
+            "firstName": "Eva",
+            "lastName": "Hermann",
+            "role": "OWNER"
+          },
+          "tenant": {
+            "id": "cmcwg03bm0000u76l98j0yh9g",
+            "name": "Eva Hermann",
+            "subdomain": "mcclure-douglas"
+          },
+          "expiresIn": 900
+        }
+      },
+      {
+        "endpoint": "/api/auth/me",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 4,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/auth/refresh",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 4,
+        "data": {
+          "error": "No refresh token provided"
+        },
+        "error": "No refresh token provided"
+      },
+      {
+        "endpoint": "/api/auth/logout",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 415,
+        "duration": 2,
+        "data": {
+          "error": "FastifyError",
+          "message": "Unsupported Media Type: application/x-www-form-urlencoded"
+        },
+        "error": "FastifyError"
+      },
+      {
+        "endpoint": "/api/auth/login",
+        "method": "POST",
+        "status": "success",
+        "statusCode": 200,
+        "duration": 1893,
+        "data": {
+          "user": {
+            "id": "cmcwg03fq0002u76l1klosuhy",
+            "email": "Katharina.Fisher@yahoo.com",
+            "firstName": "Eva",
+            "lastName": "Hermann",
+            "role": "OWNER"
+          },
+          "tenant": {
+            "id": "cmcwg03bm0000u76l98j0yh9g",
+            "name": "Eva Hermann",
+            "subdomain": "mcclure-douglas"
+          },
+          "expiresIn": 900
+        }
+      }
+    ],
+    "Properties": [
+      {
+        "endpoint": "/api/properties",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 3,
+        "data": {
+          "error": "Validation Error",
+          "message": "body/description must be object",
+          "validation": [
+            {
+              "instancePath": "/description",
+              "schemaPath": "#/properties/description/type",
+              "keyword": "type",
+              "params": {
+                "type": "object"
+              },
+              "message": "must be object"
+            }
+          ]
+        },
+        "error": "Validation Error"
+      }
+    ],
+    "Bookings": [
+      {
+        "endpoint": "/api/bookings",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 2,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      }
+    ],
+    "Pricing": [
+      {
+        "endpoint": "/api/pricing/calculate",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 2,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/pricing/quote",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route POST:/api/pricing/quote not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Availability": [
+      {
+        "endpoint": "/api/availability/availability-calendar?propertyId=&startDate=2025-07-09T20:59:58.512Z&endDate=2025-10-09T20:59:58.512Z",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 1,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/availability/check-availability",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 1,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/availability/blocked-periods",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 0,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/availability/ical/export-url/",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 0,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/availability/ical/export/",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 371,
+        "data": {
+          "error": "Property not found"
+        },
+        "error": "Property not found"
+      }
+    ],
+    "Analytics": [
+      {
+        "endpoint": "/api/analytics/overview",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 9,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/analytics/revenue",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 10,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/analytics/occupancy",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 4,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/analytics/performance",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 4,
+        "data": {
+          "message": "Route GET:/api/analytics/performance not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/analytics/export",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 6,
+        "data": {
+          "message": "Route POST:/api/analytics/export not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Messaging": [],
+    "Payments": [],
+    "Public": [
+      {
+        "endpoint": "/api/public/properties",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 5,
+        "data": {
+          "error": "Tenant not specified"
+        },
+        "error": "Tenant not specified"
+      },
+      {
+        "endpoint": "/api/public/availability/check",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 3,
+        "data": {
+          "message": "Route POST:/api/public/availability/check not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/public/pricing/calculate",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 4,
+        "data": {
+          "error": {
+            "issues": [
+              {
+                "code": "too_small",
+                "minimum": 1,
+                "type": "string",
+                "inclusive": true,
+                "exact": false,
+                "message": "String must contain at least 1 character(s)",
+                "path": [
+                  "propertyId"
+                ]
+              }
+            ],
+            "name": "ZodError"
+          }
+        },
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      }
+    ],
+    "Other": []
+  }
+}

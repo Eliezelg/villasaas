@@ -32,7 +32,7 @@ export default function PropertyAvailabilityPage() {
           checkInDays: property.checkInDays || [0, 1, 2, 3, 4, 5, 6],
           instantBooking: property.instantBooking
         }}
-        onUpdate={() => loadProperty(property.id)}
+        onUpdate={reload}
       />
 
       <Card>

@@ -52,6 +52,14 @@ class ApiClient {
     }
   }
   
+  // Méthode POST générique
+  async post<T = any>(endpoint: string, data: any) {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+  
   // Méthodes publiques pour les propriétés
   async getProperties(params?: {
     page?: number

@@ -165,7 +165,7 @@ export function AvailabilityCalendar({
     return { date, available: false, price: 0 }
   })
 
-  const allDays = [...previousMonthDays, ...monthDays]
+  const allDays: DayData[] = [...previousMonthDays, ...monthDays]
 
   return (
     <div className="w-full">
@@ -230,8 +230,8 @@ export function AvailabilityCalendar({
                 isDisabled && "cursor-not-allowed opacity-50",
                 !isDisabled && isCurrentMonth && "cursor-pointer",
                 // Styles pour les dates non disponibles
-                dayData.isBooked && isCurrentMonth && "bg-red-100 text-red-900 opacity-60",
-                dayData.isBlocked && isCurrentMonth && "bg-gray-100 text-gray-500 opacity-60",
+                dayData.isBooked === true && isCurrentMonth && "bg-red-100 text-red-900 opacity-60",
+                dayData.isBlocked === true && isCurrentMonth && "bg-gray-100 text-gray-500 opacity-60",
                 dayData.reason === 'past' && "opacity-30"
               )}
             >

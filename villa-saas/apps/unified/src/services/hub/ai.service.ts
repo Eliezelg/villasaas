@@ -173,6 +173,29 @@ export class AIService {
     return completion.choices[0].message.content || '';
   }
 
+  async searchProperties(intent: SearchIntent): Promise<Property[]> {
+    // Generate an embedding from the search intent
+    const searchText = `
+      ${intent.location || ''}
+      ${intent.propertyType?.join(' ') || ''}
+      ${intent.amenities?.join(' ') || ''}
+      ${intent.ambiance?.join(' ') || ''}
+    `.trim();
+
+    const embedding = await this.generateEmbedding(searchText);
+    
+    // Find similar properties using the embedding
+    return await this.findSimilarProperties(embedding, 20, intent);
+  }
+
+  async generateResponse(
+    message: string,
+    intent: SearchIntent,
+    properties: Property[]
+  ): Promise<string> {
+    return await this.generateSearchResponse(message, properties);
+  }
+
   async updatePropertyEmbeddings(propertyId: string): Promise<void> {
     const property = await prisma.property.findUnique({
       where: { id: propertyId },

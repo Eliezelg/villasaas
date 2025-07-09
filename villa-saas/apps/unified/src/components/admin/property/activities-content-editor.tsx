@@ -117,7 +117,7 @@ export function ActivitiesContentEditor({ propertyId, initialContent }: Activiti
       })
       
       if (response.error) {
-        throw new Error(response.error)
+        throw new Error(response.error.message || 'Failed to save activities content')
       }
 
       toast({

@@ -75,7 +75,7 @@ export default function MessagesPage() {
         {!selectedConversation ? (
           <ConversationsList
             onSelectConversation={handleSelectConversation}
-            selectedConversationId={selectedConversation?.id}
+            selectedConversationId={undefined}
             currentUserId={user?.id}
           />
         ) : (

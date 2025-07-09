@@ -21,12 +21,13 @@ export function useSinglePropertyMode(tenantId?: string): SinglePropertyModeResu
 
       try {
         // Récupérer toutes les propriétés publiées du tenant
-        const { data: properties } = await apiClient.get('/api/public/properties', {
+        const params = new URLSearchParams({
           tenantId,
           status: 'PUBLISHED'
-        })
+        });
+        const { data: properties } = await apiClient.get(`/api/public/properties?${params.toString()}`)
 
-        if (properties && properties.length === 1) {
+        if (properties && Array.isArray(properties) && properties.length === 1) {
           setIsSinglePropertyMode(true)
           setProperty(properties[0])
         } else {

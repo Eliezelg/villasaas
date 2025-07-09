@@ -6,10 +6,13 @@ import { PropertyAIService } from '../../services/property-ai.service';
 const createPropertySchema = z.object({
   name: z.string().min(1).max(100),
   propertyType: z.enum(['APARTMENT', 'HOUSE', 'VILLA', 'STUDIO', 'LOFT', 'CHALET', 'BUNGALOW', 'MOBILE_HOME', 'BOAT', 'OTHER']),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional().default('DRAFT'),
   address: z.string().min(1),
   city: z.string().min(1),
   postalCode: z.string().min(1),
   country: z.string().default('FR'),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   bedrooms: z.number().int().min(0),
   bathrooms: z.number().int().min(0),
   maxGuests: z.number().int().min(1),
@@ -23,6 +26,10 @@ const createPropertySchema = z.object({
   checkInTime: z.string().default('16:00'),
   checkOutTime: z.string().default('11:00'),
   instantBooking: z.boolean().default(false),
+  amenities: z.record(z.any()).optional(),
+  features: z.record(z.any()).optional(),
+  atmosphere: z.record(z.any()).optional(),
+  proximity: z.record(z.any()).optional(),
 });
 
 export async function propertyRoutes(fastify: FastifyInstance): Promise<void> {
@@ -106,95 +113,81 @@ export async function propertyRoutes(fastify: FastifyInstance): Promise<void> {
   // Create property
   fastify.post('/', {
     preHandler: [fastify.authenticate],
-    schema: {
-      body: {
-        type: 'object',
-        required: ['name', 'propertyType', 'address', 'city', 'postalCode', 'bedrooms', 'bathrooms', 'maxGuests', 'description', 'basePrice'],
-        properties: {
-          name: { type: 'string', minLength: 1, maxLength: 100 },
-          propertyType: { type: 'string', enum: ['APARTMENT', 'HOUSE', 'VILLA', 'STUDIO', 'LOFT', 'CHALET', 'BUNGALOW', 'MOBILE_HOME', 'BOAT', 'OTHER'] },
-          address: { type: 'string', minLength: 1 },
-          city: { type: 'string', minLength: 1 },
-          postalCode: { type: 'string', minLength: 1 },
-          country: { type: 'string' },
-          bedrooms: { type: 'integer', minimum: 0 },
-          bathrooms: { type: 'integer', minimum: 0 },
-          maxGuests: { type: 'integer', minimum: 1 },
-          surfaceArea: { type: 'number' },
-          description: { type: 'object' },
-          basePrice: { type: 'number', minimum: 0 },
-          weekendPremium: { type: 'number' },
-          cleaningFee: { type: 'number' },
-          securityDeposit: { type: 'number' },
-          minNights: { type: 'integer', minimum: 1 },
-          checkInTime: { type: 'string' },
-          checkOutTime: { type: 'string' },
-          instantBooking: { type: 'boolean' },
-        },
-      },
-    },
   }, async (request, reply) => {
-    const tenantId = getTenantId(request);
-    const data = request.body as any;
+    try {
+      const tenantId = getTenantId(request);
+      
+      // Validate with Zod inside the handler
+      const validation = createPropertySchema.safeParse(request.body);
+      if (!validation.success) {
+        return reply.code(400).send({ error: validation.error });
+      }
+      
+      const data = validation.data;
 
-    // Générer un slug unique
-    const baseSlug = data.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-    
-    let slug = baseSlug;
-    let counter = 1;
-    
-    while (true) {
-      const existing = await fastify.prisma.property.findFirst({
-        where: {
-          slug,
-          tenantId,
-        },
+      // Générer un slug unique
+      const baseSlug = data.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+      
+      let slug = baseSlug;
+      let counter = 1;
+      
+      while (true) {
+        const existing = await fastify.prisma.property.findFirst({
+          where: {
+            slug,
+            tenantId,
+          },
+        });
+        
+        if (!existing) break;
+        
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+
+      // Préparer les données avec le contenu searchable
+      const { features, ...dataWithoutFeatures } = data;
+      const propertyData = {
+        ...dataWithoutFeatures,
+        slug,
+        amenities: data.amenities || {},
+        atmosphere: data.atmosphere || features || {},
+        proximity: data.proximity || {},
+      };
+
+      // Générer le contenu searchable
+      const searchableContent = PropertyAIService.generateSearchableContent(propertyData);
+
+      const property = await fastify.prisma.property.create({
+        data: addTenantToData({
+          ...propertyData,
+          searchableContent,
+        }, tenantId),
       });
       
-      if (!existing) break;
-      
-      slug = `${baseSlug}-${counter}`;
-      counter++;
+      // Générer l'embedding après création (async mais on ne bloque pas)
+      const embeddingContent = PropertyAIService.prepareEmbeddingContent(propertyData);
+      PropertyAIService.generateEmbedding(embeddingContent).then(embedding => {
+        // Mettre à jour l'embedding en arrière-plan
+        if (embedding.length > 0) {
+          fastify.prisma.property.update({
+            where: { id: property.id },
+            data: { embedding }
+          }).catch(err => {
+            fastify.log.error('Failed to update embedding:', err);
+          });
+        }
+      });
+
+      reply.status(201).send(property);
+    } catch (error) {
+      fastify.log.error('Error creating property:', error);
+      reply.status(500).send({ error: 'Failed to create property' });
     }
-
-    // Préparer les données avec le contenu searchable
-    const propertyData = {
-      ...data,
-      slug,
-      amenities: data.amenities || {},
-      atmosphere: data.atmosphere || {},
-      proximity: data.proximity || {},
-    };
-
-    // Générer le contenu searchable
-    const searchableContent = PropertyAIService.generateSearchableContent(propertyData);
-    
-    // Générer l'embedding (async mais on ne bloque pas)
-    const embeddingContent = PropertyAIService.prepareEmbeddingContent(propertyData);
-    PropertyAIService.generateEmbedding(embeddingContent).then(embedding => {
-      // Mettre à jour l'embedding en arrière-plan
-      if (embedding.length > 0) {
-        fastify.prisma.property.update({
-          where: { id: property.id },
-          data: { embedding }
-        }).catch(err => {
-          fastify.log.error('Failed to update embedding:', err);
-        });
-      }
-    });
-
-    const property = await fastify.prisma.property.create({
-      data: addTenantToData({
-        ...propertyData,
-        searchableContent,
-      }, tenantId),
-    });
-
-    reply.status(201).send(property);
   });
 
   // Update property

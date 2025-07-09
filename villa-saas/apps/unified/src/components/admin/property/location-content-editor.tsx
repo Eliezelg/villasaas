@@ -117,7 +117,7 @@ export function LocationContentEditor({ propertyId, initialContent }: LocationCo
       })
       
       if (response.error) {
-        throw new Error(response.error)
+        throw new Error(response.error.message || 'Failed to save location content')
       }
 
       toast({

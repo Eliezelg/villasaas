@@ -85,7 +85,7 @@ class ApiClient {
               queryParams.append('priceRange[max]', String(range.max))
             }
           } else if (Array.isArray(value)) {
-            value.forEach(v => queryParams.append(key, v))
+            value.forEach(v => queryParams.append(key, String(v)))
           } else {
             queryParams.append(key, String(value))
           }

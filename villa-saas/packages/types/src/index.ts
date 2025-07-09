@@ -11,6 +11,9 @@ export type {
   PaymentStatus,
 } from '@villa-saas/database';
 
+// Import for use in interfaces below
+import type { PropertyType, PropertyStatus } from '@villa-saas/database';
+
 // API Types
 export interface ApiResponse<T> {
   data?: T;

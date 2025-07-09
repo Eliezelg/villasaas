@@ -1,0 +1,570 @@
+{
+  "summary": {
+    "totalTests": 18,
+    "successfulTests": 0,
+    "failedTests": 18,
+    "successRate": 0,
+    "timestamp": "2025-07-09T20:57:35.602Z"
+  },
+  "results": [
+    {
+      "endpoint": "/api/auth/register",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 24,
+      "data": {
+        "error": "Validation Error",
+        "message": "body must have required property 'firstName'",
+        "validation": [
+          {
+            "instancePath": "",
+            "schemaPath": "#/required",
+            "keyword": "required",
+            "params": {
+              "missingProperty": "firstName"
+            },
+            "message": "must have required property 'firstName'"
+          }
+        ]
+      },
+      "error": "Validation Error"
+    },
+    {
+      "endpoint": "/api/properties",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 3,
+      "data": {
+        "error": "Validation Error",
+        "message": "body must have required property 'propertyType'",
+        "validation": [
+          {
+            "instancePath": "",
+            "schemaPath": "#/required",
+            "keyword": "required",
+            "params": {
+              "missingProperty": "propertyType"
+            },
+            "message": "must have required property 'propertyType'"
+          }
+        ]
+      },
+      "error": "Validation Error"
+    },
+    {
+      "endpoint": "/api/bookings",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 2,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/pricing/calculate",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 2,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/pricing/quote",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route POST:/api/pricing/quote not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/availability/property/",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route GET:/api/availability/property/ not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/availability/check",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 2,
+      "data": {
+        "message": "Route POST:/api/availability/check not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/availability/property//block",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route POST:/api/availability/property//block not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/availability/property//unblock",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 2,
+      "data": {
+        "message": "Route POST:/api/availability/property//unblock not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/availability/property//ical",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 2,
+      "data": {
+        "message": "Route GET:/api/availability/property//ical not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/analytics/overview",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 1,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/analytics/revenue",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 1,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/analytics/occupancy",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 401,
+      "duration": 1,
+      "data": {
+        "error": "Unauthorized"
+      },
+      "error": "Unauthorized"
+    },
+    {
+      "endpoint": "/api/analytics/performance",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route GET:/api/analytics/performance not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/analytics/export",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route POST:/api/analytics/export not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/public/properties",
+      "method": "GET",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 2,
+      "data": {
+        "error": "Tenant not specified"
+      },
+      "error": "Tenant not specified"
+    },
+    {
+      "endpoint": "/api/public/availability/check",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 404,
+      "duration": 1,
+      "data": {
+        "message": "Route POST:/api/public/availability/check not found",
+        "error": "Not Found",
+        "statusCode": 404
+      },
+      "error": "Not Found"
+    },
+    {
+      "endpoint": "/api/public/pricing/calculate",
+      "method": "POST",
+      "status": "failed",
+      "statusCode": 400,
+      "duration": 2,
+      "data": {
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      },
+      "error": {
+        "issues": [
+          {
+            "code": "too_small",
+            "minimum": 1,
+            "type": "string",
+            "inclusive": true,
+            "exact": false,
+            "message": "String must contain at least 1 character(s)",
+            "path": [
+              "propertyId"
+            ]
+          }
+        ],
+        "name": "ZodError"
+      }
+    }
+  ],
+  "categorized": {
+    "Authentication": [
+      {
+        "endpoint": "/api/auth/register",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 24,
+        "data": {
+          "error": "Validation Error",
+          "message": "body must have required property 'firstName'",
+          "validation": [
+            {
+              "instancePath": "",
+              "schemaPath": "#/required",
+              "keyword": "required",
+              "params": {
+                "missingProperty": "firstName"
+              },
+              "message": "must have required property 'firstName'"
+            }
+          ]
+        },
+        "error": "Validation Error"
+      }
+    ],
+    "Properties": [
+      {
+        "endpoint": "/api/properties",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 3,
+        "data": {
+          "error": "Validation Error",
+          "message": "body must have required property 'propertyType'",
+          "validation": [
+            {
+              "instancePath": "",
+              "schemaPath": "#/required",
+              "keyword": "required",
+              "params": {
+                "missingProperty": "propertyType"
+              },
+              "message": "must have required property 'propertyType'"
+            }
+          ]
+        },
+        "error": "Validation Error"
+      }
+    ],
+    "Bookings": [
+      {
+        "endpoint": "/api/bookings",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 2,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      }
+    ],
+    "Pricing": [
+      {
+        "endpoint": "/api/pricing/calculate",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 2,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/pricing/quote",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route POST:/api/pricing/quote not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Availability": [
+      {
+        "endpoint": "/api/availability/property/",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route GET:/api/availability/property/ not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/availability/check",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 2,
+        "data": {
+          "message": "Route POST:/api/availability/check not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/availability/property//block",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route POST:/api/availability/property//block not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/availability/property//unblock",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 2,
+        "data": {
+          "message": "Route POST:/api/availability/property//unblock not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/availability/property//ical",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 2,
+        "data": {
+          "message": "Route GET:/api/availability/property//ical not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Analytics": [
+      {
+        "endpoint": "/api/analytics/overview",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 1,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/analytics/revenue",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 1,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/analytics/occupancy",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 401,
+        "duration": 1,
+        "data": {
+          "error": "Unauthorized"
+        },
+        "error": "Unauthorized"
+      },
+      {
+        "endpoint": "/api/analytics/performance",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route GET:/api/analytics/performance not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/analytics/export",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route POST:/api/analytics/export not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      }
+    ],
+    "Messaging": [],
+    "Payments": [],
+    "Public": [
+      {
+        "endpoint": "/api/public/properties",
+        "method": "GET",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 2,
+        "data": {
+          "error": "Tenant not specified"
+        },
+        "error": "Tenant not specified"
+      },
+      {
+        "endpoint": "/api/public/availability/check",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 404,
+        "duration": 1,
+        "data": {
+          "message": "Route POST:/api/public/availability/check not found",
+          "error": "Not Found",
+          "statusCode": 404
+        },
+        "error": "Not Found"
+      },
+      {
+        "endpoint": "/api/public/pricing/calculate",
+        "method": "POST",
+        "status": "failed",
+        "statusCode": 400,
+        "duration": 2,
+        "data": {
+          "error": {
+            "issues": [
+              {
+                "code": "too_small",
+                "minimum": 1,
+                "type": "string",
+                "inclusive": true,
+                "exact": false,
+                "message": "String must contain at least 1 character(s)",
+                "path": [
+                  "propertyId"
+                ]
+              }
+            ],
+            "name": "ZodError"
+          }
+        },
+        "error": {
+          "issues": [
+            {
+              "code": "too_small",
+              "minimum": 1,
+              "type": "string",
+              "inclusive": true,
+              "exact": false,
+              "message": "String must contain at least 1 character(s)",
+              "path": [
+                "propertyId"
+              ]
+            }
+          ],
+          "name": "ZodError"
+        }
+      }
+    ],
+    "Other": []
+  }
+}
