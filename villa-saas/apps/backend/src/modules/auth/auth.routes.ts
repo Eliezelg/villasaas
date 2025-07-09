@@ -116,20 +116,20 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       // Définir les cookies sécurisés pour les tokens
       const isProduction = process.env.NODE_ENV === 'production';
       
-      reply.setCookie('access_token', result.accessToken, {
+      reply.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'strict',
         path: '/',
-        maxAge: 15 * 60, // 15 minutes
+        maxAge: 15 * 60 * 1000, // 15 minutes en millisecondes
       });
       
-      reply.setCookie('refresh_token', result.refreshToken, {
+      reply.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
         sameSite: 'strict',
         path: '/',
-        maxAge: 7 * 24 * 60 * 60, // 7 jours
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours en millisecondes
       });
       
       // Ne pas envoyer les tokens dans la réponse JSON

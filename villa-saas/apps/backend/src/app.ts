@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import jwt from '@fastify/jwt';
+import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart';
 
 import { errorHandler } from './utils/error-handler';
@@ -130,6 +131,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     sign: {
       expiresIn: process.env.JWT_ACCESS_EXPIRATION || '15m',
     },
+  });
+
+  await app.register(cookie, {
+    secret: process.env.COOKIE_SECRET || process.env.SESSION_SECRET, // pour signer les cookies
+    parseOptions: {}
   });
 
   await app.register(multipart, {

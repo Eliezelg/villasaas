@@ -39,6 +39,7 @@ class ApiClient {
       const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers,
+        credentials: 'include', // IMPORTANT: Inclure les cookies dans les requêtes
       });
 
       // Handle 204 No Content response
