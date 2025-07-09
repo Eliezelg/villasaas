@@ -1,0 +1,14 @@
+# Configuration Nixpacks pour Railway
+[phases.setup]
+nixPkgs = ["nodejs_20", "pnpm"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = ["cd villa-saas && npm ci"]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = ["cd villa-saas/apps/backend && npm run build"]
+
+[start]
+cmd = "cd villa-saas/apps/backend && npm start"
