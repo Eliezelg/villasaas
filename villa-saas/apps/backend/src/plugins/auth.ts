@@ -7,10 +7,32 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
     'authenticate',
     async function (request: FastifyRequest, reply: FastifyReply): Promise<void> {
       try {
-        await request.jwtVerify();
+        // Vérifier d'abord le cookie, puis le header Authorization
+        let token: string | undefined;
+        
+        // Essayer de récupérer le token depuis le cookie
+        if (request.cookies && request.cookies.access_token) {
+          token = request.cookies.access_token;
+        }
+        // Sinon, essayer depuis le header Authorization
+        else if (request.headers.authorization) {
+          const parts = request.headers.authorization.split(' ');
+          if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1];
+          }
+        }
+        
+        if (!token) {
+          throw new Error('No token provided');
+        }
+        
+        // Vérifier le token
+        const decoded = await fastify.jwt.verify(token);
+        request.user = decoded;
         
         // Ajouter le tenantId à la requête pour faciliter l'accès
         request.tenantId = request.user.tenantId;
+        request.userId = request.user.userId;
       } catch (err) {
         reply.code(401).send({ error: 'Unauthorized' });
       }
@@ -22,9 +44,25 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
     'authenticateOptional',
     async function (request: FastifyRequest, _reply: FastifyReply): Promise<void> {
       try {
-        if (request.headers.authorization) {
-          await request.jwtVerify();
+        let token: string | undefined;
+        
+        // Essayer de récupérer le token depuis le cookie
+        if (request.cookies && request.cookies.access_token) {
+          token = request.cookies.access_token;
+        }
+        // Sinon, essayer depuis le header Authorization
+        else if (request.headers.authorization) {
+          const parts = request.headers.authorization.split(' ');
+          if (parts.length === 2 && parts[0] === 'Bearer') {
+            token = parts[1];
+          }
+        }
+        
+        if (token) {
+          const decoded = await fastify.jwt.verify(token);
+          request.user = decoded;
           request.tenantId = request.user.tenantId;
+          request.userId = request.user.userId;
         }
       } catch (err) {
         // Ignorer les erreurs, l'authentification est optionnelle

@@ -47,9 +47,9 @@ export default function AnalyticsPage() {
 
   const loadProperties = async () => {
     try {
-      const { data } = await propertyService.getAll();
-      if (data) {
-        setProperties(data);
+      const response = await propertyService.getAll();
+      if (response.properties) {
+        setProperties(response.properties);
       }
     } catch (error) {
       console.error('Failed to load properties:', error);

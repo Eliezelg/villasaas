@@ -38,19 +38,15 @@ export const useAuthStore = create<AuthState>()(
           return { success: false, error: error?.message || 'Login failed' };
         }
 
-        const { user, tenant, accessToken, refreshToken } = data;
-        
-        apiClient.setAccessToken(accessToken);
-        
-        // Set cookies for middleware
-        document.cookie = `access_token=${accessToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-        document.cookie = `refresh_token=${refreshToken}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        // Les tokens sont maintenant gérés par des cookies HttpOnly côté serveur
+        // On ne stocke plus les tokens côté client pour la sécurité
+        const { user, tenant } = data;
         
         set({
           user,
           tenant,
-          accessToken,
-          refreshToken,
+          accessToken: null, // Plus de stockage côté client
+          refreshToken: null, // Plus de stockage côté client
           isAuthenticated: true,
           isLoading: false,
         });
@@ -68,19 +64,14 @@ export const useAuthStore = create<AuthState>()(
           return { success: false, error: error?.message || 'Registration failed' };
         }
 
-        const { user, tenant, accessToken, refreshToken } = response;
-        
-        apiClient.setAccessToken(accessToken);
-        
-        // Set cookies for middleware
-        document.cookie = `access_token=${accessToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-        document.cookie = `refresh_token=${refreshToken}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        // Les tokens sont maintenant gérés par des cookies HttpOnly côté serveur
+        const { user, tenant } = response;
         
         set({
           user,
           tenant,
-          accessToken,
-          refreshToken,
+          accessToken: null, // Plus de stockage côté client
+          refreshToken: null, // Plus de stockage côté client
           isAuthenticated: true,
           isLoading: false,
         });
@@ -89,18 +80,10 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        const { accessToken } = get();
+        // Appeler l'endpoint de logout qui va supprimer les cookies côté serveur
+        await apiClient.post('/api/auth/logout');
         
-        if (accessToken) {
-          await apiClient.post('/api/auth/logout');
-        }
-        
-        apiClient.setAccessToken(null);
-        
-        // Clear cookies
-        document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
-        document.cookie = 'refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
-        
+        // Réinitialiser l'état local
         set({
           user: null,
           tenant: null,
@@ -111,17 +94,12 @@ export const useAuthStore = create<AuthState>()(
       },
 
       refreshSession: async () => {
-        const { refreshToken } = get();
-        
-        if (!refreshToken) {
-          return false;
-        }
-
+        // Le refresh token est dans les cookies, il sera envoyé automatiquement
         const { data, error } = await apiClient.post<{
           accessToken: string;
           refreshToken: string;
           expiresIn: number;
-        }>('/api/auth/refresh', { refreshToken });
+        }>('/api/auth/refresh', {});
 
         if (error || !data) {
           set({
@@ -134,46 +112,28 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
 
-        apiClient.setAccessToken(data.accessToken);
-        
-        set({
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-        });
-
+        // Les nouveaux tokens sont définis dans les cookies par le serveur
         return true;
       },
 
       checkAuth: async () => {
-        const { accessToken } = get();
-        
-        if (!accessToken) {
-          set({ isAuthenticated: false });
-          return;
-        }
-
-        apiClient.setAccessToken(accessToken);
-        
+        // Les cookies sont envoyés automatiquement avec la requête
         const { data, error } = await apiClient.get<User>('/api/auth/me');
         
         if (error || !data) {
-          // Try to refresh the session
-          const refreshed = await get().refreshSession();
-          
-          if (!refreshed) {
-            set({
-              user: null,
-              tenant: null,
-              accessToken: null,
-              refreshToken: null,
-              isAuthenticated: false,
-            });
-          }
+          set({
+            user: null,
+            tenant: null,
+            accessToken: null,
+            refreshToken: null,
+            isAuthenticated: false,
+          });
           return;
         }
 
         set({
           user: data,
+          tenant: data.tenant,
           isAuthenticated: true,
         });
       },
@@ -182,8 +142,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
+        // Ne plus stocker les tokens dans localStorage
         user: state.user,
         tenant: state.tenant,
       }),

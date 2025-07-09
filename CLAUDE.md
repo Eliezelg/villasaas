@@ -264,12 +264,76 @@ Generate embeddings using OpenAI text-embedding-3-small model.
 
 ## Security Requirements
 
-- JWT + refresh token authentication
-- Rate limiting on all endpoints
-- Tenant isolation at database level
-- Input validation on all user data
-- Audit logging for compliance
-- No secrets in code - use environment variables
+### 🔒 Améliorations de Sécurité Implémentées (Janvier 2025)
+
+1. **Authentification Sécurisée**
+   - JWT stockés dans des cookies HttpOnly (plus dans localStorage)
+   - Protection contre le brute force (5 tentatives max, blocage 15 min)
+   - Rotation automatique des refresh tokens
+   - Audit logging de toutes les tentatives de connexion
+
+2. **Validation des Paiements Stripe**
+   - Validation côté serveur des montants (protection manipulation prix)
+   - Webhooks Stripe avec validation de signature
+   - Capture du raw body pour vérification
+
+3. **Protection des Uploads**
+   - Validation stricte des types de fichiers (magic bytes)
+   - Scan de contenu malveillant
+   - Sanitisation des noms de fichiers
+   - Limites de taille par type
+
+4. **Headers de Sécurité**
+   - CSP (Content Security Policy) configurée
+   - HSTS avec preload (31536000 secondes)
+   - Protection XSS, clickjacking, MIME sniffing
+   - CORS restrictif pour production
+
+5. **Contrôle d'Accès (RBAC)**
+   - Middleware de permissions par rôle
+   - 3 rôles: OWNER, ADMIN, USER
+   - Permissions granulaires par action
+   - Audit logging des accès refusés
+
+6. **Audit et Monitoring**
+   - Service d'audit centralisé
+   - Logging de toutes les opérations sensibles
+   - Recherche et retention des logs
+   - Intégration prête pour Sentry
+
+### Configuration des Cookies Sécurisés
+```typescript
+// Backend - Configuration @fastify/cookie
+await app.register(cookie, {
+  secret: process.env.COOKIE_SECRET || process.env.SESSION_SECRET,
+  parseOptions: {}
+});
+
+// Définition des cookies après login
+reply.cookie('access_token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  path: '/',
+  maxAge: 15 * 60 * 1000 // 15 minutes
+});
+
+// Frontend - Inclure les cookies dans les requêtes
+fetch(url, {
+  credentials: 'include', // IMPORTANT
+  // ...
+});
+```
+
+### Middleware d'Authentification Amélioré
+```typescript
+// Le middleware vérifie d'abord les cookies, puis les headers
+if (request.cookies && request.cookies.access_token) {
+  token = request.cookies.access_token;
+} else if (request.headers.authorization) {
+  // Fallback sur Authorization header
+}
+```
 
 ## Testing Strategy
 
@@ -383,6 +447,9 @@ const form = useForm<z.infer<typeof schema>>({
 11. **PricingService refactoré** : Suppression de getPriceForDate, utilisation de calculatePrice
 12. **Statuts toujours en majuscules** : PUBLISHED, CONFIRMED, COMPLETED (jamais en minuscules)
 13. **API Client 204 No Content** : Gérer les réponses sans body pour éviter les erreurs JSON
+14. **reply.setCookie n'existe pas** : Utiliser `reply.cookie()` avec @fastify/cookie
+15. **Tokens en localStorage vulnérable** : Migration vers cookies HttpOnly
+16. **Next.js vulnérabilités** : Mise à jour de 14.1.0 vers 14.2.30
 
 ## 🔴 Règles CRITIQUES de Développement
 
@@ -441,6 +508,8 @@ Lors de l'ajout d'un nouveau module :
    - [ ] Implémenter l'isolation multi-tenant
    - [ ] Enregistrer les routes dans `app.ts`
    - [ ] Ajouter la documentation Swagger
+   - [ ] Implémenter les permissions RBAC avec `requirePermission()`
+   - [ ] Ajouter l'audit logging sur les opérations sensibles
    - [ ] Créer les tests
 
 2. **Frontend (Unified App)** :
@@ -448,6 +517,7 @@ Lors de l'ajout d'un nouveau module :
    - [ ] Créer les types dans `types/`
    - [ ] Créer les composants dans `components/`
    - [ ] Ajouter les pages dans `app/` selon le contexte (dashboard/booking/hub)
+   - [ ] Configurer `credentials: 'include'` pour les cookies
    - [ ] Gérer les données undefined
    - [ ] Implémenter la gestion d'erreurs
    - [ ] Ajouter les toasts de feedback
@@ -458,3 +528,12 @@ Lors de l'ajout d'un nouveau module :
    - [ ] Vérifier les index nécessaires
    - [ ] Exécuter `./scripts/update-db.sh`
    - [ ] Tester avec Prisma Studio
+
+## 🔐 Fichiers de Sécurité Importants
+
+- `apps/backend/src/middleware/rbac.middleware.ts` - Contrôle d'accès par rôle
+- `apps/backend/src/services/audit.service.ts` - Service d'audit logging
+- `apps/backend/src/utils/file-validator.ts` - Validation des uploads
+- `apps/backend/.env.production.example` - Template pour les variables de production
+- `SECURITY_AUDIT_REPORT.md` - Rapport d'audit de sécurité complet
+- `SECURITY_FIXES_COMPLETED.md` - Résumé des corrections effectuées

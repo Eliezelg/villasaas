@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProperty } from '@/contexts/property-context';
 import { PeriodsManager } from '@/components/admin/pricing/periods-manager';
@@ -7,6 +8,7 @@ import { InteractivePricingCalendar } from '@/components/admin/pricing/interacti
 
 export default function PropertyPricingPage() {
   const { property, isLoading, reload } = useProperty();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   if (isLoading) {
     return <p className="text-muted-foreground">Chargement...</p>;
@@ -58,9 +60,11 @@ export default function PropertyPricingPage() {
       <PeriodsManager 
         propertyId={property.id} 
         propertyName={property.name}
+        onUpdate={() => setRefreshKey(prev => prev + 1)}
       />
 
       <InteractivePricingCalendar
+        key={refreshKey}
         propertyId={property.id}
         basePrice={property.basePrice}
         weekendPremium={property.weekendPremium}

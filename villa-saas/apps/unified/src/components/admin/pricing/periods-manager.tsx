@@ -14,9 +14,10 @@ import { fr } from 'date-fns/locale';
 interface PeriodsManagerProps {
   propertyId?: string;
   propertyName?: string;
+  onUpdate?: () => void;
 }
 
-export function PeriodsManager({ propertyId, propertyName }: PeriodsManagerProps) {
+export function PeriodsManager({ propertyId, propertyName, onUpdate }: PeriodsManagerProps) {
   const { toast } = useToast();
   const [periods, setPeriods] = useState<Period[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +63,7 @@ export function PeriodsManager({ propertyId, propertyName }: PeriodsManagerProps
         setEditingPeriod(null);
         setShowForm(false);
         loadPeriods();
+        onUpdate?.();
       } else {
         toast({
           title: 'Erreur',
@@ -79,6 +81,7 @@ export function PeriodsManager({ propertyId, propertyName }: PeriodsManagerProps
         });
         setShowForm(false);
         loadPeriods();
+        onUpdate?.();
       } else {
         toast({
           title: 'Erreur',
@@ -102,6 +105,7 @@ export function PeriodsManager({ propertyId, propertyName }: PeriodsManagerProps
         description: 'La période tarifaire a été supprimée',
       });
       loadPeriods();
+      onUpdate?.();
     } else {
       toast({
         title: 'Erreur',

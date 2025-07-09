@@ -60,12 +60,14 @@ Toute la documentation est organisée dans le dossier [`docs/`](./docs/):
 - **Framework**: Fastify 4.x
 - **Language**: TypeScript (strict mode)
 - **ORM**: Prisma avec PostgreSQL
-- **Cache**: Redis
-- **Auth**: JWT avec refresh tokens
+- **Cache**: Redis (requis pour rate limiting)
+- **Auth**: JWT avec refresh tokens (cookies HttpOnly)
 - **Docs**: Swagger/OpenAPI
 - **Images**: Sharp pour l'optimisation + AWS S3
 - **Emails**: Resend + React Email
 - **Paiements**: Stripe Connect
+- **Sécurité**: Helmet, CORS, bcrypt, @fastify/cookie
+- **Monitoring**: Audit logs avec Prisma
 
 ### Frontend
 - **Framework**: Next.js 14 (App Router)
@@ -79,7 +81,8 @@ Toute la documentation est organisée dans le dossier [`docs/`](./docs/):
 - Node.js 20+
 - Docker et Docker Compose
 - PostgreSQL (via Docker)
-- Redis (via Docker)
+- Redis (via Docker) - Requis pour rate limiting et sessions
+- OpenSSL (pour générer les secrets de production)
 
 ## Installation
 
@@ -100,6 +103,10 @@ docker-compose up -d
 cd villa-saas/apps/backend
 cp .env.example .env
 # Éditer .env avec vos valeurs
+
+# Pour la production, utiliser le template sécurisé :
+cp .env.production.example .env.production
+# Générer les secrets avec : openssl rand -base64 64
 
 cd ../web
 cp .env.example .env.local
@@ -239,6 +246,7 @@ villa-saas/
 
 ## 🔒 Sécurité
 
+### Fonctionnalités de base
 - ✅ Authentification JWT avec rotation des tokens
 - ✅ Rate limiting (100 req/min)
 - ✅ Validation stricte avec Zod
@@ -246,6 +254,70 @@ villa-saas/
 - ✅ CORS configuré
 - ✅ Mots de passe hashés (bcrypt)
 - ✅ Multi-tenancy au niveau DB
+
+### 🛡️ Améliorations de Sécurité (Janvier 2025)
+
+#### 1. **Migration vers Cookies HttpOnly**
+- Stockage des JWT dans des cookies HttpOnly au lieu de localStorage
+- Protection contre les attaques XSS
+- Configuration secure/sameSite pour production
+- Support automatique dans l'API client avec `credentials: 'include'`
+
+#### 2. **Protection Brute Force**
+- Limitation à 5 tentatives de connexion par IP/email
+- Blocage temporaire de 15 minutes après dépassement
+- Compteurs stockés dans Redis avec expiration automatique
+- Protection sur login, register et refresh token
+
+#### 3. **Validation Serveur des Paiements**
+- Double vérification des montants Stripe côté serveur
+- Calcul indépendant du prix pour prévenir la manipulation
+- Tolérance de 0.01€ pour les arrondis
+- Métadonnées sécurisées dans les sessions Stripe
+
+#### 4. **Validation Stricte des Uploads**
+- Vérification des magic bytes (signatures de fichiers)
+- Validation MIME type réelle vs déclarée
+- Limite de taille à 10MB par fichier
+- Types autorisés : JPEG, PNG, WebP uniquement
+- Détection des fichiers malveillants déguisés
+
+#### 5. **Headers de Sécurité Renforcés**
+- CSP (Content Security Policy) strict avec directives détaillées
+- HSTS avec preload pour forcer HTTPS
+- X-Frame-Options contre le clickjacking
+- X-Content-Type-Options contre le MIME sniffing
+- Referrer-Policy pour la confidentialité
+
+#### 6. **RBAC et Permissions**
+- Middleware de vérification des permissions granulaires
+- Rôles : SUPER_ADMIN, ADMIN, MANAGER, VIEWER
+- Permissions spécifiques par module
+- Vérification automatique sur les routes protégées
+
+#### 7. **Audit Logging Complet**
+- Journalisation de toutes les actions sensibles
+- Informations capturées : user, IP, user-agent, timestamp
+- Actions trackées : auth, CRUD, paiements, permissions
+- Service dédié avec méthodes helper
+
+#### 8. **Sécurité des Webhooks**
+- Validation des signatures Stripe sur tous les webhooks
+- Vérification du timestamp pour prévenir les replay attacks
+- Tolérance de 5 minutes pour les retards réseau
+- Rejet automatique des requêtes non signées
+
+#### 9. **Rotation des Refresh Tokens**
+- Nouveau refresh token à chaque utilisation
+- Invalidation automatique de l'ancien token
+- Protection contre le vol de tokens
+- Expiration après 7 jours d'inactivité
+
+#### 10. **Configuration Production**
+- Template .env.production.example avec instructions
+- Génération sécurisée des secrets avec OpenSSL
+- Documentation des variables sensibles
+- Pas de secrets dans le code source
 
 ## 🧪 Tests
 

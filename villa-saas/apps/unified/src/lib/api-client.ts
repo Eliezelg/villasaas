@@ -12,12 +12,6 @@ export interface ApiResponse<T> {
 }
 
 class ApiClient {
-  private accessToken: string | null = null;
-
-  setAccessToken(token: string | null) {
-    this.accessToken = token;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -29,10 +23,6 @@ class ApiClient {
     // Only set Content-Type for requests with a body
     if (options.body && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
-    }
-
-    if (this.accessToken) {
-      headers['Authorization'] = `Bearer ${this.accessToken}`;
     }
 
     try {
