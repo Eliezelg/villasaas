@@ -8,6 +8,8 @@
     "dev": "turbo dev",
     "dev:unified": "npm run dev -w @villa-saas/unified",
     "build": "turbo build",
+    "build:railway": "bash scripts/build-railway.sh",
+    "build:backend": "npm run generate -w @villa-saas/database && npm run build -w @villa-saas/database && npm run build -w @villa-saas/utils && npm run build -w @villa-saas/types && npm run build -w @villa-saas/i18n && npm run build -w @villa-saas/backend",
     "test": "turbo test",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
