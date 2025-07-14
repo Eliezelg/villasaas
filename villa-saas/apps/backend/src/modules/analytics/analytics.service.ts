@@ -72,7 +72,7 @@ export class AnalyticsService {
     });
 
     // Calculate total revenue
-    const totalRevenue = bookings.reduce((sum, booking) => 
+    const totalRevenue = bookings.reduce((sum: number, booking: any) => 
       sum + Number(booking.total), 0
     );
 
@@ -280,7 +280,7 @@ export class AnalyticsService {
         return bookingMonth >= monthStart && bookingMonth <= monthEnd;
       });
       
-      const monthRevenue = monthBookings.reduce((sum, booking) => 
+      const monthRevenue = monthBookings.reduce((sum: number, booking: any) => 
         sum + Number(booking.total), 0
       );
       
@@ -295,7 +295,7 @@ export class AnalyticsService {
     }
 
     // Calculate totals
-    const totalRevenue = bookings.reduce((sum, booking) => 
+    const totalRevenue = bookings.reduce((sum: number, booking: any) => 
       sum + Number(booking.total), 0
     );
     
