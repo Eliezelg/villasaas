@@ -20,6 +20,7 @@ Ce guide explique comment configurer l'intégration avec OVH pour permettre l'ac
 
 ## 2. Obtenir un Consumer Key
 
+
 Exécutez cette commande curl en remplaçant YOUR_APP_KEY :
 
 ```bash

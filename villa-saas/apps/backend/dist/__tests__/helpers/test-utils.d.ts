@@ -7,10 +7,10 @@ export declare function createAuthHeader(token: string): {
     authorization: string;
 };
 export declare function createTenant(prisma: PrismaClient): Promise<{
+    name: string;
     id: string;
     createdAt: Date;
     updatedAt: Date;
-    name: string;
     email: string;
     phone: string | null;
     companyName: string | null;
@@ -42,9 +42,9 @@ export declare function createUser(prisma: PrismaClient, tenantId: string): Prom
     email: string;
     phone: string | null;
     isActive: boolean;
+    passwordHash: string;
     firstName: string;
     lastName: string;
-    passwordHash: string;
     emailVerified: boolean;
     tenantId: string;
     role: import(".prisma/client").$Enums.UserRole;

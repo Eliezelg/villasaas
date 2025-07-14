@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@villa-saas/database';
 import type { FastifyInstance } from 'fastify';
 
 async function prismaPlugin(fastify: FastifyInstance): Promise<void> {

@@ -299,7 +299,7 @@ export class AnalyticsService {
       sum + Number(booking.total), 0
     );
     
-    const totalNights = bookings.reduce((sum, booking) => 
+    const totalNights = bookings.reduce((sum: number, booking: any) => 
       sum + differenceInDays(booking.checkOut, booking.checkIn), 0
     );
     

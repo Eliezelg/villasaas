@@ -589,7 +589,7 @@ async function publicRoutes(fastify) {
             let promoCodeDiscount = 0;
             let promoCodeId = null;
             if (data.promoCode) {
-                const promoValidation = await (0, promocode_service_1.validatePromoCode)(fastify.prisma, {
+                const promoValidation = await (0, promocode_service_1.validatePromoCode)({
                     code: data.promoCode,
                     tenantId: tenant.id,
                     propertyId: data.propertyId,

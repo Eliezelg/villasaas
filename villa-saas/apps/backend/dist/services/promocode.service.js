@@ -2,9 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validatePromoCode = validatePromoCode;
 exports.applyPromoCode = applyPromoCode;
-async function validatePromoCode(prisma, params) {
+const database_1 = require("@villa-saas/database");
+async function validatePromoCode(params) {
     const { code, tenantId, propertyId, totalAmount, nights, userId } = params;
-    const promoCode = await prisma.promoCode.findFirst({
+    const promoCode = await database_1.prisma.promoCode.findFirst({
         where: {
             code: code.toUpperCase(),
             tenantId,
@@ -43,7 +44,7 @@ async function validatePromoCode(prisma, params) {
     }
     // Vérifier la limite d'utilisation par utilisateur
     if (promoCode.maxUsesPerUser && userId) {
-        const userUsageCount = await prisma.booking.count({
+        const userUsageCount = await database_1.prisma.booking.count({
             where: {
                 promoCodeId: promoCode.id,
                 userId,
@@ -76,8 +77,8 @@ async function validatePromoCode(prisma, params) {
         finalAmount: totalAmount - discountAmount,
     };
 }
-async function applyPromoCode(prisma, promoCodeId) {
-    await prisma.promoCode.update({
+async function applyPromoCode(promoCodeId) {
+    await database_1.prisma.promoCode.update({
         where: { id: promoCodeId },
         data: {
             currentUses: { increment: 1 }

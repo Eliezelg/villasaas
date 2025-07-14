@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 interface ValidatePromoCodeParams {
     code: string;
     tenantId: string;
@@ -9,7 +8,7 @@ interface ValidatePromoCodeParams {
     nights: number;
     userId?: string;
 }
-export declare function validatePromoCode(prisma: PrismaClient, params: ValidatePromoCodeParams): Promise<{
+export declare function validatePromoCode(params: ValidatePromoCodeParams): Promise<{
     valid: boolean;
     error: string;
     promoCodeId?: undefined;
@@ -30,6 +29,6 @@ export declare function validatePromoCode(prisma: PrismaClient, params: Validate
     finalAmount: number;
     error?: undefined;
 }>;
-export declare function applyPromoCode(prisma: PrismaClient, promoCodeId: string): Promise<void>;
+export declare function applyPromoCode(promoCodeId: string): Promise<void>;
 export {};
 //# sourceMappingURL=promocode.service.d.ts.map

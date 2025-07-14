@@ -1,17 +1,11 @@
 [phases.setup]
-nixPkgs = ["nodejs-20_x", "npm-9_x"]
+nixPkgs = ["nodejs-20_x", "npm-9_x", "bash"]
 
 [phases.install]
-cmds = ["npm ci", "cd packages/database && npx prisma generate"]
+cmds = ["npm ci"]
 
 [phases.build]
-cmds = [
-  "cd packages/database && npm run build",
-  "cd packages/types && npm run build",
-  "cd packages/utils && npm run build",
-  "cd packages/i18n && npm run build",
-  "cd apps/backend && npm run build"
-]
+cmds = ["bash scripts/build-railway.sh"]
 
 [start]
 cmd = "cd apps/backend && npm start"
