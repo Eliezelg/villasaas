@@ -1,18 +1,8 @@
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 import { Server as SocketIOServer } from 'socket.io';
-import { verify } from '@fastify/jwt';
 
-interface SocketUser {
-  userId: string;
-  tenantId: string;
-  role: string;
-}
 
-interface SocketData {
-  user?: SocketUser;
-  conversations: Set<string>;
-}
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -149,7 +139,7 @@ const websocketPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => 
             conversationId: data.conversationId,
             senderId: user?.userId,
             content: data.content,
-            type: data.type || 'TEXT',
+            type: data.type || 'TEXT' as any,
           },
           include: {
             sender: {

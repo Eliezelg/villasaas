@@ -20,6 +20,44 @@ const imageMetadataSchema = z.object({
 export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<void> {
   const s3Service = new S3Service(fastify.s3);
 
+  // Get all images for a property
+  fastify.get('/:propertyId/images', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      description: 'Récupérer toutes les images d\'une propriété',
+      tags: ['properties', 'images'],
+      params: {
+        type: 'object',
+        properties: {
+          propertyId: { type: 'string' },
+        },
+        required: ['propertyId'],
+      },
+    },
+  }, async (request, reply) => {
+    const { tenantId } = request;
+    const { propertyId } = request.params as { propertyId: string };
+
+    // Vérifier que la propriété appartient au tenant
+    const property = await fastify.prisma.property.findFirst({
+      where: {
+        id: propertyId,
+        tenantId,
+      },
+    });
+
+    if (!property) {
+      return reply.code(404).send({ error: 'Property not found' });
+    }
+
+    const images = await fastify.prisma.propertyImage.findMany({
+      where: { propertyId },
+      orderBy: { order: 'asc' },
+    });
+
+    return reply.send(images);
+  });
+
   // Upload images for a property
   fastify.post('/:propertyId/images', {
     preHandler: [fastify.authenticate],
@@ -68,10 +106,10 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
         mimeType = data.mimetype;
         if (data.fields && data.fields.metadata) {
           const metadataValue = data.fields.metadata;
-          if (typeof metadataValue === 'object' && metadataValue.value) {
+          if (typeof metadataValue === 'object' && 'value' in metadataValue) {
             // Fastify multipart retourne un objet avec une propriété 'value'
             try {
-              metadata = JSON.parse(metadataValue.value);
+              metadata = JSON.parse((metadataValue as any).value);
             } catch (e) {
               metadata = {};
             }
@@ -101,8 +139,8 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
         return reply.code(400).send({ error: 'Invalid base64 image format' });
       }
       
-      mimeType = matches[1];
-      const base64Data = matches[2];
+      mimeType = matches[1] || 'image/jpeg';
+      const base64Data = matches[2] || '';
       buffer = Buffer.from(base64Data, 'base64');
     }
 
@@ -200,6 +238,125 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
       fastify.log.error(error);
       return reply.code(500).send({ error: 'Failed to generate upload URL' });
     }
+  });
+
+  // Update single image order
+  fastify.put('/:propertyId/images/:imageId/reorder', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      description: 'Mettre à jour l\'ordre d\'une image',
+      tags: ['properties', 'images'],
+    },
+  }, async (request, reply) => {
+    const { tenantId } = request;
+    const { propertyId, imageId } = request.params as { propertyId: string; imageId: string };
+    const { order } = request.body as { order: number };
+
+    // Vérifier que la propriété appartient au tenant
+    const property = await fastify.prisma.property.findFirst({
+      where: {
+        id: propertyId,
+        tenantId,
+      },
+    });
+
+    if (!property) {
+      return reply.code(404).send({ error: 'Property not found' });
+    }
+
+    // Vérifier que l'image existe
+    const image = await fastify.prisma.propertyImage.findFirst({
+      where: {
+        id: imageId,
+        propertyId,
+      },
+    });
+
+    if (!image) {
+      return reply.code(404).send({ error: 'Image not found' });
+    }
+
+    // Mettre à jour l'ordre
+    const updatedImage = await fastify.prisma.propertyImage.update({
+      where: { id: imageId },
+      data: { order },
+    });
+
+    return reply.send(updatedImage);
+  });
+
+  // Set image as primary
+  fastify.put('/:propertyId/images/:imageId/primary', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      description: 'Définir une image comme principale',
+      tags: ['properties', 'images'],
+    },
+  }, async (request, reply) => {
+    const { tenantId } = request;
+    const { propertyId, imageId } = request.params as { propertyId: string; imageId: string };
+
+    // Vérifier que la propriété appartient au tenant
+    const property = await fastify.prisma.property.findFirst({
+      where: {
+        id: propertyId,
+        tenantId,
+      },
+    });
+
+    if (!property) {
+      return reply.code(404).send({ error: 'Property not found' });
+    }
+
+    // Vérifier que l'image existe
+    const image = await fastify.prisma.propertyImage.findFirst({
+      where: {
+        id: imageId,
+        propertyId,
+      },
+    });
+
+    if (!image) {
+      return reply.code(404).send({ error: 'Image not found' });
+    }
+
+    // Retirer le statut primary de toutes les autres images
+    await fastify.prisma.propertyImage.updateMany({
+      where: {
+        propertyId,
+        id: { not: imageId },
+      },
+      data: { isPrimary: false },
+    });
+
+    // Définir cette image comme principale
+    const updatedImage = await fastify.prisma.propertyImage.update({
+      where: { id: imageId },
+      data: { 
+        isPrimary: true,
+        order: 0, // L'image principale est toujours en première position
+      },
+    });
+
+    // Réorganiser les autres images
+    const otherImages = await fastify.prisma.propertyImage.findMany({
+      where: {
+        propertyId,
+        id: { not: imageId },
+      },
+      orderBy: { order: 'asc' },
+    });
+
+    const updatePromises = otherImages.map((img, index) =>
+      fastify.prisma.propertyImage.update({
+        where: { id: img.id },
+        data: { order: index + 1 },
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    return reply.send(updatedImage);
   });
 
   // Update image order
@@ -344,14 +501,21 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
     }
 
     try {
-      // Extraire la clé de base depuis l'URL
-      const urlParts = image.url.split('/');
-      const filename = urlParts[urlParts.length - 1];
-      const baseKey = filename.replace(/-[^-]+\.jpg$/, '');
-      const fullKey = `properties/${tenantId}/${propertyId}/${baseKey}`;
+      // Si l'image a été uploadée vers S3, la supprimer
+      if (image.url && (image.url.includes('s3') || image.url.includes('amazonaws'))) {
+        try {
+          // Extraire la clé de base depuis l'URL
+          const urlParts = image.url.split('/');
+          const filename = urlParts[urlParts.length - 1];
+          const baseKey = filename?.replace(/-[^-]+\.jpg$/, '') || '';
+          const fullKey = `properties/${tenantId}/${propertyId}/${baseKey}`;
 
-      // Supprimer de S3
-      await s3Service.deleteImage(fullKey);
+          // Supprimer de S3
+          await s3Service.deleteImage(fullKey);
+        } catch (s3Error) {
+          fastify.log.error(s3Error, 'Failed to delete image from S3, continuing with DB deletion');
+        }
+      }
 
       // Supprimer de la base de données
       await fastify.prisma.propertyImage.delete({

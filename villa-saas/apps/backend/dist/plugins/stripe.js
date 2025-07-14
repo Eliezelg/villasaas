@@ -10,7 +10,7 @@ async function stripePlugin(fastify) {
         throw new Error('STRIPE_SECRET_KEY must be set');
     }
     const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
-        apiVersion: '2024-12-18.acacia',
+        apiVersion: '2025-06-30.basil',
         typescript: true,
     });
     fastify.decorate('stripe', stripe);

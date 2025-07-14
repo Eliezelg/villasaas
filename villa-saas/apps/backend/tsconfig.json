@@ -25,6 +25,7 @@
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": true,
     "strictNullChecks": true,
+    "jsx": "react",
     "types": ["node", "jest"]
   },
   "include": ["src/**/*"],

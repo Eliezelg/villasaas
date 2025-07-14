@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Home",
+    "properties": "Eigenschappen",
+    "about": "Over ons",
+    "contact": "Contact",
+    "login": "Inloggen",
+    "signup": "Registreren",
+    "dashboard": "Dashboard"
+  },
+  "actions": {
+    "search": "Zoeken",
+    "filter": "Filteren",
+    "sort": "Sorteren",
+    "book": "Boeken",
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "save": "Opslaan",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "view": "Bekijken",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "continue": "Doorgaan",
+    "backToHome": "Terug naar home"
+  },
+  "labels": {
+    "email": "E-mail",
+    "password": "Wachtwoord",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "phone": "Telefoon",
+    "address": "Adres",
+    "city": "Stad",
+    "country": "Land",
+    "postalCode": "Postcode",
+    "language": "Taal",
+    "currency": "Valuta"
+  },
+  "messages": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "success": "Succesvol voltooid",
+    "noResults": "Geen resultaten gevonden",
+    "required": "Dit veld is verplicht",
+    "invalidEmail": "Ongeldig e-mailadres",
+    "invalidPhone": "Ongeldig telefoonnummer",
+    "notFound": "Pagina niet gevonden"
+  },
+  "footer": {
+    "rights": "Alle rechten voorbehouden",
+    "privacy": "Privacybeleid",
+    "terms": "Servicevoorwaarden",
+    "cookies": "Cookie-instellingen"
+  }
+}

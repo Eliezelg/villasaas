@@ -1,5 +1,4 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { Role } from '@villa-saas/database';
 
 export type Permission = 
   | 'properties.read'
@@ -20,7 +19,7 @@ export type Permission =
   | 'settings.write';
 
 // Définir les permissions par rôle
-const rolePermissions: Record<Role, Permission[]> = {
+const rolePermissions: Record<string, Permission[]> = {
   OWNER: [
     // Les propriétaires ont toutes les permissions
     'properties.read', 'properties.write', 'properties.delete',
@@ -53,20 +52,20 @@ const rolePermissions: Record<Role, Permission[]> = {
 /**
  * Middleware pour vérifier les rôles
  */
-export function requireRole(allowedRoles: Role[]) {
+export function requireRole(allowedRoles: string[]) {
   return async function (request: FastifyRequest, reply: FastifyReply) {
     if (!request.user) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
 
-    const userRole = request.user.role as Role;
+    const userRole = request.user.role as string;
     
     if (!allowedRoles.includes(userRole)) {
       // Log de sécurité
       await request.server.prisma.auditLog.create({
         data: {
           tenantId: request.tenantId!,
-          userId: request.userId,
+          userId: request.user?.userId || null,
           action: 'access.denied',
           entity: 'rbac',
           details: {
@@ -96,7 +95,7 @@ export function requirePermission(requiredPermission: Permission) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
 
-    const userRole = request.user.role as Role;
+    const userRole = request.user.role as string;
     const userPermissions = rolePermissions[userRole] || [];
     
     if (!userPermissions.includes(requiredPermission)) {
@@ -104,7 +103,7 @@ export function requirePermission(requiredPermission: Permission) {
       await request.server.prisma.auditLog.create({
         data: {
           tenantId: request.tenantId!,
-          userId: request.userId,
+          userId: request.user?.userId || null,
           action: 'permission.denied',
           entity: 'rbac',
           details: {
@@ -135,7 +134,7 @@ export function requireAllPermissions(requiredPermissions: Permission[]) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
 
-    const userRole = request.user.role as Role;
+    const userRole = request.user.role as string;
     const userPermissions = rolePermissions[userRole] || [];
     
     const missingPermissions = requiredPermissions.filter(
@@ -147,7 +146,7 @@ export function requireAllPermissions(requiredPermissions: Permission[]) {
       await request.server.prisma.auditLog.create({
         data: {
           tenantId: request.tenantId!,
-          userId: request.userId,
+          userId: request.user?.userId || null,
           action: 'permissions.denied',
           entity: 'rbac',
           details: {
@@ -178,7 +177,7 @@ export function requireAnyPermission(requiredPermissions: Permission[]) {
       return reply.code(401).send({ error: 'Unauthorized' });
     }
 
-    const userRole = request.user.role as Role;
+    const userRole = request.user.role as string;
     const userPermissions = rolePermissions[userRole] || [];
     
     const hasAnyPermission = requiredPermissions.some(
@@ -190,7 +189,7 @@ export function requireAnyPermission(requiredPermissions: Permission[]) {
       await request.server.prisma.auditLog.create({
         data: {
           tenantId: request.tenantId!,
-          userId: request.userId,
+          userId: request.user?.userId || null,
           action: 'permissions.denied',
           entity: 'rbac',
           details: {
@@ -215,7 +214,7 @@ export function requireAnyPermission(requiredPermissions: Permission[]) {
 /**
  * Vérifier si un utilisateur a une permission spécifique
  */
-export function hasPermission(userRole: Role, permission: Permission): boolean {
+export function hasPermission(userRole: string, permission: Permission): boolean {
   const permissions = rolePermissions[userRole] || [];
   return permissions.includes(permission);
 }
@@ -223,6 +222,6 @@ export function hasPermission(userRole: Role, permission: Permission): boolean {
 /**
  * Obtenir toutes les permissions d'un rôle
  */
-export function getRolePermissions(role: Role): Permission[] {
+export function getRolePermissions(role: string): Permission[] {
   return rolePermissions[role] || [];
 }

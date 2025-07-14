@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { getTenantId, createTenantFilter, addTenantToData } from '@villa-saas/utils';
+import { getTenantId, addTenantToData } from '@villa-saas/utils';
 
 const createPeriodSchema = z.object({
   propertyId: z.string().optional(),
@@ -175,7 +175,7 @@ export async function periodRoutes(fastify: FastifyInstance): Promise<void> {
     // Vérifier s'il y a des réservations sur cette période
     const bookings = await fastify.prisma.booking.count({
       where: {
-        propertyId: period.propertyId,
+        propertyId: period.propertyId || undefined,
         tenantId,
         status: { in: ['PENDING', 'CONFIRMED'] },
         OR: [

@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Ana Sayfa",
+    "properties": "Mülkler",
+    "about": "Hakkımızda",
+    "contact": "İletişim",
+    "login": "Giriş",
+    "signup": "Kayıt Ol",
+    "dashboard": "Kontrol Paneli"
+  },
+  "actions": {
+    "search": "Ara",
+    "filter": "Filtrele",
+    "sort": "Sırala",
+    "book": "Rezervasyon Yap",
+    "cancel": "İptal",
+    "confirm": "Onayla",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "view": "Görüntüle",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "continue": "Devam Et",
+    "backToHome": "Ana sayfaya dön"
+  },
+  "labels": {
+    "email": "E-posta",
+    "password": "Şifre",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "phone": "Telefon",
+    "address": "Adres",
+    "city": "Şehir",
+    "country": "Ülke",
+    "postalCode": "Posta Kodu",
+    "language": "Dil",
+    "currency": "Para Birimi"
+  },
+  "messages": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "success": "İşlem başarılı",
+    "noResults": "Sonuç bulunamadı",
+    "required": "Bu alan zorunludur",
+    "invalidEmail": "Geçersiz e-posta",
+    "invalidPhone": "Geçersiz telefon numarası",
+    "notFound": "Sayfa bulunamadı"
+  },
+  "footer": {
+    "rights": "Tüm hakları saklıdır",
+    "privacy": "Gizlilik politikası",
+    "terms": "Hizmet şartları",
+    "cookies": "Çerez ayarları"
+  }
+}

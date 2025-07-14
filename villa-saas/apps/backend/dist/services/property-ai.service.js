@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PropertyAIService = void 0;
+const openai_1 = __importDefault(require("openai"));
 class PropertyAIService {
     /**
      * Génère le contenu searchable à partir des données de la propriété
@@ -120,17 +124,29 @@ class PropertyAIService {
         return parts.join('. ');
     }
     /**
-     * Mock de génération d'embeddings (à remplacer par OpenAI)
+     * Génère un embedding vectoriel avec OpenAI
      */
     static async generateEmbedding(text) {
-        // TODO: Intégrer OpenAI text-embedding-3-small
-        // const response = await openai.embeddings.create({
-        //   model: "text-embedding-3-small",
-        //   input: text,
-        // });
-        // return response.data[0].embedding;
-        // Pour l'instant, retourne un vecteur vide
-        return [];
+        // Vérifier que la clé API est configurée
+        if (!process.env.OPENAI_API_KEY) {
+            console.warn('⚠️ OPENAI_API_KEY non configurée - embedding désactivé');
+            return [];
+        }
+        try {
+            const openai = new openai_1.default({
+                apiKey: process.env.OPENAI_API_KEY
+            });
+            const response = await openai.embeddings.create({
+                model: "text-embedding-3-small",
+                input: text,
+            });
+            return response.data[0]?.embedding || [];
+        }
+        catch (error) {
+            console.error('❌ Erreur génération embedding:', error);
+            // Retourner un vecteur vide en cas d'erreur pour ne pas bloquer
+            return [];
+        }
     }
     // Traductions des clés
     static translatePropertyType(type) {

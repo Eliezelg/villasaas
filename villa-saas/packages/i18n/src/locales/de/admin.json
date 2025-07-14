@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen in Ihrem Villa SaaS Dashboard",
+    "stats": {
+      "properties": "Immobilien",
+      "activeProperties": "Aktive Immobilien",
+      "bookings": "Buchungen",
+      "thisMonth": "Diesen Monat",
+      "revenue": "Einnahmen",
+      "occupancyRate": "Belegungsrate",
+      "averageThisMonth": "Durchschnitt diesen Monat"
+    },
+    "recentBookings": {
+      "title": "Aktuelle Buchungen",
+      "subtitle": "Ihre letzten Buchungen",
+      "empty": "Noch keine Buchungen vorhanden"
+    },
+    "recentActivity": {
+      "title": "Aktuelle Aktivitäten",
+      "subtitle": "Letzte Aktionen in Ihrem Konto",
+      "empty": "Keine aktuellen Aktivitäten"
+    }
+  },
+  "properties": {
+    "title": "Immobilien",
+    "subtitle": "Verwalten Sie Ihre Immobilien",
+    "addProperty": "Immobilie hinzufügen",
+    "loading": "Wird geladen...",
+    "error": "Fehler beim Laden der Immobilien",
+    "empty": {
+      "title": "Keine Immobilien",
+      "description": "Beginnen Sie mit dem Hinzufügen Ihrer ersten Immobilie"
+    },
+    "deleteConfirm": "Sind Sie sicher, dass Sie löschen möchten",
+    "labels": {
+      "bedrooms": "Schlafzimmer",
+      "guests": "Gäste",
+      "pricePerNight": "Preis/Nacht",
+      "edit": "Bearbeiten"
+    },
+    "types": {
+      "APARTMENT": "Wohnung",
+      "HOUSE": "Haus",
+      "VILLA": "Villa",
+      "STUDIO": "Studio",
+      "LOFT": "Loft",
+      "ROOM": "Zimmer",
+      "OTHER": "Andere"
+    },
+    "statuses": {
+      "DRAFT": "Entwurf",
+      "PUBLISHED": "Veröffentlicht",
+      "ARCHIVED": "Archiviert"
+    }
+  },
+  "bookings": {
+    "title": "Buchungen",
+    "subtitle": "Verwalten Sie Ihre Buchungen",
+    "newBooking": "Neue Buchung",
+    "search": "Suchen (Referenz, Name, E-Mail)",
+    "filters": {
+      "allProperties": "Alle Immobilien",
+      "allStatuses": "Alle Status",
+      "apply": "Filtern"
+    },
+    "table": {
+      "reference": "Referenz",
+      "property": "Immobilie",
+      "client": "Kunde",
+      "dates": "Daten",
+      "guests": "Gäste",
+      "total": "Gesamt",
+      "status": "Status",
+      "actions": "Aktionen"
+    },
+    "labels": {
+      "nights": "Nächte",
+      "night": "Nacht",
+      "babies": "Babys",
+      "baby": "Baby",
+      "viewDetails": "Details anzeigen",
+      "confirm": "Bestätigen",
+      "cancel": "Stornieren"
+    },
+    "empty": "Keine Buchungen gefunden",
+    "pagination": "Seite {page} von {totalPages} ({total} Ergebnisse)",
+    "errors": {
+      "loadError": "Buchungen konnten nicht geladen werden"
+    },
+    "messages": {
+      "confirmSuccess": "Die Buchung {reference} wurde bestätigt",
+      "cancelSuccess": "Die Buchung {reference} wurde storniert",
+      "cancelConfirm": "Sind Sie sicher, dass Sie diese Buchung stornieren möchten?",
+      "cancelReason": "Vom Eigentümer storniert"
+    },
+    "statuses": {
+      "PENDING": "Ausstehend",
+      "CONFIRMED": "Bestätigt",
+      "CANCELLED": "Storniert",
+      "COMPLETED": "Abgeschlossen",
+      "NO_SHOW": "Nicht erschienen"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie alle Einstellungen Ihres Kontos und Ihrer Immobilien",
+    "sections": {
+      "profile": {
+        "title": "Firmenprofil",
+        "description": "Verwalten Sie Ihre Firmeninformationen"
+      },
+      "payments": {
+        "title": "Zahlungen",
+        "description": "Konfigurieren Sie Ihre Zahlungsmethoden und Provisionen"
+      },
+      "users": {
+        "title": "Benutzer",
+        "description": "Verwalten Sie Benutzer und deren Berechtigungen"
+      },
+      "emails": {
+        "title": "E-Mails",
+        "description": "Personalisieren Sie Ihre E-Mail-Vorlagen"
+      },
+      "autoResponses": {
+        "title": "Automatische Antworten",
+        "description": "Konfigurieren Sie automatische Nachrichten und den KI-Chatbot"
+      },
+      "integrations": {
+        "title": "Integrationen",
+        "description": "Verbinden Sie Ihre externen Tools (Airbnb, Booking.com, etc.)"
+      },
+      "security": {
+        "title": "Sicherheit",
+        "description": "Verwalten Sie Sicherheit und Zugriffe"
+      },
+      "preferences": {
+        "title": "Einstellungen",
+        "description": "Personalisieren Sie Ihre Erfahrung"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Zurück zur Startseite",
+    "login": {
+      "title": "Anmeldung",
+      "subtitle": "Melden Sie sich bei Ihrem Villa SaaS Konto an",
+      "email": "E-Mail",
+      "emailPlaceholder": "ihre@email.de",
+      "password": "Passwort",
+      "errors": {
+        "invalidEmail": "Ungültige E-Mail-Adresse",
+        "passwordRequired": "Passwort ist erforderlich",
+        "generic": "Ein Fehler ist aufgetreten"
+      },
+      "submit": "Anmelden",
+      "submitting": "Anmeldung...",
+      "noAccount": "Noch kein Konto?",
+      "createAccount": "Konto erstellen"
+    },
+    "logout": "Abmelden"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "properties": "Immobilien",
+    "bookings": "Buchungen",
+    "messages": "Nachrichten",
+    "analytics": "Analysen",
+    "bookingOptions": "Buchungsoptionen",
+    "paymentConfiguration": "Zahlungskonfiguration",
+    "users": "Benutzer",
+    "settings": "Einstellungen"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Erneut versuchen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Vorherige",
+    "yes": "Ja",
+    "no": "Nein",
+    "close": "Schließen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "refresh": "Aktualisieren",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "download": "Herunterladen",
+    "upload": "Hochladen",
+    "print": "Drucken",
+    "share": "Teilen",
+    "copy": "Kopieren",
+    "paste": "Einfügen",
+    "cut": "Ausschneiden",
+    "selectAll": "Alles auswählen",
+    "deselectAll": "Auswahl aufheben"
+  }
+}

@@ -20,7 +20,7 @@ export declare class AuthService {
             subdomain: string | null;
         };
     }>;
-    login(data: LoginDto): Promise<{
+    login(data: LoginDto, ipAddress?: string): Promise<{
         accessToken: string;
         refreshToken: string;
         expiresIn: number;

@@ -23,7 +23,8 @@ const publicPromoCodesRoutes = async (fastify) => {
         if (!validation.success) {
             return reply.code(400).send({ error: validation.error });
         }
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }

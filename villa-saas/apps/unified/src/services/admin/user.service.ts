@@ -6,20 +6,26 @@ export interface User {
   firstName: string
   lastName: string
   role: 'OWNER' | 'ADMIN' | 'USER'
-  active: boolean
+  isActive: boolean
   emailVerified: boolean
   createdAt: string
   lastLoginAt?: string
+  phone?: string
 }
 
 export interface InviteUserDto {
   email: string
   role: 'USER' | 'ADMIN'
+  firstName: string
+  lastName: string
 }
 
 export interface UpdateUserDto {
-  active?: boolean
+  isActive?: boolean
   role?: 'USER' | 'ADMIN'
+  firstName?: string
+  lastName?: string
+  phone?: string
 }
 
 class UserService {

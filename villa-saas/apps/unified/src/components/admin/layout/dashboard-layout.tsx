@@ -2,29 +2,33 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import { Home, Building2, Calendar, Users, Settings, LogOut, BarChart3, MessageSquare, Package, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth.store'
+import { AdminLanguageSelector } from '@/components/admin/language-selector'
 
-const navigation = [
-  { name: 'Tableau de bord', href: '/admin/dashboard', icon: Home },
-  { name: 'Propriétés', href: '/admin/dashboard/properties', icon: Building2 },
-  { name: 'Réservations', href: '/admin/dashboard/bookings', icon: Calendar },
-  { name: 'Messages', href: '/admin/dashboard/messages', icon: MessageSquare },
-  { name: 'Analytics', href: '/admin/dashboard/analytics', icon: BarChart3 },
-  { name: 'Options de réservation', href: '/admin/dashboard/booking-options', icon: Package },
-  { name: 'Configuration paiements', href: '/admin/dashboard/payment-configuration', icon: CreditCard },
-  { name: 'Utilisateurs', href: '/admin/dashboard/users', icon: Users },
-  { name: 'Paramètres', href: '/admin/dashboard/settings', icon: Settings },
+const navigationItems = [
+  { key: 'dashboard', href: '/admin/dashboard', icon: Home },
+  { key: 'properties', href: '/admin/dashboard/properties', icon: Building2 },
+  { key: 'bookings', href: '/admin/dashboard/bookings', icon: Calendar },
+  { key: 'messages', href: '/admin/dashboard/messages', icon: MessageSquare },
+  { key: 'analytics', href: '/admin/dashboard/analytics', icon: BarChart3 },
+  { key: 'bookingOptions', href: '/admin/dashboard/booking-options', icon: Package },
+  { key: 'paymentConfiguration', href: '/admin/dashboard/payment-configuration', icon: CreditCard },
+  { key: 'users', href: '/admin/dashboard/users', icon: Users },
+  { key: 'settings', href: '/admin/dashboard/settings', icon: Settings },
 ]
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user, tenant, logout } = useAuthStore()
+  const t = useTranslations('admin.navigation')
+  const locale = useLocale()
 
   const handleLogout = async () => {
     await logout()
-    router.push('/login')
+    router.push(`/${locale}/admin/login`)
   }
 
   return (
@@ -38,14 +42,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           
           <div className="mt-8 flex-grow flex flex-col">
             <nav className="flex-1 px-2 pb-4 space-y-1">
-              {navigation.map((item) => (
+              {navigationItems.map((item) => (
                 <Link
-                  key={item.name}
-                  href={item.href}
+                  key={item.key}
+                  href={`/${locale}${item.href}`}
                   className="group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-gray-50"
                 >
                   <item.icon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
-                  {item.name}
+                  {t(item.key)}
                 </Link>
               ))}
             </nav>
@@ -76,6 +80,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <div className="bg-white shadow-sm border-b border-gray-200">
+          <div className="px-6 py-3 flex items-center justify-between">
+            <h2 className="text-lg font-medium text-gray-900">
+              {tenant?.name || 'Villa SaaS'}
+            </h2>
+            <AdminLanguageSelector />
+          </div>
+        </div>
+        
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
           <div className="container mx-auto px-6 py-8">
             {children}

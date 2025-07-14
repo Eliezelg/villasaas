@@ -60,8 +60,8 @@ const createRuleSchema = z.object({
 export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void> {
   const autoResponseService = new AutoResponseService(fastify);
 
-  // Get templates
-  fastify.get('/templates', {
+  // Get auto-response config
+  fastify.get('/auto-response', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     const tenantId = getTenantId(request);
@@ -81,11 +81,29 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
       ],
     });
 
-    reply.send(templates);
+    reply.send({
+      templates,
+      enabled: true
+    });
+  });
+
+  // Create auto-response config
+  fastify.post('/auto-response', {
+    preHandler: [fastify.authenticate],
+  }, async (request, reply) => {
+    getTenantId(request); // Validate tenant
+    const { templates, rules } = request.body as any;
+
+    // Simple implementation for now
+    reply.send({
+      templates: templates || [],
+      rules: rules || [],
+      enabled: true
+    });
   });
 
   // Get single template
-  fastify.get('/templates/:id', {
+  fastify.get('/auto-response/templates/:id', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     const tenantId = getTenantId(request);
@@ -107,7 +125,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Create template
-  fastify.post('/templates', {
+  fastify.post('/auto-response/templates', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier les permissions
@@ -130,7 +148,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Update template
-  fastify.patch('/templates/:id', {
+  fastify.patch('/auto-response/templates/:id', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier les permissions
@@ -160,7 +178,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Delete template
-  fastify.delete('/templates/:id', {
+  fastify.delete('/auto-response/templates/:id', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier les permissions
@@ -188,7 +206,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Get rules
-  fastify.get('/rules', {
+  fastify.get('/auto-response/rules', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     const tenantId = getTenantId(request);
@@ -219,7 +237,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Create rule
-  fastify.post('/rules', {
+  fastify.post('/auto-response/rules', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier les permissions
@@ -265,7 +283,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Update rule
-  fastify.patch('/rules/:id', {
+  fastify.patch('/auto-response/rules/:id', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier les permissions
@@ -295,7 +313,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Delete rule
-  fastify.delete('/rules/:id', {
+  fastify.delete('/auto-response/rules/:id', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier les permissions
@@ -323,7 +341,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Initialize default templates for new tenant
-  fastify.post('/initialize', {
+  fastify.post('/auto-response/initialize', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     // Vérifier que c'est le OWNER
@@ -350,7 +368,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Get chatbot session status
-  fastify.get('/chatbot/:conversationId', {
+  fastify.get('/auto-response/chatbot/:conversationId', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     const { conversationId } = request.params as { conversationId: string };
@@ -380,7 +398,7 @@ export async function autoResponseRoutes(fastify: FastifyInstance): Promise<void
   });
 
   // Toggle chatbot for conversation
-  fastify.post('/chatbot/:conversationId/toggle', {
+  fastify.post('/auto-response/chatbot/:conversationId/toggle', {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     const { conversationId } = request.params as { conversationId: string };

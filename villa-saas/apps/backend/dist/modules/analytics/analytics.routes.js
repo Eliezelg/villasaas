@@ -198,6 +198,105 @@ async function analyticsRoutes(fastify) {
             return reply.code(500).send({ error: 'Failed to get revenue analytics' });
         }
     });
+    // Get top properties
+    fastify.get('/top-properties', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            tags: ['Analytics'],
+            summary: 'Get top performing properties',
+            description: 'Get properties ranked by revenue or bookings',
+            querystring: {
+                type: 'object',
+                properties: {
+                    startDate: { type: 'string', format: 'date-time' },
+                    endDate: { type: 'string', format: 'date-time' },
+                    limit: { type: 'number', default: 10 },
+                    sortBy: { type: 'string', enum: ['revenue', 'bookings'], default: 'revenue' }
+                }
+            },
+            response: {
+                200: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            revenue: { type: 'number' },
+                            bookings: { type: 'number' },
+                            occupancyRate: { type: 'number' },
+                            averageNightlyRate: { type: 'number' }
+                        }
+                    }
+                }
+            }
+        }
+    }, async (request, reply) => {
+        const { startDate, endDate, limit = 10, sortBy = 'revenue' } = request.query;
+        const dateRange = {
+            startDate: startDate ? new Date(startDate) : (0, date_fns_1.startOfMonth)((0, date_fns_1.subMonths)(new Date(), 2)),
+            endDate: endDate ? new Date(endDate) : (0, date_fns_1.endOfMonth)(new Date())
+        };
+        try {
+            const tenantId = (0, utils_1.getTenantId)(request);
+            const topProperties = await analyticsService.getTopProperties(tenantId, dateRange, limit, sortBy);
+            return reply.send(topProperties);
+        }
+        catch (error) {
+            request.log.error(error);
+            return reply.code(500).send({ error: 'Failed to get top properties' });
+        }
+    });
+    // Get booking sources
+    fastify.get('/booking-sources', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            tags: ['Analytics'],
+            summary: 'Get booking sources analytics',
+            description: 'Get bookings breakdown by source',
+            querystring: {
+                type: 'object',
+                properties: {
+                    startDate: { type: 'string', format: 'date-time' },
+                    endDate: { type: 'string', format: 'date-time' },
+                    propertyId: { type: 'string', format: 'uuid' }
+                }
+            },
+            response: {
+                200: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            source: { type: 'string' },
+                            count: { type: 'number' },
+                            revenue: { type: 'number' },
+                            percentage: { type: 'number' }
+                        }
+                    }
+                }
+            }
+        }
+    }, async (request, reply) => {
+        const validation = dateRangeSchema.safeParse(request.query);
+        if (!validation.success) {
+            return reply.code(400).send({ error: validation.error });
+        }
+        const { startDate, endDate, propertyId } = validation.data;
+        const dateRange = {
+            startDate: startDate ? new Date(startDate) : (0, date_fns_1.startOfMonth)((0, date_fns_1.subMonths)(new Date(), 2)),
+            endDate: endDate ? new Date(endDate) : (0, date_fns_1.endOfMonth)(new Date())
+        };
+        try {
+            const tenantId = (0, utils_1.getTenantId)(request);
+            const bookingSources = await analyticsService.getBookingSources(tenantId, dateRange, propertyId);
+            return reply.send(bookingSources);
+        }
+        catch (error) {
+            request.log.error(error);
+            return reply.code(500).send({ error: 'Failed to get booking sources' });
+        }
+    });
     // Export analytics data
     fastify.get('/export', {
         preHandler: [fastify.authenticate],

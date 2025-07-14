@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "ホーム",
+    "properties": "物件",
+    "about": "私たちについて",
+    "contact": "お問い合わせ",
+    "login": "ログイン",
+    "signup": "新規登録",
+    "dashboard": "ダッシュボード"
+  },
+  "actions": {
+    "search": "検索",
+    "filter": "フィルター",
+    "sort": "並び替え",
+    "book": "予約",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "view": "表示",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "continue": "続ける",
+    "backToHome": "ホームに戻る"
+  },
+  "labels": {
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "firstName": "名",
+    "lastName": "姓",
+    "phone": "電話番号",
+    "address": "住所",
+    "city": "市区町村",
+    "country": "国",
+    "postalCode": "郵便番号",
+    "language": "言語",
+    "currency": "通貨"
+  },
+  "messages": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "正常に完了しました",
+    "noResults": "結果が見つかりません",
+    "required": "必須項目です",
+    "invalidEmail": "無効なメールアドレス",
+    "invalidPhone": "無効な電話番号",
+    "notFound": "ページが見つかりません"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "cookies": "クッキー設定"
+  }
+}

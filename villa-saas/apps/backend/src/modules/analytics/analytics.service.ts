@@ -1,6 +1,5 @@
 import { PrismaClient } from '@villa-saas/database';
-import { startOfMonth, endOfMonth, subMonths, differenceInDays, format } from 'date-fns';
-import { Decimal } from '@prisma/client/runtime/library';
+import { startOfMonth, endOfMonth, differenceInDays, format } from 'date-fns';
 
 interface DateRange {
   startDate: Date;
@@ -56,7 +55,7 @@ export class AnalyticsService {
   async getOverview(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<OverviewData> {
     const bookingFilter = {
       tenantId,
-      status: { in: ['CONFIRMED', 'COMPLETED'] },
+      status: { in: ['CONFIRMED', 'COMPLETED'] as any },
       checkIn: { gte: dateRange.startDate },
       checkOut: { lte: dateRange.endDate },
       ...(propertyId && { propertyId })
@@ -88,11 +87,11 @@ export class AnalyticsService {
 
     // Group by property for top properties
     const propertyStats = bookings.reduce((acc, booking) => {
-      const propId = booking.property.id;
+      const propId = booking.propertyId;
       if (!acc[propId]) {
         acc[propId] = {
           id: propId,
-          name: booking.property.name,
+          name: booking.property?.name || 'Unknown',
           revenue: 0,
           bookings: 0
         };
@@ -108,7 +107,7 @@ export class AnalyticsService {
 
     // Group by booking source
     const sourceStats = bookings.reduce((acc, booking) => {
-      const source = booking.source;
+      const source = booking.source || 'UNKNOWN';
       if (!acc[source]) {
         acc[source] = {
           source,
@@ -136,7 +135,7 @@ export class AnalyticsService {
   async getOccupancy(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<OccupancyData> {
     const propertyFilter = {
       tenantId,
-      status: 'PUBLISHED',
+      status: 'PUBLISHED' as any,
       ...(propertyId && { id: propertyId })
     };
 
@@ -160,7 +159,7 @@ export class AnalyticsService {
       this.db.booking.findMany({
         where: {
           propertyId: { in: properties.map(p => p.id) },
-          status: { in: ['CONFIRMED', 'COMPLETED'] },
+          status: { in: ['CONFIRMED', 'COMPLETED'] as any },
           checkOut: { gte: dateRange.startDate },
           checkIn: { lte: dateRange.endDate }
         },
@@ -252,7 +251,7 @@ export class AnalyticsService {
   async getRevenue(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<RevenueData> {
     const bookingFilter = {
       tenantId,
-      status: { in: ['CONFIRMED', 'COMPLETED'] },
+      status: { in: ['CONFIRMED', 'COMPLETED'] as any },
       checkIn: { gte: dateRange.startDate },
       checkOut: { lte: dateRange.endDate },
       ...(propertyId && { propertyId })
@@ -313,6 +312,117 @@ export class AnalyticsService {
       averageRevenuePerBooking: Math.round(averageRevenuePerBooking * 100) / 100,
       monthlyData
     };
+  }
+
+  async getTopProperties(
+    tenantId: string, 
+    dateRange: DateRange, 
+    limit: number = 10,
+    sortBy: 'revenue' | 'bookings' = 'revenue'
+  ): Promise<any[]> {
+    const bookings = await this.db.booking.findMany({
+      where: {
+        tenantId,
+        status: { in: ['CONFIRMED', 'COMPLETED'] as any },
+        checkIn: { gte: dateRange.startDate },
+        checkOut: { lte: dateRange.endDate }
+      },
+      include: {
+        property: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
+    });
+
+    // Group by property
+    const propertyStats = new Map<string, any>();
+    
+    for (const booking of bookings) {
+      const propId = booking.propertyId;
+      const stats = propertyStats.get(propId) || {
+        id: propId,
+        name: booking.property.name,
+        revenue: 0,
+        bookings: 0,
+        nights: 0
+      };
+      
+      stats.revenue += Number(booking.total);
+      stats.bookings += 1;
+      stats.nights += differenceInDays(booking.checkOut, booking.checkIn);
+      
+      propertyStats.set(propId, stats);
+    }
+
+    // Calculate occupancy rates
+    const propertiesArray = Array.from(propertyStats.values());
+    const totalDays = differenceInDays(dateRange.endDate, dateRange.startDate) + 1;
+    
+    const results = propertiesArray.map(prop => ({
+      ...prop,
+      occupancyRate: Math.round((prop.nights / totalDays) * 100),
+      averageNightlyRate: prop.nights > 0 ? Math.round(prop.revenue / prop.nights) : 0
+    }));
+
+    // Sort by specified criteria
+    results.sort((a, b) => b[sortBy] - a[sortBy]);
+
+    return results.slice(0, limit);
+  }
+
+  async getBookingSources(
+    tenantId: string,
+    dateRange: DateRange,
+    propertyId?: string
+  ): Promise<any[]> {
+    const bookingFilter = {
+      tenantId,
+      status: { in: ['CONFIRMED', 'COMPLETED'] as any },
+      checkIn: { gte: dateRange.startDate },
+      checkOut: { lte: dateRange.endDate },
+      ...(propertyId && { propertyId })
+    };
+
+    const bookings = await this.db.booking.findMany({
+      where: bookingFilter,
+      select: {
+        total: true,
+        source: true
+      }
+    });
+
+    // Group by source
+    const sourceStats = new Map<string, any>();
+    let totalRevenue = 0;
+    
+    for (const booking of bookings) {
+      const source = booking.source || 'DIRECT';
+      const stats = sourceStats.get(source) || {
+        source,
+        count: 0,
+        revenue: 0
+      };
+      
+      stats.count += 1;
+      stats.revenue += Number(booking.total);
+      totalRevenue += Number(booking.total);
+      
+      sourceStats.set(source, stats);
+    }
+
+    // Calculate percentages
+    const results = Array.from(sourceStats.values()).map(source => ({
+      ...source,
+      percentage: totalRevenue > 0 ? Math.round((source.revenue / totalRevenue) * 100) : 0
+    }));
+
+    // Sort by revenue
+    results.sort((a, b) => b.revenue - a.revenue);
+
+    return results;
   }
 
   async exportData(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<Buffer> {

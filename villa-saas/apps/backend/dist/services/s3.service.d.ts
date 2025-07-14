@@ -16,7 +16,7 @@ export declare class S3Service {
     /**
      * Upload une image avec génération automatique de différentes tailles
      */
-    uploadImage(file: Buffer, mimetype: string, options?: UploadOptions): Promise<{
+    uploadImage(file: Buffer, _mimetype: string, options?: UploadOptions): Promise<{
         url: string;
         urls: Record<string, string>;
         key: string;
@@ -36,6 +36,6 @@ export declare class S3Service {
     /**
      * Copie les images d'une propriété (pour la duplication)
      */
-    copyPropertyImages(sourceFolder: string, targetFolder: string): Promise<void>;
+    copyPropertyImages(_sourceFolder: string, _targetFolder: string): Promise<void>;
 }
 //# sourceMappingURL=s3.service.d.ts.map

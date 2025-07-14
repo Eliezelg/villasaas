@@ -56,33 +56,45 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     mode = 'admin'
     
+    // Appliquer le middleware i18n pour le mode admin
+    const response = intlMiddleware(request as any)
+    
+    // Extraire le pathname sans la locale
+    const pathSegments = pathname.split('/')
+    const hasLocale = locales.includes(pathSegments[1] as any)
+    const pathWithoutLocale = hasLocale 
+      ? '/' + pathSegments.slice(2).join('/')
+      : pathname
+    
     // Vérifier si c'est une route publique
-    const isPublicRoute = publicRoutes.some(route => pathname === route)
+    const isPublicRoute = publicRoutes.some(route => pathWithoutLocale === route)
     if (isPublicRoute) {
       // Pour les routes publiques, on laisse passer
-      return NextResponse.next()
+      return response
     }
     
     // Vérifier si c'est une route protégée
-    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+    const isProtectedRoute = protectedRoutes.some(route => pathWithoutLocale.startsWith(route))
     if (isProtectedRoute) {
       const token = request.cookies.get('access_token')
       
       if (!token) {
-        // Rediriger vers la page de connexion
-        const loginUrl = new URL('/admin/login', request.url)
+        // Rediriger vers la page de connexion avec la locale
+        const locale = hasLocale ? pathSegments[1] : 'fr'
+        const loginUrl = new URL(`/${locale}/admin/login`, request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl)
       }
     }
     
     // Si on est sur login/signup et qu'on est déjà connecté
-    if ((pathname === '/admin/login' || pathname === '/admin/signup') && request.cookies.get('access_token')) {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+    if ((pathWithoutLocale === '/admin/login' || pathWithoutLocale === '/admin/signup') && request.cookies.get('access_token')) {
+      const locale = hasLocale ? pathSegments[1] : 'fr'
+      return NextResponse.redirect(new URL(`/${locale}/admin/dashboard`, request.url))
     }
     
-    // Pour les autres routes admin, laisser passer
-    return NextResponse.next()
+    // Pour les autres routes admin, retourner la réponse i18n
+    return response
   }
   
   // 2. Vérifier si c'est un sous-domaine (mode booking)
@@ -110,10 +122,10 @@ export async function middleware(request: NextRequest) {
         tenant = cached.subdomain
         mode = 'booking'
       } else {
-        // Faire une requête API pour obtenir le tenant
+        // Faire une requête API pour obtenir le tenant/property
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-          const response = await fetch(`${apiUrl}/api/public/tenant-by-domain/${hostname}`, {
+          const response = await fetch(`${apiUrl}/api/public/domain-lookup/${hostname}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -123,7 +135,7 @@ export async function middleware(request: NextRequest) {
           
           if (response.ok) {
             const data = await response.json()
-            if (data.tenant) {
+            if (data.found) {
               tenant = data.tenant.subdomain
               mode = 'booking'
               // Mettre en cache
@@ -132,6 +144,12 @@ export async function middleware(request: NextRequest) {
                 subdomain: data.tenant.subdomain,
                 timestamp: Date.now()
               })
+              
+              // Si c'est une propriété avec un domaine personnalisé et qu'on accède via le sous-domaine
+              // on pourrait rediriger vers le domaine personnalisé
+              if (data.type === 'property' && data.property.customDomain && hostname.includes('.villasaas.com')) {
+                return NextResponse.redirect(`https://${data.property.customDomain}${pathname}`)
+              }
             }
           }
         } catch (error) {

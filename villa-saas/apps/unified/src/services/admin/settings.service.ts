@@ -16,7 +16,6 @@ export interface CompanySettings {
 export interface PaymentSettings {
   stripeConnected: boolean
   stripeAccountId?: string
-  commissionRate: number
   minimumPayout: number
   payoutDelay: number
   automaticPayouts: boolean
@@ -84,7 +83,22 @@ class SettingsService {
   }
 
   async createStripeConnectLink() {
-    return apiClient.post<{ url: string }>('/api/settings/payment/stripe-connect')
+    return apiClient.post<{ url: string }>('/api/stripe/connect/onboarding')
+  }
+
+  async createStripeOAuthLink() {
+    return apiClient.get<{ url: string }>('/api/stripe/connect/oauth')
+  }
+
+  async getStripeConnectStatus() {
+    return apiClient.get<{
+      connected: boolean;
+      status: string;
+      detailsSubmitted: boolean;
+      chargesEnabled: boolean;
+      payoutsEnabled: boolean;
+      requirements: any;
+    }>('/api/stripe/connect/status')
   }
 
   // Email Settings

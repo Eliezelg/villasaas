@@ -16,6 +16,8 @@ interface AuthState {
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
   checkAuth: () => Promise<void>;
+  setUser: (user: User) => void;
+  setTenant: (tenant: Tenant) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -136,6 +138,14 @@ export const useAuthStore = create<AuthState>()(
           // tenant is kept from login/register, not updated from /me endpoint
           isAuthenticated: true,
         });
+      },
+
+      setUser: (user) => {
+        set({ user, isAuthenticated: true });
+      },
+
+      setTenant: (tenant) => {
+        set({ tenant });
       },
     }),
     {

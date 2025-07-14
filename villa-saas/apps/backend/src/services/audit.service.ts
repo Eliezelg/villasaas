@@ -93,7 +93,7 @@ export class AuditService {
       entity,
       entityId,
       details,
-      userId: request.userId,
+      userId: request.user?.userId,
       tenantId: request.tenantId,
       ip: request.ip,
       userAgent: request.headers['user-agent'],
@@ -138,7 +138,7 @@ export class AuditService {
    * Décorateur pour automatiquement logger les actions
    */
   static auditAction(action: AuditAction, entity: string) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
       const originalMethod = descriptor.value;
 
       descriptor.value = async function (...args: any[]) {

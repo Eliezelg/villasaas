@@ -6,6 +6,8 @@ export interface BookingPriceCalculation {
     touristTax: number;
     extraFees: any[];
     discountAmount: number;
+    optionsTotal: number;
+    depositAmount: number;
     subtotal: number;
     total: number;
     breakdown: {
@@ -13,6 +15,13 @@ export interface BookingPriceCalculation {
         price: number;
         isWeekend: boolean;
     }[];
+    selectedOptions?: Array<{
+        optionId: string;
+        name: string;
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+    }>;
 }
 export declare class BookingService {
     private prisma;
@@ -23,7 +32,10 @@ export declare class BookingService {
         children: number;
         infants: number;
         pets: number;
-    }): Promise<BookingPriceCalculation>;
+    }, selectedOptions?: Array<{
+        optionId: string;
+        quantity: number;
+    }>): Promise<BookingPriceCalculation>;
     checkAvailability(propertyId: string, checkIn: Date, checkOut: Date, excludeBookingId?: string): Promise<{
         available: boolean;
         reason?: string;

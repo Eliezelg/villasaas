@@ -9,7 +9,7 @@ export declare class PropertyAIService {
      */
     static prepareEmbeddingContent(property: Partial<Property>): string;
     /**
-     * Mock de génération d'embeddings (à remplacer par OpenAI)
+     * Génère un embedding vectoriel avec OpenAI
      */
     static generateEmbedding(text: string): Promise<number[]>;
     private static translatePropertyType;

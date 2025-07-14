@@ -1,0 +1,94 @@
+{
+  "bookingConfirmation": {
+    "subject": "Booking confirmation {{reference}}",
+    "title": "Booking confirmed!",
+    "greeting": "Hello {{guestName}},",
+    "intro": "We are pleased to confirm your booking. Here are the details:",
+    "details": {
+      "title": "Booking details",
+      "reference": "Reference",
+      "property": "Property",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Guests",
+      "total": "Total amount"
+    },
+    "thankYou": "We look forward to welcoming you!",
+    "footer": "This email was sent by {{tenantName}}. If you did not make this booking, please ignore this email."
+  },
+  "paymentFailed": {
+    "subject": "Payment failed for booking {{reference}}",
+    "title": "Payment failed",
+    "greeting": "Hello {{guestName}},",
+    "intro": "We were unable to process the payment for your booking. Here are your booking details:",
+    "warning": "⚠️ Your booking will be automatically cancelled in 24 hours if payment is not completed.",
+    "retryButton": "Retry payment",
+    "contact": "If you are experiencing difficulties, please don't hesitate to contact us.",
+    "footer": "This email was sent by {{tenantName}}. If you did not make this booking, please ignore this email."
+  },
+  "bookingCancelled": {
+    "subject": "Booking cancellation {{reference}}",
+    "title": "Booking cancelled",
+    "greeting": "Hello {{guestName}},",
+    "intro": "Your booking has been cancelled due to payment failure.",
+    "details": {
+      "title": "Cancelled booking details",
+      "reference": "Reference",
+      "property": "Property",
+      "checkIn": "Planned check-in",
+      "checkOut": "Planned check-out"
+    },
+    "newBooking": "You can make a new booking at any time on our website.",
+    "footer": "This email was sent by {{tenantName}}."
+  },
+  "ownerNotification": {
+    "subject": "New booking: {{propertyName}}",
+    "title": "New booking",
+    "greeting": "Hello,",
+    "intro": "A new booking has been made for your property.",
+    "details": {
+      "title": "Booking details",
+      "reference": "Reference",
+      "property": "Property",
+      "guest": "Guest",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Guests",
+      "total": "Total amount"
+    },
+    "footer": "This email was sent by {{tenantName}}."
+  },
+  "checkInReminder": {
+    "subject": "Reminder: Your arrival is coming up - {{propertyName}}",
+    "title": "Your arrival is coming up!",
+    "greeting": "Hello {{guestName}},",
+    "intro": "We look forward to welcoming you tomorrow at {{propertyName}}.",
+    "checkInTime": "Check-in time: from 4:00 PM",
+    "instructions": "You will receive detailed arrival instructions in a future email.",
+    "contact": "If you have any questions, please don't hesitate to contact us.",
+    "footer": "This email was sent by {{tenantName}}."
+  },
+  "checkInInstructions": {
+    "subject": "Arrival instructions - {{propertyName}}",
+    "title": "Arrival instructions",
+    "greeting": "Hello {{guestName}},",
+    "intro": "Here is all the information you need for your arrival:",
+    "address": "Address",
+    "accessCode": "Access code",
+    "wifiPassword": "WiFi password",
+    "checkOut": "Check-out time: before 10:00 AM",
+    "emergency": "In case of emergency",
+    "enjoyStay": "We wish you an excellent stay!",
+    "footer": "This email was sent by {{tenantName}}."
+  },
+  "reviewRequest": {
+    "subject": "How was your stay at {{propertyName}}?",
+    "title": "Your opinion matters!",
+    "greeting": "Hello {{guestName}},",
+    "intro": "We hope you had a wonderful stay at {{propertyName}}.",
+    "request": "Your feedback is valuable to us and helps future travelers. Could you take a few minutes to share your experience?",
+    "reviewButton": "Leave a review",
+    "thankYou": "Thank you for your trust and see you soon!",
+    "footer": "This email was sent by {{tenantName}}."
+  }
+}

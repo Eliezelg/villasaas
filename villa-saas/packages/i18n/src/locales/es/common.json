@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "properties": "Propiedades",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "dashboard": "Panel de control"
+  },
+  "actions": {
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "book": "Reservar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "continue": "Continuar",
+    "backToHome": "Volver al inicio"
+  },
+  "labels": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "city": "Ciudad",
+    "country": "País",
+    "postalCode": "Código postal",
+    "language": "Idioma",
+    "currency": "Moneda"
+  },
+  "messages": {
+    "loading": "Cargando...",
+    "error": "Se produjo un error",
+    "success": "Operación exitosa",
+    "noResults": "No se encontraron resultados",
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "Correo electrónico inválido",
+    "invalidPhone": "Número de teléfono inválido",
+    "notFound": "Página no encontrada"
+  },
+  "footer": {
+    "rights": "© Villa SaaS. Todos los derechos reservados",
+    "privacy": "Política de privacidad",
+    "terms": "Términos de servicio",
+    "cookies": "Configuración de cookies"
+  }
+}

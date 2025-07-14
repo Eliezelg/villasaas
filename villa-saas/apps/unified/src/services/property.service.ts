@@ -22,7 +22,7 @@ class PropertyService {
     if (params?.status) queryParams.append('status', params.status);
 
     const response = await apiClient.get<PropertyResponse>(
-      `/properties?${queryParams.toString()}`
+      `/api/properties?${queryParams.toString()}`
     );
     return response.data || { properties: [], total: 0, page: 1, totalPages: 0 };
   }
@@ -38,29 +38,29 @@ class PropertyService {
   }
 
   async getById(id: string): Promise<Property> {
-    const response = await apiClient.get<Property>(`/properties/${id}`);
+    const response = await apiClient.get<Property>(`/api/properties/${id}`);
     if (!response.data) throw new Error('Property not found');
     return response.data;
   }
 
   async create(data: any): Promise<Property> {
-    const response = await apiClient.post<Property>('/properties', data);
+    const response = await apiClient.post<Property>('/api/properties', data);
     if (!response.data) throw new Error('Failed to create property');
     return response.data;
   }
 
   async update(id: string, data: any): Promise<Property> {
-    const response = await apiClient.put<Property>(`/properties/${id}`, data);
+    const response = await apiClient.put<Property>(`/api/properties/${id}`, data);
     if (!response.data) throw new Error('Failed to update property');
     return response.data;
   }
 
   async delete(id: string): Promise<void> {
-    await apiClient.delete(`/properties/${id}`);
+    await apiClient.delete(`/api/properties/${id}`);
   }
 
   async updateStatus(id: string, status: string): Promise<Property> {
-    const response = await apiClient.patch<Property>(`/properties/${id}/status`, { status });
+    const response = await apiClient.patch<Property>(`/api/properties/${id}/status`, { status });
     if (!response.data) throw new Error('Failed to update status');
     return response.data;
   }

@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Home",
+    "properties": "Proprietà",
+    "about": "Chi siamo",
+    "contact": "Contatti",
+    "login": "Accedi",
+    "signup": "Registrati",
+    "dashboard": "Dashboard"
+  },
+  "actions": {
+    "search": "Cerca",
+    "filter": "Filtra",
+    "sort": "Ordina",
+    "book": "Prenota",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "save": "Salva",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "view": "Visualizza",
+    "back": "Indietro",
+    "next": "Avanti",
+    "previous": "Precedente",
+    "continue": "Continua",
+    "backToHome": "Torna alla home"
+  },
+  "labels": {
+    "email": "Email",
+    "password": "Password",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "phone": "Telefono",
+    "address": "Indirizzo",
+    "city": "Città",
+    "country": "Paese",
+    "postalCode": "CAP",
+    "language": "Lingua",
+    "currency": "Valuta"
+  },
+  "messages": {
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore",
+    "success": "Operazione completata",
+    "noResults": "Nessun risultato trovato",
+    "required": "Questo campo è obbligatorio",
+    "invalidEmail": "Email non valida",
+    "invalidPhone": "Numero di telefono non valido",
+    "notFound": "Pagina non trovata"
+  },
+  "footer": {
+    "rights": "Tutti i diritti riservati",
+    "privacy": "Informativa sulla privacy",
+    "terms": "Termini di servizio",
+    "cookies": "Impostazioni cookie"
+  }
+}

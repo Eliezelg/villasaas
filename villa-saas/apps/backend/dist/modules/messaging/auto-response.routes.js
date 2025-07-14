@@ -58,8 +58,8 @@ const createRuleSchema = zod_1.z.object({
 });
 async function autoResponseRoutes(fastify) {
     const autoResponseService = new auto_response_service_1.AutoResponseService(fastify);
-    // Get templates
-    fastify.get('/templates', {
+    // Get auto-response config
+    fastify.get('/auto-response', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         const tenantId = (0, utils_1.getTenantId)(request);
@@ -78,10 +78,26 @@ async function autoResponseRoutes(fastify) {
                 { createdAt: 'desc' },
             ],
         });
-        reply.send(templates);
+        reply.send({
+            templates,
+            enabled: true
+        });
+    });
+    // Create auto-response config
+    fastify.post('/auto-response', {
+        preHandler: [fastify.authenticate],
+    }, async (request, reply) => {
+        (0, utils_1.getTenantId)(request); // Validate tenant
+        const { templates, rules } = request.body;
+        // Simple implementation for now
+        reply.send({
+            templates: templates || [],
+            rules: rules || [],
+            enabled: true
+        });
     });
     // Get single template
-    fastify.get('/templates/:id', {
+    fastify.get('/auto-response/templates/:id', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         const tenantId = (0, utils_1.getTenantId)(request);
@@ -99,7 +115,7 @@ async function autoResponseRoutes(fastify) {
         reply.send(template);
     });
     // Create template
-    fastify.post('/templates', {
+    fastify.post('/auto-response/templates', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier les permissions
@@ -118,7 +134,7 @@ async function autoResponseRoutes(fastify) {
         reply.status(201).send(template);
     });
     // Update template
-    fastify.patch('/templates/:id', {
+    fastify.patch('/auto-response/templates/:id', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier les permissions
@@ -143,7 +159,7 @@ async function autoResponseRoutes(fastify) {
         reply.send({ updated: true });
     });
     // Delete template
-    fastify.delete('/templates/:id', {
+    fastify.delete('/auto-response/templates/:id', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier les permissions
@@ -166,7 +182,7 @@ async function autoResponseRoutes(fastify) {
         reply.status(204).send();
     });
     // Get rules
-    fastify.get('/rules', {
+    fastify.get('/auto-response/rules', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         const tenantId = (0, utils_1.getTenantId)(request);
@@ -194,7 +210,7 @@ async function autoResponseRoutes(fastify) {
         reply.send(rules);
     });
     // Create rule
-    fastify.post('/rules', {
+    fastify.post('/auto-response/rules', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier les permissions
@@ -234,7 +250,7 @@ async function autoResponseRoutes(fastify) {
         reply.status(201).send(rule);
     });
     // Update rule
-    fastify.patch('/rules/:id', {
+    fastify.patch('/auto-response/rules/:id', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier les permissions
@@ -259,7 +275,7 @@ async function autoResponseRoutes(fastify) {
         reply.send({ updated: true });
     });
     // Delete rule
-    fastify.delete('/rules/:id', {
+    fastify.delete('/auto-response/rules/:id', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier les permissions
@@ -282,7 +298,7 @@ async function autoResponseRoutes(fastify) {
         reply.status(204).send();
     });
     // Initialize default templates for new tenant
-    fastify.post('/initialize', {
+    fastify.post('/auto-response/initialize', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         // Vérifier que c'est le OWNER
@@ -303,7 +319,7 @@ async function autoResponseRoutes(fastify) {
         reply.send({ message: 'Default templates created successfully' });
     });
     // Get chatbot session status
-    fastify.get('/chatbot/:conversationId', {
+    fastify.get('/auto-response/chatbot/:conversationId', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         const { conversationId } = request.params;
@@ -328,7 +344,7 @@ async function autoResponseRoutes(fastify) {
         });
     });
     // Toggle chatbot for conversation
-    fastify.post('/chatbot/:conversationId/toggle', {
+    fastify.post('/auto-response/chatbot/:conversationId/toggle', {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         const { conversationId } = request.params;

@@ -214,21 +214,22 @@ async function messagingRoutes(fastify) {
     });
     // Create new conversation
     fastify.post('/conversations', {
-        preHandler: request => {
+        preHandler: (request, reply) => {
             // Permettre aux invités de créer des conversations
             if (!request.headers.authorization) {
                 return;
             }
-            return fastify.authenticate(request);
+            return fastify.authenticate(request, reply);
         },
     }, async (request, reply) => {
         const validatedData = createConversationSchema.parse(request.body);
         const userId = request.user?.userId;
         let tenantId;
         let propertyOwnerId = null;
+        let property = null;
         // Si c'est une conversation liée à une propriété, récupérer le tenant
         if (validatedData.propertyId) {
-            const property = await fastify.prisma.property.findUnique({
+            property = await fastify.prisma.property.findUnique({
                 where: { id: validatedData.propertyId },
                 select: {
                     tenantId: true,
@@ -323,30 +324,35 @@ async function messagingRoutes(fastify) {
         if (fastify.io) {
             fastify.io.to(`conversation:${conversation.id}`).emit('message:new', message);
         }
-        // Traiter les réponses automatiques pour les nouvelles conversations
-        await autoResponseService.processMessage({
-            conversationId: conversation.id,
-            message: validatedData.message,
-            propertyId: validatedData.propertyId,
-            tenantId,
-            language: 'fr',
-            guestName: validatedData.guestName,
-            property: conversation.propertyId ? {
-                name: property?.tenant.users[0]?.firstName || 'Notre propriété',
-                address: '',
-                city: '',
-            } : undefined,
+        // Traiter les réponses automatiques pour les nouvelles conversations de manière asynchrone
+        // pour éviter les timeouts
+        setImmediate(() => {
+            autoResponseService.processMessage({
+                conversationId: conversation.id,
+                message: validatedData.message,
+                propertyId: validatedData.propertyId,
+                tenantId,
+                language: 'fr',
+                guestName: validatedData.guestName,
+                property: conversation.propertyId ? {
+                    name: property?.tenant.users[0]?.firstName || 'Notre propriété',
+                    address: '',
+                    city: '',
+                } : undefined,
+            }).catch(error => {
+                fastify.log.error(error, 'Error processing auto response');
+            });
         });
         reply.status(201).send({ conversation, message });
     });
     // Send message
     fastify.post('/conversations/:id/messages', {
-        preHandler: request => {
+        preHandler: (request, reply) => {
             // Permettre aux invités d'envoyer des messages
             if (!request.headers.authorization) {
                 return;
             }
-            return fastify.authenticate(request);
+            return fastify.authenticate(request, reply);
         },
     }, async (request, reply) => {
         const { id } = request.params;

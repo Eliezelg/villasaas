@@ -7,9 +7,9 @@ exports.propertyImageRoutes = propertyImageRoutes;
 const zod_1 = require("zod");
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
-const crypto_1 = __importDefault(require("crypto"));
 const utils_1 = require("@villa-saas/utils");
 const image_optimizer_1 = require("../../utils/image-optimizer");
+const file_validator_1 = require("../../utils/file-validator");
 const uploadDir = path_1.default.join(process.cwd(), 'uploads', 'properties');
 // Ensure upload directory exists
 async function ensureUploadDir() {
@@ -61,13 +61,25 @@ async function propertyImageRoutes(fastify) {
             return;
         }
         // Extract base64 data
-        const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+        const base64Match = image.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
+        if (!base64Match) {
+            reply.status(400).send({ error: 'Invalid image format' });
+            return;
+        }
+        const declaredMimeType = base64Match[1];
+        const base64Data = base64Match[2] || '';
         const buffer = Buffer.from(base64Data, 'base64');
-        // Generate unique filename
-        const ext = path_1.default.extname(filename);
-        const baseName = `${propertyId}_${crypto_1.default.randomBytes(8).toString('hex')}`;
-        const tempFilename = `${baseName}${ext}`;
-        const tempPath = path_1.default.join(uploadDir, tempFilename);
+        // Validate file before processing
+        const validationResult = await (0, file_validator_1.validateFileUpload)(buffer, filename, declaredMimeType);
+        if (!validationResult.valid) {
+            reply.status(400).send({ error: validationResult.error });
+            return;
+        }
+        // Generate secure filename
+        const sanitizedFilename = (0, file_validator_1.sanitizeFilename)(filename);
+        const secureFilename = (0, file_validator_1.generateSecureFilename)(sanitizedFilename, propertyId);
+        const baseName = path_1.default.basename(secureFilename, path_1.default.extname(secureFilename));
+        const tempPath = path_1.default.join(uploadDir, secureFilename);
         // Save temporary file
         await promises_1.default.writeFile(tempPath, buffer);
         try {
@@ -83,7 +95,7 @@ async function propertyImageRoutes(fastify) {
             const propertyImage = await fastify.prisma.propertyImage.create({
                 data: {
                     propertyId,
-                    url: urls.medium || urls.original, // Default display URL
+                    url: urls.medium || urls.original || '', // Default display URL
                     urls: urls, // Store all sizes
                     order: (maxOrder?.order ?? -1) + 1,
                 },

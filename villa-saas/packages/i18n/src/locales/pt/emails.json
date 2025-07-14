@@ -1,0 +1,94 @@
+{
+  "bookingConfirmation": {
+    "subject": "Confirmação de reserva {{reference}}",
+    "title": "Reserva confirmada!",
+    "greeting": "Olá {{guestName}},",
+    "intro": "Temos o prazer de confirmar a sua reserva. Aqui estão os detalhes:",
+    "details": {
+      "title": "Detalhes da reserva",
+      "reference": "Referência",
+      "property": "Propriedade",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Hóspedes",
+      "total": "Valor total"
+    },
+    "thankYou": "Esperamos recebê-lo em breve!",
+    "footer": "Este email foi enviado por {{tenantName}}. Se não fez esta reserva, por favor ignore este email."
+  },
+  "paymentFailed": {
+    "subject": "Pagamento falhado para a reserva {{reference}}",
+    "title": "Pagamento falhado",
+    "greeting": "Olá {{guestName}},",
+    "intro": "Não conseguimos processar o pagamento da sua reserva. Aqui estão os detalhes da reserva:",
+    "warning": "⚠️ A sua reserva será automaticamente cancelada em 24 horas se o pagamento não for concluído.",
+    "retryButton": "Tentar novamente",
+    "contact": "Se está a enfrentar dificuldades, não hesite em contactar-nos.",
+    "footer": "Este email foi enviado por {{tenantName}}. Se não fez esta reserva, por favor ignore este email."
+  },
+  "bookingCancelled": {
+    "subject": "Cancelamento de reserva {{reference}}",
+    "title": "Reserva cancelada",
+    "greeting": "Olá {{guestName}},",
+    "intro": "A sua reserva foi cancelada devido a uma falha no pagamento.",
+    "details": {
+      "title": "Detalhes da reserva cancelada",
+      "reference": "Referência",
+      "property": "Propriedade",
+      "checkIn": "Check-in planeado",
+      "checkOut": "Check-out planeado"
+    },
+    "newBooking": "Pode fazer uma nova reserva a qualquer momento no nosso website.",
+    "footer": "Este email foi enviado por {{tenantName}}."
+  },
+  "ownerNotification": {
+    "subject": "Nova reserva: {{propertyName}}",
+    "title": "Nova reserva",
+    "greeting": "Olá,",
+    "intro": "Foi feita uma nova reserva para a sua propriedade.",
+    "details": {
+      "title": "Detalhes da reserva",
+      "reference": "Referência",
+      "property": "Propriedade",
+      "guest": "Hóspede",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Hóspedes",
+      "total": "Valor total"
+    },
+    "footer": "Este email foi enviado por {{tenantName}}."
+  },
+  "checkInReminder": {
+    "subject": "Lembrete: A sua chegada aproxima-se - {{propertyName}}",
+    "title": "A sua chegada aproxima-se!",
+    "greeting": "Olá {{guestName}},",
+    "intro": "Esperamos recebê-lo amanhã em {{propertyName}}.",
+    "checkInTime": "Hora de check-in: a partir das 16:00",
+    "instructions": "Receberá instruções detalhadas de chegada num próximo email.",
+    "contact": "Se tem alguma pergunta, não hesite em contactar-nos.",
+    "footer": "Este email foi enviado por {{tenantName}}."
+  },
+  "checkInInstructions": {
+    "subject": "Instruções de chegada - {{propertyName}}",
+    "title": "Instruções de chegada",
+    "greeting": "Olá {{guestName}},",
+    "intro": "Aqui está toda a informação necessária para a sua chegada:",
+    "address": "Endereço",
+    "accessCode": "Código de acesso",
+    "wifiPassword": "Senha WiFi",
+    "checkOut": "Hora de check-out: antes das 10:00",
+    "emergency": "Em caso de emergência",
+    "enjoyStay": "Desejamos-lhe uma excelente estadia!",
+    "footer": "Este email foi enviado por {{tenantName}}."
+  },
+  "reviewRequest": {
+    "subject": "Como foi a sua estadia em {{propertyName}}?",
+    "title": "A sua opinião importa!",
+    "greeting": "Olá {{guestName}},",
+    "intro": "Esperamos que tenha tido uma estadia maravilhosa em {{propertyName}}.",
+    "request": "Os seus comentários são valiosos para nós e ajudam futuros viajantes. Poderia dedicar alguns minutos para partilhar a sua experiência?",
+    "reviewButton": "Deixar uma avaliação",
+    "thankYou": "Obrigado pela confiança e até breve!",
+    "footer": "Este email foi enviado por {{tenantName}}."
+  }
+}

@@ -149,7 +149,7 @@ async function periodRoutes(fastify) {
         // Vérifier s'il y a des réservations sur cette période
         const bookings = await fastify.prisma.booking.count({
             where: {
-                propertyId: period.propertyId,
+                propertyId: period.propertyId || undefined,
                 tenantId,
                 status: { in: ['PENDING', 'CONFIRMED'] },
                 OR: [

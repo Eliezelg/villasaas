@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { locales } from '@villa-saas/i18n';
+import { locales, localeNames } from '@villa-saas/i18n';
 import {
   Select,
   SelectContent,
@@ -11,14 +11,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-const languageNames: Record<string, string> = {
-  fr: 'Français',
-  en: 'English',
-};
-
 const languageFlags: Record<string, string> = {
   fr: '🇫🇷',
   en: '🇬🇧',
+  es: '🇪🇸',
+  de: '🇩🇪',
+  it: '🇮🇹',
+  pt: '🇵🇹',
+  nl: '🇳🇱',
+  ru: '🇷🇺',
+  zh: '🇨🇳',
+  ja: '🇯🇵',
+  ar: '🇸🇦',
+  he: '🇮🇱',
+  hi: '🇮🇳',
+  tr: '🇹🇷',
+  pl: '🇵🇱',
 };
 
 export function LanguageSelector() {
@@ -41,7 +49,7 @@ export function LanguageSelector() {
         <SelectValue>
           <span className="flex items-center gap-2">
             <span>{languageFlags[locale]}</span>
-            <span>{languageNames[locale]}</span>
+            <span>{localeNames[locale as keyof typeof localeNames]}</span>
           </span>
         </SelectValue>
       </SelectTrigger>
@@ -50,7 +58,7 @@ export function LanguageSelector() {
           <SelectItem key={loc} value={loc}>
             <span className="flex items-center gap-2">
               <span>{languageFlags[loc]}</span>
-              <span>{languageNames[loc]}</span>
+              <span>{localeNames[loc as keyof typeof localeNames]}</span>
             </span>
           </SelectItem>
         ))}

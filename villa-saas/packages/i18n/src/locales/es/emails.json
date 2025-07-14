@@ -1,0 +1,94 @@
+{
+  "bookingConfirmation": {
+    "subject": "Confirmación de reserva {{reference}}",
+    "title": "¡Reserva confirmada!",
+    "greeting": "Hola {{guestName}},",
+    "intro": "Nos complace confirmar su reserva. Aquí están los detalles:",
+    "details": {
+      "title": "Detalles de la reserva",
+      "reference": "Referencia",
+      "property": "Propiedad",
+      "checkIn": "Entrada",
+      "checkOut": "Salida",
+      "guests": "Huéspedes",
+      "total": "Importe total"
+    },
+    "thankYou": "¡Esperamos darle la bienvenida!",
+    "footer": "Este correo fue enviado por {{tenantName}}. Si no realizó esta reserva, por favor ignore este email."
+  },
+  "paymentFailed": {
+    "subject": "Pago fallido para la reserva {{reference}}",
+    "title": "Pago fallido",
+    "greeting": "Hola {{guestName}},",
+    "intro": "No pudimos procesar el pago de su reserva. Aquí están los detalles de su reserva:",
+    "warning": "⚠️ Su reserva será cancelada automáticamente en 24 horas si no se completa el pago.",
+    "retryButton": "Reintentar pago",
+    "contact": "Si está experimentando dificultades, no dude en contactarnos.",
+    "footer": "Este correo fue enviado por {{tenantName}}. Si no realizó esta reserva, por favor ignore este email."
+  },
+  "bookingCancelled": {
+    "subject": "Cancelación de reserva {{reference}}",
+    "title": "Reserva cancelada",
+    "greeting": "Hola {{guestName}},",
+    "intro": "Su reserva ha sido cancelada debido a un fallo en el pago.",
+    "details": {
+      "title": "Detalles de la reserva cancelada",
+      "reference": "Referencia",
+      "property": "Propiedad",
+      "checkIn": "Entrada planificada",
+      "checkOut": "Salida planificada"
+    },
+    "newBooking": "Puede realizar una nueva reserva en cualquier momento en nuestro sitio web.",
+    "footer": "Este correo fue enviado por {{tenantName}}."
+  },
+  "ownerNotification": {
+    "subject": "Nueva reserva: {{propertyName}}",
+    "title": "Nueva reserva",
+    "greeting": "Hola,",
+    "intro": "Se ha realizado una nueva reserva para su propiedad.",
+    "details": {
+      "title": "Detalles de la reserva",
+      "reference": "Referencia",
+      "property": "Propiedad",
+      "guest": "Huésped",
+      "checkIn": "Entrada",
+      "checkOut": "Salida",
+      "guests": "Huéspedes",
+      "total": "Importe total"
+    },
+    "footer": "Este correo fue enviado por {{tenantName}}."
+  },
+  "checkInReminder": {
+    "subject": "Recordatorio: Su llegada se acerca - {{propertyName}}",
+    "title": "¡Su llegada se acerca!",
+    "greeting": "Hola {{guestName}},",
+    "intro": "Esperamos darle la bienvenida mañana en {{propertyName}}.",
+    "checkInTime": "Hora de entrada: a partir de las 16:00",
+    "instructions": "Recibirá instrucciones detalladas de llegada en un próximo correo.",
+    "contact": "Si tiene alguna pregunta, no dude en contactarnos.",
+    "footer": "Este correo fue enviado por {{tenantName}}."
+  },
+  "checkInInstructions": {
+    "subject": "Instrucciones de llegada - {{propertyName}}",
+    "title": "Instrucciones de llegada",
+    "greeting": "Hola {{guestName}},",
+    "intro": "Aquí está toda la información que necesita para su llegada:",
+    "address": "Dirección",
+    "accessCode": "Código de acceso",
+    "wifiPassword": "Contraseña WiFi",
+    "checkOut": "Hora de salida: antes de las 10:00",
+    "emergency": "En caso de emergencia",
+    "enjoyStay": "¡Le deseamos una excelente estancia!",
+    "footer": "Este correo fue enviado por {{tenantName}}."
+  },
+  "reviewRequest": {
+    "subject": "¿Cómo fue su estancia en {{propertyName}}?",
+    "title": "¡Su opinión importa!",
+    "greeting": "Hola {{guestName}},",
+    "intro": "Esperamos que haya tenido una estancia maravillosa en {{propertyName}}.",
+    "request": "Sus comentarios son valiosos para nosotros y ayudan a futuros viajeros. ¿Podría tomarse unos minutos para compartir su experiencia?",
+    "reviewButton": "Dejar una reseña",
+    "thankYou": "¡Gracias por su confianza y hasta pronto!",
+    "footer": "Este correo fue enviado por {{tenantName}}."
+  }
+}

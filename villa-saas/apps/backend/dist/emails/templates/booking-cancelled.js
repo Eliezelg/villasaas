@@ -41,38 +41,38 @@ const i18n_email_service_1 = require("../../services/i18n-email.service");
 const BookingCancelledEmail = ({ locale, guestName, bookingReference, propertyName, checkIn, checkOut, tenantName = 'Villa SaaS', tenantLogo, }) => {
     const i18n = new i18n_email_service_1.I18nEmailService(locale);
     const previewText = i18n.t('emails.bookingCancelled.subject', { reference: bookingReference });
-    return (<base_email_1.BaseEmail previewText={previewText} tenantName={tenantName} tenantLogo={tenantLogo} footer={i18n.t('emails.bookingCancelled.footer', { tenantName })}>
-      <components_1.Heading style={base_email_1.styles.h1}>{i18n.t('emails.bookingCancelled.title')}</components_1.Heading>
-      
-      <components_1.Text style={base_email_1.styles.text}>
-        {i18n.t('emails.bookingCancelled.greeting', { guestName })}
-      </components_1.Text>
-
-      <components_1.Text style={base_email_1.styles.text}>
-        {i18n.t('emails.bookingCancelled.intro')}
-      </components_1.Text>
-
-      <components_1.Section style={base_email_1.styles.infoSection}>
-        <components_1.Text style={base_email_1.styles.infoTitle}>{i18n.t('emails.bookingCancelled.details.title')}</components_1.Text>
-        <components_1.Hr style={base_email_1.styles.hr}/>
-        <components_1.Text style={base_email_1.styles.infoItem}>
-          <strong>{i18n.t('emails.bookingCancelled.details.reference')}:</strong> {bookingReference}
-        </components_1.Text>
-        <components_1.Text style={base_email_1.styles.infoItem}>
-          <strong>{i18n.t('emails.bookingCancelled.details.property')}:</strong> {propertyName}
-        </components_1.Text>
-        <components_1.Text style={base_email_1.styles.infoItem}>
-          <strong>{i18n.t('emails.bookingCancelled.details.checkIn')}:</strong> {i18n.formatDate(checkIn)}
-        </components_1.Text>
-        <components_1.Text style={base_email_1.styles.infoItem}>
-          <strong>{i18n.t('emails.bookingCancelled.details.checkOut')}:</strong> {i18n.formatDate(checkOut)}
-        </components_1.Text>
-      </components_1.Section>
-
-      <components_1.Text style={base_email_1.styles.text}>
-        {i18n.t('emails.bookingCancelled.newBooking')}
-      </components_1.Text>
-    </base_email_1.BaseEmail>);
+    return (React.createElement(base_email_1.BaseEmail, { previewText: previewText, tenantName: tenantName, tenantLogo: tenantLogo, footer: i18n.t('emails.bookingCancelled.footer', { tenantName }) },
+        React.createElement(components_1.Heading, { style: base_email_1.styles.h1 }, i18n.t('emails.bookingCancelled.title')),
+        React.createElement(components_1.Text, { style: base_email_1.styles.text }, i18n.t('emails.bookingCancelled.greeting', { guestName })),
+        React.createElement(components_1.Text, { style: base_email_1.styles.text }, i18n.t('emails.bookingCancelled.intro')),
+        React.createElement(components_1.Section, { style: base_email_1.styles.infoSection },
+            React.createElement(components_1.Text, { style: base_email_1.styles.infoTitle }, i18n.t('emails.bookingCancelled.details.title')),
+            React.createElement(components_1.Hr, { style: base_email_1.styles.hr }),
+            React.createElement(components_1.Text, { style: base_email_1.styles.infoItem },
+                React.createElement("strong", null,
+                    i18n.t('emails.bookingCancelled.details.reference'),
+                    ":"),
+                " ",
+                bookingReference),
+            React.createElement(components_1.Text, { style: base_email_1.styles.infoItem },
+                React.createElement("strong", null,
+                    i18n.t('emails.bookingCancelled.details.property'),
+                    ":"),
+                " ",
+                propertyName),
+            React.createElement(components_1.Text, { style: base_email_1.styles.infoItem },
+                React.createElement("strong", null,
+                    i18n.t('emails.bookingCancelled.details.checkIn'),
+                    ":"),
+                " ",
+                i18n.formatDate(checkIn)),
+            React.createElement(components_1.Text, { style: base_email_1.styles.infoItem },
+                React.createElement("strong", null,
+                    i18n.t('emails.bookingCancelled.details.checkOut'),
+                    ":"),
+                " ",
+                i18n.formatDate(checkOut))),
+        React.createElement(components_1.Text, { style: base_email_1.styles.text }, i18n.t('emails.bookingCancelled.newBooking'))));
 };
 exports.BookingCancelledEmail = BookingCancelledEmail;
 exports.default = exports.BookingCancelledEmail;

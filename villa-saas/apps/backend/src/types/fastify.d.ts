@@ -18,7 +18,6 @@ declare module 'fastify' {
       tenantId: string;
       email: string;
       role: string;
-      permissions: string[];
     };
     tenantId?: string;
   }
@@ -31,14 +30,12 @@ declare module '@fastify/jwt' {
       tenantId: string;
       email: string;
       role: string;
-      permissions: string[];
     };
     user: {
       userId: string;
       tenantId: string;
       email: string;
       role: string;
-      permissions: string[];
     };
   }
 }

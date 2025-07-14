@@ -8,6 +8,7 @@ const client_s3_1 = require("@aws-sdk/client-s3");
 async function s3Plugin(fastify) {
     const s3Config = {
         region: process.env.AWS_REGION || 'eu-central-1',
+        endpoint: process.env.AWS_S3_ENDPOINT, // Support pour Cloudflare R2
         credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY ? {
             accessKeyId: process.env.AWS_ACCESS_KEY_ID,
             secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

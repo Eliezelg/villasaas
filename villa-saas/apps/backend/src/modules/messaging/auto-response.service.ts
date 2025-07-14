@@ -1,5 +1,4 @@
 import type { FastifyInstance } from 'fastify';
-import type { Prisma } from '@prisma/client';
 import OpenAI from 'openai';
 
 interface AutoResponseContext {
@@ -126,7 +125,7 @@ export class AutoResponseService {
         data: {
           history,
           messagesCount: { increment: 1 },
-          state: this.determineNewState(aiResponse, session.state),
+          state: this.determineNewState(aiResponse, session.state) as any,
         },
       });
 
@@ -180,7 +179,7 @@ Si le client demande:
   /**
    * Déterminer le nouvel état du chatbot
    */
-  private determineNewState(response: string, currentState: string): string {
+  private determineNewState(response: string, _currentState: string): string {
     // Logique simple pour déterminer l'état
     if (response.toLowerCase().includes('transférer') || response.toLowerCase().includes('agent')) {
       return 'WAITING_HUMAN';
@@ -228,8 +227,6 @@ Si le client demande:
 
       // Vérifier l'heure
       if (triggers.time) {
-        const now = new Date();
-        const currentTime = `${now.getHours()}:${now.getMinutes()}`;
         
         if (triggers.time.from && triggers.time.to) {
           // TODO: Implémenter la logique de comparaison d'heures

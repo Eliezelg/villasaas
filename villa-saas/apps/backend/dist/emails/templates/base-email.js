@@ -37,24 +37,17 @@ exports.styles = exports.BaseEmail = void 0;
 const React = __importStar(require("react"));
 const components_1 = require("@react-email/components");
 const BaseEmail = ({ previewText, children, tenantName = 'Villa SaaS', tenantLogo, footer, }) => {
-    return (<components_1.Html>
-      <components_1.Head />
-      <components_1.Preview>{previewText}</components_1.Preview>
-      <components_1.Body style={main}>
-        <components_1.Container style={container}>
-          {tenantLogo && (<components_1.Section style={logoSection}>
-              <components_1.Img src={tenantLogo} width="150" height="auto" alt={tenantName} style={logo}/>
-            </components_1.Section>)}
-
-          {children}
-
-          {footer && (<>
-              <hr style={hr}/>
-              <components_1.Text style={footerText}>{footer}</components_1.Text>
-            </>)}
-        </components_1.Container>
-      </components_1.Body>
-    </components_1.Html>);
+    return (React.createElement(components_1.Html, null,
+        React.createElement(components_1.Head, null),
+        React.createElement(components_1.Preview, null, previewText),
+        React.createElement(components_1.Body, { style: main },
+            React.createElement(components_1.Container, { style: container },
+                tenantLogo && (React.createElement(components_1.Section, { style: logoSection },
+                    React.createElement(components_1.Img, { src: tenantLogo, width: "150", height: "auto", alt: tenantName, style: logo }))),
+                children,
+                footer && (React.createElement(React.Fragment, null,
+                    React.createElement("hr", { style: hr }),
+                    React.createElement(components_1.Text, { style: footerText }, footer)))))));
 };
 exports.BaseEmail = BaseEmail;
 // Shared styles
@@ -161,6 +154,6 @@ exports.styles = {
     },
 };
 // Re-export individual styles for convenience
-const { main, container, logoSection, logo, h1, text, infoSection, infoTitle, infoItem, button, buttonSection, hr, footerText, warningSection, warningText, successSection, successText, } = exports.styles;
+const { main, container, logoSection, logo, hr, footerText, } = exports.styles;
 exports.default = exports.BaseEmail;
 //# sourceMappingURL=base-email.js.map

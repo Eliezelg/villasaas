@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Kontrol Paneli",
+    "welcome": "Villa SaaS kontrol panelinize hoş geldiniz",
+    "stats": {
+      "properties": "Mülkler",
+      "activeProperties": "Aktif mülkler",
+      "bookings": "Rezervasyonlar",
+      "thisMonth": "Bu ay",
+      "revenue": "Gelirler",
+      "occupancyRate": "Doluluk oranı",
+      "averageThisMonth": "Bu ay ortalama"
+    },
+    "recentBookings": {
+      "title": "Son rezervasyonlar",
+      "subtitle": "Son rezervasyonlarınız",
+      "empty": "Şu anda rezervasyon yok"
+    },
+    "recentActivity": {
+      "title": "Son aktiviteler",
+      "subtitle": "Hesabınızdaki son işlemler",
+      "empty": "Son aktivite yok"
+    }
+  },
+  "properties": {
+    "title": "Mülkler",
+    "subtitle": "Mülklerinizi yönetin",
+    "addProperty": "Mülk ekle",
+    "loading": "Yükleniyor...",
+    "error": "Mülkler yüklenirken hata oluştu",
+    "empty": {
+      "title": "Mülk yok",
+      "description": "İlk mülkünüzü ekleyerek başlayın"
+    },
+    "deleteConfirm": "Silmek istediğinizden emin misiniz",
+    "labels": {
+      "bedrooms": "Yatak odaları",
+      "guests": "Misafirler",
+      "pricePerNight": "Fiyat/gece",
+      "edit": "Düzenle"
+    },
+    "types": {
+      "APARTMENT": "Daire",
+      "HOUSE": "Ev",
+      "VILLA": "Villa",
+      "STUDIO": "Stüdyo",
+      "LOFT": "Loft",
+      "ROOM": "Oda",
+      "OTHER": "Diğer"
+    },
+    "statuses": {
+      "DRAFT": "Taslak",
+      "PUBLISHED": "Yayınlandı",
+      "ARCHIVED": "Arşivlendi"
+    }
+  },
+  "bookings": {
+    "title": "Rezervasyonlar",
+    "subtitle": "Rezervasyonlarınızı yönetin",
+    "newBooking": "Yeni rezervasyon",
+    "search": "Ara (referans, isim, e-posta)",
+    "filters": {
+      "allProperties": "Tüm mülkler",
+      "allStatuses": "Tüm durumlar",
+      "apply": "Filtrele"
+    },
+    "table": {
+      "reference": "Referans",
+      "property": "Mülk",
+      "client": "Müşteri",
+      "dates": "Tarihler",
+      "guests": "Misafirler",
+      "total": "Toplam",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    "labels": {
+      "nights": "geceler",
+      "night": "gece",
+      "babies": "bebekler",
+      "baby": "bebek",
+      "viewDetails": "Detayları gör",
+      "confirm": "Onayla",
+      "cancel": "İptal et"
+    },
+    "empty": "Rezervasyon bulunamadı",
+    "pagination": "Sayfa {page} / {totalPages} ({total} sonuç)",
+    "errors": {
+      "loadError": "Rezervasyonlar yüklenemedi"
+    },
+    "messages": {
+      "confirmSuccess": "Rezervasyon {reference} onaylandı",
+      "cancelSuccess": "Rezervasyon {reference} iptal edildi",
+      "cancelConfirm": "Bu rezervasyonu iptal etmek istediğinizden emin misiniz?",
+      "cancelReason": "Mülk sahibi tarafından iptal edildi"
+    },
+    "statuses": {
+      "PENDING": "Beklemede",
+      "CONFIRMED": "Onaylandı",
+      "CANCELLED": "İptal edildi",
+      "COMPLETED": "Tamamlandı",
+      "NO_SHOW": "Gelmedi"
+    }
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "subtitle": "Hesabınızın ve mülklerinizin tüm ayarlarını yönetin",
+    "sections": {
+      "profile": {
+        "title": "Şirket profili",
+        "description": "Şirket bilgilerinizi yönetin"
+      },
+      "payments": {
+        "title": "Ödemeler",
+        "description": "Ödeme yöntemlerinizi ve komisyonlarınızı yapılandırın"
+      },
+      "users": {
+        "title": "Kullanıcılar",
+        "description": "Kullanıcıları ve izinlerini yönetin"
+      },
+      "emails": {
+        "title": "E-postalar",
+        "description": "E-posta şablonlarınızı özelleştirin"
+      },
+      "autoResponses": {
+        "title": "Otomatik yanıtlar",
+        "description": "Otomatik mesajları ve AI sohbet robotunu yapılandırın"
+      },
+      "integrations": {
+        "title": "Entegrasyonlar",
+        "description": "Harici araçlarınızı bağlayın (Airbnb, Booking.com, vb.)"
+      },
+      "security": {
+        "title": "Güvenlik",
+        "description": "Güvenlik ve erişimleri yönetin"
+      },
+      "preferences": {
+        "title": "Tercihler",
+        "description": "Deneyiminizi özelleştirin"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Ana sayfaya dön",
+    "login": {
+      "title": "Giriş",
+      "subtitle": "Villa SaaS hesabınıza giriş yapın",
+      "email": "E-posta",
+      "emailPlaceholder": "sizin@eposta.com",
+      "password": "Şifre",
+      "errors": {
+        "invalidEmail": "Geçersiz e-posta",
+        "passwordRequired": "Şifre gereklidir",
+        "generic": "Bir hata oluştu"
+      },
+      "submit": "Giriş yap",
+      "submitting": "Giriş yapılıyor...",
+      "noAccount": "Henüz hesabınız yok mu?",
+      "createAccount": "Hesap oluştur"
+    },
+    "logout": "Çıkış yap"
+  },
+  "navigation": {
+    "dashboard": "Kontrol Paneli",
+    "properties": "Mülkler",
+    "bookings": "Rezervasyonlar",
+    "messages": "Mesajlar",
+    "analytics": "Analizler",
+    "bookingOptions": "Rezervasyon seçenekleri",
+    "paymentConfiguration": "Ödeme yapılandırması",
+    "users": "Kullanıcılar",
+    "settings": "Ayarlar"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "retry": "Tekrar dene",
+    "save": "Kaydet",
+    "cancel": "İptal et",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "confirm": "Onayla",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "yes": "Evet",
+    "no": "Hayır",
+    "close": "Kapat",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "sort": "Sırala",
+    "refresh": "Yenile",
+    "export": "Dışa aktar",
+    "import": "İçe aktar",
+    "download": "İndir",
+    "upload": "Yükle",
+    "print": "Yazdır",
+    "share": "Paylaş",
+    "copy": "Kopyala",
+    "paste": "Yapıştır",
+    "cut": "Kes",
+    "selectAll": "Tümünü seç",
+    "deselectAll": "Seçimi kaldır"
+  }
+}

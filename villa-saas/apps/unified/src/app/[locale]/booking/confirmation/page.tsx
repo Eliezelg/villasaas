@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTenant } from '@/lib/tenant-context'
@@ -33,7 +33,7 @@ interface BookingData {
   }
 }
 
-export default function BookingConfirmationPage() {
+function BookingConfirmationPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { tenant } = useTenant()
@@ -266,5 +266,13 @@ export default function BookingConfirmationPage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function BookingConfirmationPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <BookingConfirmationPageContent />
+    </Suspense>
   )
 }

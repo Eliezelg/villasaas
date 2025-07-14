@@ -9,6 +9,12 @@ const calculatePriceSchema = zod_1.z.object({
     checkIn: zod_1.z.string().datetime(),
     checkOut: zod_1.z.string().datetime(),
     guests: zod_1.z.number().int().positive(),
+    adults: zod_1.z.number().int().positive().optional(),
+    children: zod_1.z.number().int().min(0).optional(),
+    selectedOptions: zod_1.z.array(zod_1.z.object({
+        optionId: zod_1.z.string(),
+        quantity: zod_1.z.number().int().positive()
+    })).optional()
 });
 async function pricingRoutes(fastify) {
     const pricingService = new pricing_service_1.PricingService(fastify.prisma);
@@ -24,6 +30,18 @@ async function pricingRoutes(fastify) {
                     checkIn: { type: 'string', format: 'date-time' },
                     checkOut: { type: 'string', format: 'date-time' },
                     guests: { type: 'integer', minimum: 1 },
+                    adults: { type: 'integer', minimum: 1 },
+                    children: { type: 'integer', minimum: 0 },
+                    selectedOptions: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                optionId: { type: 'string' },
+                                quantity: { type: 'integer', minimum: 1 }
+                            }
+                        }
+                    }
                 },
             },
         },

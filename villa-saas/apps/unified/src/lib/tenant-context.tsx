@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { getCookie } from './utils'
+import { getCookie, deleteCookie } from './utils'
 
 interface TenantInfo {
   id: string
@@ -41,22 +41,55 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadTenant() {
       try {
+        // Ne pas charger le tenant sur les pages admin
+        if (typeof window !== 'undefined' && window.location.pathname.includes('/admin')) {
+          // Supprimer le cookie tenant sur les pages admin pour éviter les conflits
+          deleteCookie('tenant')
+          setLoading(false)
+          return
+        }
+
         // Récupérer le subdomain depuis le cookie
         const subdomain = getCookie('tenant')
         
         if (!subdomain) {
-          throw new Error('No tenant found')
-        }
+          // Si pas de cookie, essayer de détecter le subdomain depuis l'URL
+          const hostname = window.location.hostname
+          const parts = hostname.split('.')
+          
+          // Si on est sur localhost ou sur le domaine principal, pas de tenant
+          if (hostname === 'localhost' || hostname.includes('localhost') || parts.length < 3) {
+            setLoading(false)
+            return
+          }
+          
+          // Sinon, le premier élément est le subdomain
+          const detectedSubdomain = parts[0]
+          if (detectedSubdomain === 'www' || detectedSubdomain === 'app') {
+            setLoading(false)
+            return
+          }
+          
+          // Utiliser le subdomain détecté
+          const response = await fetch(`/api/tenant/${detectedSubdomain}`)
+          
+          if (!response.ok) {
+            throw new Error('Failed to load tenant')
+          }
 
-        // Charger les infos du tenant depuis l'API
-        const response = await fetch(`/api/tenant/${subdomain}`)
-        
-        if (!response.ok) {
-          throw new Error('Failed to load tenant')
-        }
+          const data = await response.json()
+          setTenant(data)
+        } else {
+          // Charger les infos du tenant depuis l'API avec le cookie
+          const response = await fetch(`/api/tenant/${subdomain}`)
+          
+          if (!response.ok) {
+            throw new Error('Failed to load tenant')
+          }
 
-        const data = await response.json()
-        setTenant(data)
+          const data = await response.json()
+          setTenant(data)
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {

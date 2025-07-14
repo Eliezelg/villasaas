@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "welcome": "आपके Villa SaaS डैशबोर्ड में आपका स्वागत है",
+    "stats": {
+      "properties": "संपत्तियां",
+      "activeProperties": "सक्रिय संपत्तियां",
+      "bookings": "बुकिंग",
+      "thisMonth": "इस महीने",
+      "revenue": "आय",
+      "occupancyRate": "अधिभोग दर",
+      "averageThisMonth": "इस महीने का औसत"
+    },
+    "recentBookings": {
+      "title": "हाल की बुकिंग",
+      "subtitle": "आपकी नवीनतम बुकिंग",
+      "empty": "फिलहाल कोई बुकिंग नहीं"
+    },
+    "recentActivity": {
+      "title": "हाल की गतिविधि",
+      "subtitle": "आपके खाते में नवीनतम कार्रवाइयां",
+      "empty": "कोई हाल की गतिविधि नहीं"
+    }
+  },
+  "properties": {
+    "title": "संपत्तियां",
+    "subtitle": "अपनी संपत्तियों का प्रबंधन करें",
+    "addProperty": "संपत्ति जोड़ें",
+    "loading": "लोड हो रहा है...",
+    "error": "संपत्तियों को लोड करने में त्रुटि",
+    "empty": {
+      "title": "कोई संपत्ति नहीं",
+      "description": "अपनी पहली संपत्ति जोड़कर शुरू करें"
+    },
+    "deleteConfirm": "क्या आप वाकई हटाना चाहते हैं",
+    "labels": {
+      "bedrooms": "शयनकक्ष",
+      "guests": "मेहमान",
+      "pricePerNight": "मूल्य/रात",
+      "edit": "संपादित करें"
+    },
+    "types": {
+      "APARTMENT": "अपार्टमेंट",
+      "HOUSE": "घर",
+      "VILLA": "विला",
+      "STUDIO": "स्टूडियो",
+      "LOFT": "लॉफ्ट",
+      "ROOM": "कमरा",
+      "OTHER": "अन्य"
+    },
+    "statuses": {
+      "DRAFT": "ड्राफ्ट",
+      "PUBLISHED": "प्रकाशित",
+      "ARCHIVED": "संग्रहीत"
+    }
+  },
+  "bookings": {
+    "title": "बुकिंग",
+    "subtitle": "अपनी बुकिंग प्रबंधित करें",
+    "newBooking": "नई बुकिंग",
+    "search": "खोजें (संदर्भ, नाम, ईमेल)",
+    "filters": {
+      "allProperties": "सभी संपत्तियां",
+      "allStatuses": "सभी स्थितियां",
+      "apply": "फ़िल्टर"
+    },
+    "table": {
+      "reference": "संदर्भ",
+      "property": "संपत्ति",
+      "client": "ग्राहक",
+      "dates": "तिथियां",
+      "guests": "मेहमान",
+      "total": "कुल",
+      "status": "स्थिति",
+      "actions": "कार्रवाइयां"
+    },
+    "labels": {
+      "nights": "रातें",
+      "night": "रात",
+      "babies": "शिशु",
+      "baby": "शिशु",
+      "viewDetails": "विवरण देखें",
+      "confirm": "पुष्टि करें",
+      "cancel": "रद्द करें"
+    },
+    "empty": "कोई बुकिंग नहीं मिली",
+    "pagination": "पृष्ठ {page} का {totalPages} ({total} परिणाम)",
+    "errors": {
+      "loadError": "बुकिंग लोड नहीं हो सकीं"
+    },
+    "messages": {
+      "confirmSuccess": "बुकिंग {reference} की पुष्टि हो गई है",
+      "cancelSuccess": "बुकिंग {reference} रद्द कर दी गई है",
+      "cancelConfirm": "क्या आप वाकई इस बुकिंग को रद्द करना चाहते हैं?",
+      "cancelReason": "मालिक द्वारा रद्द"
+    },
+    "statuses": {
+      "PENDING": "प्रतीक्षारत",
+      "CONFIRMED": "पुष्ट",
+      "CANCELLED": "रद्द",
+      "COMPLETED": "पूर्ण",
+      "NO_SHOW": "नो-शो"
+    }
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "subtitle": "अपने खाते और संपत्तियों की सभी सेटिंग्स प्रबंधित करें",
+    "sections": {
+      "profile": {
+        "title": "कंपनी प्रोफ़ाइल",
+        "description": "अपनी कंपनी की जानकारी प्रबंधित करें"
+      },
+      "payments": {
+        "title": "भुगतान",
+        "description": "अपनी भुगतान विधियों और कमीशन कॉन्फ़िगर करें"
+      },
+      "users": {
+        "title": "उपयोगकर्ता",
+        "description": "उपयोगकर्ताओं और उनकी अनुमतियों को प्रबंधित करें"
+      },
+      "emails": {
+        "title": "ईमेल",
+        "description": "अपने ईमेल टेम्प्लेट कस्टमाइज़ करें"
+      },
+      "autoResponses": {
+        "title": "स्वचालित प्रतिक्रियाएं",
+        "description": "स्वचालित संदेश और AI चैटबॉट कॉन्फ़िगर करें"
+      },
+      "integrations": {
+        "title": "इंटीग्रेशन",
+        "description": "अपने बाहरी टूल कनेक्ट करें (Airbnb, Booking.com, आदि)"
+      },
+      "security": {
+        "title": "सुरक्षा",
+        "description": "सुरक्षा और पहुंच प्रबंधित करें"
+      },
+      "preferences": {
+        "title": "प्राथमिकताएं",
+        "description": "अपना अनुभव कस्टमाइज़ करें"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "होम पर वापस जाएं",
+    "login": {
+      "title": "लॉगिन",
+      "subtitle": "अपने Villa SaaS खाते में लॉगिन करें",
+      "email": "ईमेल",
+      "emailPlaceholder": "your@email.com",
+      "password": "पासवर्ड",
+      "errors": {
+        "invalidEmail": "अमान्य ईमेल",
+        "passwordRequired": "पासवर्ड आवश्यक है",
+        "generic": "एक त्रुटि हुई है"
+      },
+      "submit": "लॉगिन करें",
+      "submitting": "लॉगिन हो रहा है...",
+      "noAccount": "अभी तक खाता नहीं है?",
+      "createAccount": "खाता बनाएं"
+    },
+    "logout": "लॉगआउट"
+  },
+  "navigation": {
+    "dashboard": "डैशबोर्ड",
+    "properties": "संपत्तियां",
+    "bookings": "बुकिंग",
+    "messages": "संदेश",
+    "analytics": "एनालिटिक्स",
+    "bookingOptions": "बुकिंग विकल्प",
+    "paymentConfiguration": "भुगतान कॉन्फ़िगरेशन",
+    "users": "उपयोगकर्ता",
+    "settings": "सेटिंग्स"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई है",
+    "retry": "फिर से प्रयास करें",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "confirm": "पुष्टि करें",
+    "back": "वापस",
+    "next": "अगला",
+    "previous": "पिछला",
+    "yes": "हां",
+    "no": "नहीं",
+    "close": "बंद करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "sort": "क्रमबद्ध करें",
+    "refresh": "रीफ्रेश करें",
+    "export": "निर्यात करें",
+    "import": "आयात करें",
+    "download": "डाउनलोड करें",
+    "upload": "अपलोड करें",
+    "print": "प्रिंट करें",
+    "share": "शेयर करें",
+    "copy": "कॉपी करें",
+    "paste": "पेस्ट करें",
+    "cut": "कट करें",
+    "selectAll": "सभी चुनें",
+    "deselectAll": "चयन रद्द करें"
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "dashboard": {
+    "title": "לוח בקרה",
+    "welcome": "ברוכים הבאים ללוח הבקרה שלכם ב-Villa SaaS",
+    "stats": {
+      "properties": "נכסים",
+      "activeProperties": "נכסים פעילים",
+      "bookings": "הזמנות",
+      "thisMonth": "החודש",
+      "revenue": "הכנסות",
+      "occupancyRate": "שיעור תפוסה",
+      "averageThisMonth": "ממוצע החודש"
+    },
+    "recentBookings": {
+      "title": "הזמנות אחרונות",
+      "subtitle": "ההזמנות האחרונות שלך",
+      "empty": "אין הזמנות כרגע"
+    },
+    "recentActivity": {
+      "title": "פעילות אחרונה",
+      "subtitle": "פעולות אחרונות בחשבונך",
+      "empty": "אין פעילות אחרונה"
+    }
+  },
+  "properties": {
+    "title": "נכסים",
+    "subtitle": "נהל את הנכסים שלך",
+    "addProperty": "הוסף נכס",
+    "loading": "טוען...",
+    "error": "שגיאה בטעינת הנכסים",
+    "empty": {
+      "title": "אין נכסים",
+      "description": "התחל בהוספת הנכס הראשון שלך"
+    },
+    "deleteConfirm": "האם אתה בטוח שברצונך למחוק",
+    "labels": {
+      "bedrooms": "חדרי שינה",
+      "guests": "אורחים",
+      "pricePerNight": "מחיר/לילה",
+      "edit": "ערוך"
+    },
+    "types": {
+      "APARTMENT": "דירה",
+      "HOUSE": "בית",
+      "VILLA": "וילה",
+      "STUDIO": "סטודיו",
+      "LOFT": "לופט",
+      "ROOM": "חדר",
+      "OTHER": "אחר"
+    },
+    "statuses": {
+      "DRAFT": "טיוטה",
+      "PUBLISHED": "פורסם",
+      "ARCHIVED": "בארכיון"
+    }
+  },
+  "bookings": {
+    "title": "הזמנות",
+    "subtitle": "נהל את ההזמנות שלך",
+    "newBooking": "הזמנה חדשה",
+    "search": "חיפוש (מספר סימוכין, שם, אימייל)",
+    "filters": {
+      "allProperties": "כל הנכסים",
+      "allStatuses": "כל הסטטוסים",
+      "apply": "סנן"
+    },
+    "table": {
+      "reference": "מספר סימוכין",
+      "property": "נכס",
+      "client": "לקוח",
+      "dates": "תאריכים",
+      "guests": "אורחים",
+      "total": "סה״כ",
+      "status": "סטטוס",
+      "actions": "פעולות"
+    },
+    "labels": {
+      "nights": "לילות",
+      "night": "לילה",
+      "babies": "תינוקות",
+      "baby": "תינוק",
+      "viewDetails": "ראה פרטים",
+      "confirm": "אשר",
+      "cancel": "בטל"
+    },
+    "empty": "לא נמצאו הזמנות",
+    "pagination": "עמוד {page} מתוך {totalPages} ({total} תוצאות)",
+    "errors": {
+      "loadError": "לא ניתן לטעון את ההזמנות"
+    },
+    "messages": {
+      "confirmSuccess": "ההזמנה {reference} אושרה",
+      "cancelSuccess": "ההזמנה {reference} בוטלה",
+      "cancelConfirm": "האם אתה בטוח שברצונך לבטל הזמנה זו?",
+      "cancelReason": "בוטלה על ידי הבעלים"
+    },
+    "statuses": {
+      "PENDING": "ממתין",
+      "CONFIRMED": "מאושר",
+      "CANCELLED": "בוטל",
+      "COMPLETED": "הושלם",
+      "NO_SHOW": "לא הגיע"
+    }
+  },
+  "settings": {
+    "title": "הגדרות",
+    "subtitle": "נהל את כל ההגדרות של החשבון והנכסים שלך",
+    "sections": {
+      "profile": {
+        "title": "פרופיל חברה",
+        "description": "נהל את פרטי החברה שלך"
+      },
+      "payments": {
+        "title": "תשלומים",
+        "description": "הגדר את שיטות התשלום והעמלות שלך"
+      },
+      "users": {
+        "title": "משתמשים",
+        "description": "נהל משתמשים והרשאותיהם"
+      },
+      "emails": {
+        "title": "אימיילים",
+        "description": "התאם אישית את תבניות האימייל שלך"
+      },
+      "autoResponses": {
+        "title": "תגובות אוטומטיות",
+        "description": "הגדר הודעות אוטומטיות וצ׳אטבוט AI"
+      },
+      "integrations": {
+        "title": "אינטגרציות",
+        "description": "חבר את הכלים החיצוניים שלך (Airbnb, Booking.com וכו׳)"
+      },
+      "security": {
+        "title": "אבטחה",
+        "description": "נהל אבטחה וגישות"
+      },
+      "preferences": {
+        "title": "העדפות",
+        "description": "התאם אישית את החוויה שלך"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "חזרה לדף הבית",
+    "login": {
+      "title": "התחברות",
+      "subtitle": "התחבר לחשבון Villa SaaS שלך",
+      "email": "אימייל",
+      "emailPlaceholder": "your@email.com",
+      "password": "סיסמה",
+      "errors": {
+        "invalidEmail": "אימייל לא תקין",
+        "passwordRequired": "סיסמה נדרשת",
+        "generic": "אירעה שגיאה"
+      },
+      "submit": "התחבר",
+      "submitting": "מתחבר...",
+      "noAccount": "עדיין אין לך חשבון?",
+      "createAccount": "צור חשבון"
+    },
+    "logout": "התנתק"
+  },
+  "navigation": {
+    "dashboard": "לוח בקרה",
+    "properties": "נכסים",
+    "bookings": "הזמנות",
+    "messages": "הודעות",
+    "analytics": "ניתוחים",
+    "bookingOptions": "אפשרויות הזמנה",
+    "paymentConfiguration": "הגדרת תשלומים",
+    "users": "משתמשים",
+    "settings": "הגדרות"
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "אירעה שגיאה",
+    "retry": "נסה שוב",
+    "save": "שמור",
+    "cancel": "בטל",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "confirm": "אשר",
+    "back": "חזור",
+    "next": "הבא",
+    "previous": "הקודם",
+    "yes": "כן",
+    "no": "לא",
+    "close": "סגור",
+    "search": "חיפוש",
+    "filter": "סנן",
+    "sort": "מיין",
+    "refresh": "רענן",
+    "export": "ייצא",
+    "import": "ייבא",
+    "download": "הורד",
+    "upload": "העלה",
+    "print": "הדפס",
+    "share": "שתף",
+    "copy": "העתק",
+    "paste": "הדבק",
+    "cut": "גזור",
+    "selectAll": "בחר הכל",
+    "deselectAll": "בטל בחירה"
+  },
+  "_rtl": true
+}

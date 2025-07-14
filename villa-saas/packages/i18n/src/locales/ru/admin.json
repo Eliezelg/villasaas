@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Панель управления",
+    "welcome": "Добро пожаловать в панель управления Villa SaaS",
+    "stats": {
+      "properties": "Недвижимость",
+      "activeProperties": "Активная недвижимость",
+      "bookings": "Бронирования",
+      "thisMonth": "В этом месяце",
+      "revenue": "Доходы",
+      "occupancyRate": "Уровень заполняемости",
+      "averageThisMonth": "Среднее за этот месяц"
+    },
+    "recentBookings": {
+      "title": "Последние бронирования",
+      "subtitle": "Ваши последние бронирования",
+      "empty": "На данный момент бронирований нет"
+    },
+    "recentActivity": {
+      "title": "Последняя активность",
+      "subtitle": "Последние действия в вашем аккаунте",
+      "empty": "Нет последней активности"
+    }
+  },
+  "properties": {
+    "title": "Недвижимость",
+    "subtitle": "Управляйте вашей недвижимостью",
+    "addProperty": "Добавить недвижимость",
+    "loading": "Загрузка...",
+    "error": "Ошибка при загрузке недвижимости",
+    "empty": {
+      "title": "Нет недвижимости",
+      "description": "Начните с добавления вашей первой недвижимости"
+    },
+    "deleteConfirm": "Вы уверены, что хотите удалить",
+    "labels": {
+      "bedrooms": "Спальни",
+      "guests": "Гости",
+      "pricePerNight": "Цена/ночь",
+      "edit": "Изменить"
+    },
+    "types": {
+      "APARTMENT": "Квартира",
+      "HOUSE": "Дом",
+      "VILLA": "Вилла",
+      "STUDIO": "Студия",
+      "LOFT": "Лофт",
+      "ROOM": "Комната",
+      "OTHER": "Другое"
+    },
+    "statuses": {
+      "DRAFT": "Черновик",
+      "PUBLISHED": "Опубликовано",
+      "ARCHIVED": "В архиве"
+    }
+  },
+  "bookings": {
+    "title": "Бронирования",
+    "subtitle": "Управляйте вашими бронированиями",
+    "newBooking": "Новое бронирование",
+    "search": "Поиск (номер, имя, email)",
+    "filters": {
+      "allProperties": "Вся недвижимость",
+      "allStatuses": "Все статусы",
+      "apply": "Фильтровать"
+    },
+    "table": {
+      "reference": "Номер",
+      "property": "Недвижимость",
+      "client": "Клиент",
+      "dates": "Даты",
+      "guests": "Гости",
+      "total": "Итого",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "labels": {
+      "nights": "ночей",
+      "night": "ночь",
+      "babies": "младенцы",
+      "baby": "младенец",
+      "viewDetails": "Подробнее",
+      "confirm": "Подтвердить",
+      "cancel": "Отменить"
+    },
+    "empty": "Бронирования не найдены",
+    "pagination": "Страница {page} из {totalPages} ({total} результатов)",
+    "errors": {
+      "loadError": "Невозможно загрузить бронирования"
+    },
+    "messages": {
+      "confirmSuccess": "Бронирование {reference} подтверждено",
+      "cancelSuccess": "Бронирование {reference} отменено",
+      "cancelConfirm": "Вы уверены, что хотите отменить это бронирование?",
+      "cancelReason": "Отменено владельцем"
+    },
+    "statuses": {
+      "PENDING": "В ожидании",
+      "CONFIRMED": "Подтверждено",
+      "CANCELLED": "Отменено",
+      "COMPLETED": "Завершено",
+      "NO_SHOW": "Не явился"
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "subtitle": "Управляйте всеми настройками вашего аккаунта и недвижимости",
+    "sections": {
+      "profile": {
+        "title": "Профиль компании",
+        "description": "Управляйте информацией о вашей компании"
+      },
+      "payments": {
+        "title": "Платежи",
+        "description": "Настройте способы оплаты и комиссии"
+      },
+      "users": {
+        "title": "Пользователи",
+        "description": "Управляйте пользователями и их правами"
+      },
+      "emails": {
+        "title": "Электронная почта",
+        "description": "Настройте шаблоны электронной почты"
+      },
+      "autoResponses": {
+        "title": "Автоматические ответы",
+        "description": "Настройте автоматические сообщения и AI чат-бота"
+      },
+      "integrations": {
+        "title": "Интеграции",
+        "description": "Подключите внешние инструменты (Airbnb, Booking.com и др.)"
+      },
+      "security": {
+        "title": "Безопасность",
+        "description": "Управляйте безопасностью и доступом"
+      },
+      "preferences": {
+        "title": "Предпочтения",
+        "description": "Персонализируйте ваш опыт"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Вернуться на главную",
+    "login": {
+      "title": "Вход",
+      "subtitle": "Войдите в ваш аккаунт Villa SaaS",
+      "email": "Email",
+      "emailPlaceholder": "ваш@email.com",
+      "password": "Пароль",
+      "errors": {
+        "invalidEmail": "Неверный email",
+        "passwordRequired": "Требуется пароль",
+        "generic": "Произошла ошибка"
+      },
+      "submit": "Войти",
+      "submitting": "Вход...",
+      "noAccount": "Еще нет аккаунта?",
+      "createAccount": "Создать аккаунт"
+    },
+    "logout": "Выйти"
+  },
+  "navigation": {
+    "dashboard": "Панель управления",
+    "properties": "Недвижимость",
+    "bookings": "Бронирования",
+    "messages": "Сообщения",
+    "analytics": "Аналитика",
+    "bookingOptions": "Параметры бронирования",
+    "paymentConfiguration": "Настройка платежей",
+    "users": "Пользователи",
+    "settings": "Настройки"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "retry": "Попробовать снова",
+    "save": "Сохранить",
+    "cancel": "Отменить",
+    "delete": "Удалить",
+    "edit": "Изменить",
+    "confirm": "Подтвердить",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Назад",
+    "yes": "Да",
+    "no": "Нет",
+    "close": "Закрыть",
+    "search": "Поиск",
+    "filter": "Фильтровать",
+    "sort": "Сортировать",
+    "refresh": "Обновить",
+    "export": "Экспортировать",
+    "import": "Импортировать",
+    "download": "Скачать",
+    "upload": "Загрузить",
+    "print": "Печать",
+    "share": "Поделиться",
+    "copy": "Копировать",
+    "paste": "Вставить",
+    "cut": "Вырезать",
+    "selectAll": "Выделить все",
+    "deselectAll": "Снять выделение"
+  }
+}

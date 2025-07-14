@@ -24,6 +24,10 @@ const createBookingSchema = zod_1.z.object({
     specialRequests: zod_1.z.string().optional(),
     source: zod_1.z.string().optional(),
     externalId: zod_1.z.string().optional(),
+    selectedOptions: zod_1.z.array(zod_1.z.object({
+        optionId: zod_1.z.string().min(1),
+        quantity: zod_1.z.number().int().positive()
+    })).optional(),
 });
 const updateBookingSchema = zod_1.z.object({
     guestFirstName: zod_1.z.string().min(1).optional(),
@@ -355,6 +359,45 @@ async function bookingRoutes(fastify) {
         });
         return reply.send(updated);
     });
+    // Update booking status
+    fastify.patch('/bookings/:id/status', {
+        preHandler: [fastify.authenticate],
+        schema: {
+            description: 'Update booking status',
+            tags: ['bookings'],
+        }
+    }, async (request, reply) => {
+        const tenantId = (0, utils_1.getTenantId)(request);
+        const { id } = request.params;
+        const { status } = request.body;
+        // Validate status
+        const validStatuses = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED', 'NO_SHOW'];
+        if (!validStatuses.includes(status)) {
+            return reply.code(400).send({ error: 'Invalid status' });
+        }
+        const booking = await fastify.prisma.booking.findFirst({
+            where: { id, tenantId }
+        });
+        if (!booking) {
+            return reply.code(404).send({ error: 'Booking not found' });
+        }
+        const updated = await fastify.prisma.booking.update({
+            where: { id },
+            data: { status: status },
+            include: {
+                property: {
+                    select: {
+                        id: true,
+                        name: true,
+                        address: true,
+                        city: true,
+                        images: { select: { id: true, url: true, order: true } }
+                    }
+                }
+            }
+        });
+        return reply.send(updated);
+    });
     // Confirmer une réservation
     fastify.post('/bookings/:id/confirm', {
         preHandler: [fastify.authenticate],
@@ -396,13 +439,17 @@ async function bookingRoutes(fastify) {
                 }
             }
         });
-        // Récupérer les informations du tenant
+        // Récupérer les informations du tenant avec le site public
         const tenant = await fastify.prisma.tenant.findUnique({
             where: { id: tenantId },
             select: {
                 name: true,
-                logo: true,
-                subdomain: true
+                subdomain: true,
+                publicSite: {
+                    select: {
+                        logo: true
+                    }
+                }
             }
         });
         // Envoyer email de confirmation
@@ -420,8 +467,8 @@ async function bookingRoutes(fastify) {
                 currency: updated.currency,
                 propertyImage: updated.property.images?.[0]?.urls?.large || updated.property.images?.[0]?.url,
                 tenantName: tenant?.name,
-                tenantLogo: tenant?.logo || undefined,
-                tenantSubdomain: tenant?.subdomain,
+                tenantLogo: tenant?.publicSite?.logo || undefined,
+                tenantSubdomain: tenant?.subdomain || undefined,
                 locale: updated.guestCountry === 'GB' || updated.guestCountry === 'US' ? 'en' : 'fr'
             });
         }

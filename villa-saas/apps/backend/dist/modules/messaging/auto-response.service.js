@@ -139,7 +139,7 @@ Si le client demande:
     /**
      * Déterminer le nouvel état du chatbot
      */
-    determineNewState(response, currentState) {
+    determineNewState(response, _currentState) {
         // Logique simple pour déterminer l'état
         if (response.toLowerCase().includes('transférer') || response.toLowerCase().includes('agent')) {
             return 'WAITING_HUMAN';
@@ -179,8 +179,6 @@ Si le client demande:
             }
             // Vérifier l'heure
             if (triggers.time) {
-                const now = new Date();
-                const currentTime = `${now.getHours()}:${now.getMinutes()}`;
                 if (triggers.time.from && triggers.time.to) {
                     // TODO: Implémenter la logique de comparaison d'heures
                 }

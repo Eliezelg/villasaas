@@ -41,8 +41,8 @@ export function PropertyImage({
     )
   }
   
-  // Pour les images locales ou S3, utiliser Next/Image
-  if (src.startsWith('/') || src.startsWith('http://localhost') || src.includes('amazonaws.com')) {
+  // Pour les images locales, S3 ou R2, utiliser Next/Image
+  if (src.startsWith('/') || src.startsWith('http://localhost') || src.includes('amazonaws.com') || src.includes('r2.dev')) {
     return (
       <div className={`relative ${isLoading ? 'animate-pulse bg-gray-200' : ''}`}>
         <Image

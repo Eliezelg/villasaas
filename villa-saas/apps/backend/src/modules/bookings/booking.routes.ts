@@ -480,7 +480,7 @@ export async function bookingRoutes(fastify: FastifyInstance) {
 
       const updated = await fastify.prisma.booking.update({
         where: { id },
-        data: { status },
+        data: { status: status as any },
         include: {
           property: {
             select: {
@@ -549,13 +549,17 @@ export async function bookingRoutes(fastify: FastifyInstance) {
         }
       });
 
-      // Récupérer les informations du tenant
+      // Récupérer les informations du tenant avec le site public
       const tenant = await fastify.prisma.tenant.findUnique({
         where: { id: tenantId },
         select: {
           name: true,
-          logo: true,
-          subdomain: true
+          subdomain: true,
+          publicSite: {
+            select: {
+              logo: true
+            }
+          }
         }
       });
 
@@ -572,10 +576,10 @@ export async function bookingRoutes(fastify: FastifyInstance) {
           guests: updated.adults + updated.children,
           totalAmount: updated.total,
           currency: updated.currency,
-          propertyImage: updated.property.images?.[0]?.urls?.large || updated.property.images?.[0]?.url,
+          propertyImage: (updated.property.images?.[0]?.urls as any)?.large || updated.property.images?.[0]?.url,
           tenantName: tenant?.name,
-          tenantLogo: tenant?.logo || undefined,
-          tenantSubdomain: tenant?.subdomain,
+          tenantLogo: tenant?.publicSite?.logo || undefined,
+          tenantSubdomain: tenant?.subdomain || undefined,
           locale: updated.guestCountry === 'GB' || updated.guestCountry === 'US' ? 'en' : 'fr'
         });
       } catch (emailError) {

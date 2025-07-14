@@ -23,8 +23,9 @@ class ApiClient {
       ...(options.headers as Record<string, string> || {}),
     };
 
-    // Only set Content-Type for requests with a body
-    if (options.body && !headers['Content-Type']) {
+    // Only set Content-Type for JSON requests
+    // Don't set it for FormData - the browser will set it with the boundary
+    if (options.body && !headers['Content-Type'] && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
     }
 
@@ -108,14 +109,14 @@ class ApiClient {
   async post<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
+      body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined),
     });
   }
 
   async patch<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'PATCH',
-      body: body ? JSON.stringify(body) : undefined,
+      body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined),
     });
   }
 
@@ -126,7 +127,7 @@ class ApiClient {
   async put<T>(endpoint: string, body?: any) {
     return this.request<T>(endpoint, {
       method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
+      body: body instanceof FormData ? body : (body ? JSON.stringify(body) : undefined),
     });
   }
 

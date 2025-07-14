@@ -6,6 +6,8 @@ export declare const registerSchema: z.ZodObject<{
     lastName: z.ZodString;
     companyName: z.ZodString;
     phone: z.ZodOptional<z.ZodString>;
+    subdomain: z.ZodOptional<z.ZodString>;
+    domainOption: z.ZodOptional<z.ZodEnum<["subdomain", "custom", "existing"]>>;
 }, "strip", z.ZodTypeAny, {
     email: string;
     companyName: string;
@@ -13,6 +15,8 @@ export declare const registerSchema: z.ZodObject<{
     lastName: string;
     password: string;
     phone?: string | undefined;
+    subdomain?: string | undefined;
+    domainOption?: "subdomain" | "custom" | "existing" | undefined;
 }, {
     email: string;
     companyName: string;
@@ -20,6 +24,8 @@ export declare const registerSchema: z.ZodObject<{
     lastName: string;
     password: string;
     phone?: string | undefined;
+    subdomain?: string | undefined;
+    domainOption?: "subdomain" | "custom" | "existing" | undefined;
 }>;
 export declare const loginSchema: z.ZodObject<{
     email: z.ZodString;

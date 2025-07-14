@@ -27,12 +27,11 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
         }
         
         // Vérifier le token
-        const decoded = await fastify.jwt.verify(token);
+        const decoded = await fastify.jwt.verify(token) as { userId: string; tenantId: string; email: string; role: string; permissions: string[] };
         request.user = decoded;
         
         // Ajouter le tenantId à la requête pour faciliter l'accès
         request.tenantId = request.user.tenantId;
-        request.userId = request.user.userId;
       } catch (err) {
         reply.code(401).send({ error: 'Unauthorized' });
       }
@@ -59,10 +58,9 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
         }
         
         if (token) {
-          const decoded = await fastify.jwt.verify(token);
+          const decoded = await fastify.jwt.verify(token) as { userId: string; tenantId: string; email: string; role: string; permissions: string[] };
           request.user = decoded;
           request.tenantId = request.user.tenantId;
-          request.userId = request.user.userId;
         }
       } catch (err) {
         // Ignorer les erreurs, l'authentification est optionnelle

@@ -1,0 +1,58 @@
+{
+  "navigation": {
+    "home": "בית",
+    "properties": "נכסים",
+    "about": "אודות",
+    "contact": "צור קשר",
+    "login": "התחברות",
+    "signup": "הרשמה",
+    "dashboard": "לוח בקרה"
+  },
+  "actions": {
+    "search": "חיפוש",
+    "filter": "סינון",
+    "sort": "מיון",
+    "book": "הזמן",
+    "cancel": "ביטול",
+    "confirm": "אישור",
+    "save": "שמירה",
+    "delete": "מחיקה",
+    "edit": "עריכה",
+    "view": "צפייה",
+    "back": "חזור",
+    "next": "הבא",
+    "previous": "הקודם",
+    "continue": "המשך",
+    "backToHome": "חזרה לדף הבית"
+  },
+  "labels": {
+    "email": "דוא״ל",
+    "password": "סיסמה",
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "phone": "טלפון",
+    "address": "כתובת",
+    "city": "עיר",
+    "country": "מדינה",
+    "postalCode": "מיקוד",
+    "language": "שפה",
+    "currency": "מטבע"
+  },
+  "messages": {
+    "loading": "טוען...",
+    "error": "אירעה שגיאה",
+    "success": "הפעולה הושלמה בהצלחה",
+    "noResults": "לא נמצאו תוצאות",
+    "required": "שדה חובה",
+    "invalidEmail": "כתובת דוא״ל לא תקינה",
+    "invalidPhone": "מספר טלפון לא תקין",
+    "notFound": "הדף לא נמצא"
+  },
+  "footer": {
+    "rights": "כל הזכויות שמורות",
+    "privacy": "מדיניות פרטיות",
+    "terms": "תנאי שימוש",
+    "cookies": "הגדרות עוגיות"
+  },
+  "_rtl": true
+}

@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { apiClient } from '@/lib/api-client-booking'
@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Search, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
-export default function MyBookingPage() {
+function MyBookingPageContent() {
   const t = useTranslations()
   const locale = useLocale()
   const router = useRouter()
@@ -173,5 +173,13 @@ export default function MyBookingPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function MyBookingPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <MyBookingPageContent />
+    </Suspense>
   )
 }

@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import { randomUUID } from 'crypto';
@@ -29,7 +29,7 @@ export class S3Service {
    */
   async uploadImage(
     file: Buffer,
-    mimetype: string,
+    _mimetype: string,
     options: UploadOptions = {}
   ): Promise<{
     url: string;
@@ -38,7 +38,6 @@ export class S3Service {
   }> {
     const folder = options.folder || 'properties';
     const fileId = randomUUID();
-    const extension = mimetype.split('/')[1] || 'jpg';
     const baseKey = `${folder}/${fileId}`;
 
     // Tailles par défaut
@@ -74,7 +73,7 @@ export class S3Service {
         console.log(`Processed image ${size.name}: ${processedImage.length} bytes`);
       } catch (sharpError) {
         console.error(`Sharp processing failed for ${size.name}:`, sharpError);
-        throw new Error(`Image processing failed: ${sharpError.message}`);
+        throw new Error(`Image processing failed: ${(sharpError as Error).message}`);
       }
 
       const key = `${baseKey}-${size.name}.jpg`;
@@ -102,7 +101,7 @@ export class S3Service {
     }
 
     return {
-      url: urls.large || urls.original,
+      url: urls.large || urls.original || '',
       urls,
       key: baseKey,
     };
@@ -159,7 +158,7 @@ export class S3Service {
   /**
    * Copie les images d'une propriété (pour la duplication)
    */
-  async copyPropertyImages(sourceFolder: string, targetFolder: string): Promise<void> {
+  async copyPropertyImages(_sourceFolder: string, _targetFolder: string): Promise<void> {
     // TODO: Implémenter la copie des images
     // Utiliser ListObjectsV2Command et CopyObjectCommand
   }

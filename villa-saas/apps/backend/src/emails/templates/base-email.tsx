@@ -168,19 +168,8 @@ const {
   container,
   logoSection,
   logo,
-  h1,
-  text,
-  infoSection,
-  infoTitle,
-  infoItem,
-  button,
-  buttonSection,
   hr,
   footerText,
-  warningSection,
-  warningText,
-  successSection,
-  successText,
 } = styles;
 
 export default BaseEmail;

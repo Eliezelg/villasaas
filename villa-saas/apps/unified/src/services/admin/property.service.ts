@@ -22,7 +22,7 @@ class PropertyService {
     if (params?.status) queryParams.append('status', params.status);
 
     const response = await apiClient.get<PropertyResponse>(
-      `/properties?${queryParams.toString()}`
+      `/api/properties?${queryParams.toString()}`
     );
     
     if (!response.data) {
@@ -72,13 +72,33 @@ class PropertyService {
   }
 
   async updateStatus(id: string, status: string): Promise<Property> {
-    const response = await apiClient.patch<Property>(`/properties/${id}/status`, { status });
+    const response = await apiClient.patch<Property>(`/api/properties/${id}/status`, { status });
     
     if (!response.data) {
       throw new Error('Failed to update property status');
     }
     
     return response.data;
+  }
+
+  // Gestion des langues
+  async getLanguages(propertyId: string) {
+    return apiClient.get<any[]>(`/api/properties/${propertyId}/languages`);
+  }
+
+  async enableLanguage(propertyId: string, language: string, translationType: 'manual' | 'automatic') {
+    return apiClient.post(`/api/properties/${propertyId}/languages`, {
+      language,
+      translationType
+    });
+  }
+
+  async disableLanguage(propertyId: string, language: string) {
+    return apiClient.delete(`/api/properties/${propertyId}/languages/${language}`);
+  }
+
+  async updateLanguageSettings(propertyId: string, language: string, settings: any) {
+    return apiClient.patch(`/api/properties/${propertyId}/languages/${language}`, settings);
   }
 }
 

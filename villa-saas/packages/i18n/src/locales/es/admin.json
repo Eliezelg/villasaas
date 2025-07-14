@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Panel de control",
+    "welcome": "Bienvenido a tu panel de Villa SaaS",
+    "stats": {
+      "properties": "Propiedades",
+      "activeProperties": "Propiedades activas",
+      "bookings": "Reservas",
+      "thisMonth": "Este mes",
+      "revenue": "Ingresos",
+      "occupancyRate": "Tasa de ocupación",
+      "averageThisMonth": "Promedio este mes"
+    },
+    "recentBookings": {
+      "title": "Reservas recientes",
+      "subtitle": "Tus últimas reservas",
+      "empty": "No hay reservas por el momento"
+    },
+    "recentActivity": {
+      "title": "Actividad reciente",
+      "subtitle": "Últimas acciones en tu cuenta",
+      "empty": "No hay actividad reciente"
+    }
+  },
+  "properties": {
+    "title": "Propiedades",
+    "subtitle": "Gestiona tus inmuebles",
+    "addProperty": "Añadir propiedad",
+    "loading": "Cargando...",
+    "error": "Error al cargar las propiedades",
+    "empty": {
+      "title": "Sin propiedades",
+      "description": "Comienza añadiendo tu primera propiedad"
+    },
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar",
+    "labels": {
+      "bedrooms": "Habitaciones",
+      "guests": "Huéspedes",
+      "pricePerNight": "Precio/noche",
+      "edit": "Editar"
+    },
+    "types": {
+      "APARTMENT": "Apartamento",
+      "HOUSE": "Casa",
+      "VILLA": "Villa",
+      "STUDIO": "Estudio",
+      "LOFT": "Loft",
+      "ROOM": "Habitación",
+      "OTHER": "Otro"
+    },
+    "statuses": {
+      "DRAFT": "Borrador",
+      "PUBLISHED": "Publicado",
+      "ARCHIVED": "Archivado"
+    }
+  },
+  "bookings": {
+    "title": "Reservas",
+    "subtitle": "Gestiona tus reservas",
+    "newBooking": "Nueva reserva",
+    "search": "Buscar (referencia, nombre, email)",
+    "filters": {
+      "allProperties": "Todas las propiedades",
+      "allStatuses": "Todos los estados de reserva",
+      "apply": "Filtrar"
+    },
+    "table": {
+      "reference": "Referencia",
+      "property": "Propiedad",
+      "client": "Cliente",
+      "dates": "Fechas",
+      "guests": "Huéspedes",
+      "total": "Total",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "labels": {
+      "nights": "noches",
+      "night": "noche",
+      "babies": "bebés",
+      "baby": "bebé",
+      "viewDetails": "Ver detalles",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    },
+    "empty": "No se encontraron reservas",
+    "pagination": "Página {page} de {totalPages} ({total} resultados)",
+    "errors": {
+      "loadError": "No se pudieron cargar las reservas"
+    },
+    "messages": {
+      "confirmSuccess": "La reserva {reference} ha sido confirmada",
+      "cancelSuccess": "La reserva {reference} ha sido cancelada",
+      "cancelConfirm": "¿Estás seguro de que quieres cancelar esta reserva?",
+      "cancelReason": "Cancelada por el propietario"
+    },
+    "statuses": {
+      "PENDING": "Pendiente",
+      "CONFIRMED": "Confirmada",
+      "CANCELLED": "Cancelada",
+      "COMPLETED": "Completada",
+      "NO_SHOW": "No show"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona todos los ajustes de tu cuenta y propiedades",
+    "sections": {
+      "profile": {
+        "title": "Perfil de empresa",
+        "description": "Gestiona la información de tu empresa"
+      },
+      "payments": {
+        "title": "Pagos",
+        "description": "Configura tus métodos de pago y comisiones"
+      },
+      "users": {
+        "title": "Usuarios",
+        "description": "Gestiona los usuarios y sus permisos"
+      },
+      "emails": {
+        "title": "Correos",
+        "description": "Personaliza tus plantillas de correo"
+      },
+      "autoResponses": {
+        "title": "Respuestas automáticas",
+        "description": "Configura mensajes automáticos y el chatbot IA"
+      },
+      "integrations": {
+        "title": "Integraciones",
+        "description": "Conecta tus herramientas externas (Airbnb, Booking.com, etc.)"
+      },
+      "security": {
+        "title": "Seguridad",
+        "description": "Gestiona la seguridad y los accesos"
+      },
+      "preferences": {
+        "title": "Preferencias",
+        "description": "Personaliza tu experiencia"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Volver al inicio",
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Accede a tu cuenta Villa SaaS",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@correo.com",
+      "password": "Contraseña",
+      "errors": {
+        "invalidEmail": "Correo electrónico inválido",
+        "passwordRequired": "La contraseña es obligatoria",
+        "generic": "Se produjo un error"
+      },
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "noAccount": "¿No tienes cuenta?",
+      "createAccount": "Crear cuenta"
+    },
+    "logout": "Cerrar sesión"
+  },
+  "navigation": {
+    "dashboard": "Panel de control",
+    "properties": "Propiedades",
+    "bookings": "Reservas",
+    "messages": "Mensajes",
+    "analytics": "Analíticas",
+    "bookingOptions": "Opciones de reserva",
+    "paymentConfiguration": "Configuración de pagos",
+    "users": "Usuarios",
+    "settings": "Configuración"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Se produjo un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "yes": "Sí",
+    "no": "No",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "refresh": "Actualizar",
+    "export": "Exportar",
+    "import": "Importar",
+    "download": "Descargar",
+    "upload": "Subir",
+    "print": "Imprimir",
+    "share": "Compartir",
+    "copy": "Copiar",
+    "paste": "Pegar",
+    "cut": "Cortar",
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo"
+  }
+}

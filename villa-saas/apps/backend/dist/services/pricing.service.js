@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PricingService = void 0;
 const date_fns_1 = require("date-fns");
+const types_1 = require("@villa-saas/types");
 class PricingService {
     prisma;
     constructor(prisma) {
@@ -65,7 +66,7 @@ class PricingService {
             totalAccommodation += finalPrice;
             totalWeekendPremium += weekendPremium;
             breakdown.push({
-                date: date.toISOString().split('T')[0],
+                date: date.toISOString().split('T')[0] || '',
                 basePrice,
                 weekendPremium,
                 finalPrice,
@@ -83,16 +84,85 @@ class PricingService {
         }
         longStayDiscount = Math.round(totalAccommodation * discountRate * 100) / 100;
         // Vérifier la durée minimum de séjour
-        const minNightsRequired = Math.max(property.minNights, ...periods.map(p => p.minNights).filter(Boolean));
+        const minNightsRequired = Math.max(property.minNights, ...periods.map(p => p.minNights || 0).filter(Boolean));
         if (nights < minNightsRequired) {
             throw new Error(`Minimum stay is ${minNightsRequired} nights for these dates`);
         }
-        // Calculer la taxe de séjour (exemple: 1€ par personne par nuit)
-        const touristTaxPerPersonPerNight = 1; // À paramétrer selon la localisation
-        const touristTax = request.guests * nights * touristTaxPerPersonPerNight;
+        // Récupérer la configuration des paiements
+        const paymentConfig = await this.prisma.paymentConfiguration.findUnique({
+            where: { tenantId: request.tenantId }
+        });
+        // Calculer la taxe de séjour
+        let touristTax = 0;
+        if (paymentConfig?.touristTaxEnabled) {
+            const adults = request.adults || request.guests;
+            const children = request.children || 0;
+            touristTax = (0, types_1.calculateTouristTax)(paymentConfig, adults, children, nights, totalAccommodation);
+        }
+        // Calculer les options sélectionnées
+        let optionsTotal = 0;
+        const selectedOptionsDetails = [];
+        if (request.selectedOptions && request.selectedOptions.length > 0) {
+            const optionIds = request.selectedOptions.map(o => o.optionId);
+            // Récupérer les options avec leurs personnalisations pour cette propriété
+            const options = await this.prisma.bookingOption.findMany({
+                where: {
+                    id: { in: optionIds },
+                    tenantId: request.tenantId,
+                    isActive: true
+                },
+                include: {
+                    properties: {
+                        where: { propertyId: request.propertyId },
+                        select: {
+                            customPrice: true,
+                            customMinQuantity: true,
+                            customMaxQuantity: true,
+                            isEnabled: true
+                        }
+                    }
+                }
+            });
+            for (const selectedOption of request.selectedOptions) {
+                const option = options.find(o => o.id === selectedOption.optionId);
+                if (!option)
+                    continue;
+                const propertyOption = option.properties[0];
+                if (propertyOption && !propertyOption.isEnabled)
+                    continue;
+                // Vérifier les contraintes
+                if (option.minGuests && request.guests < option.minGuests)
+                    continue;
+                if (option.maxGuests && request.guests > option.maxGuests)
+                    continue;
+                if (option.minNights && nights < option.minNights)
+                    continue;
+                // Utiliser le prix personnalisé si disponible
+                const unitPrice = propertyOption?.customPrice || option.pricePerUnit;
+                // Calculer le prix de l'option
+                const optionPrice = (0, types_1.calculateOptionPrice)({
+                    pricingType: option.pricingType,
+                    pricePerUnit: unitPrice,
+                    pricingPeriod: option.pricingPeriod
+                }, selectedOption.quantity, request.guests, nights);
+                optionsTotal += optionPrice;
+                selectedOptionsDetails.push({
+                    optionId: option.id,
+                    name: typeof option.name === 'object' ? option.name.fr || 'Option' : 'Option',
+                    quantity: selectedOption.quantity,
+                    unitPrice,
+                    totalPrice: optionPrice
+                });
+            }
+        }
         // Calculer les totaux
-        const subtotal = totalAccommodation - longStayDiscount + (property.cleaningFee || 0);
+        const subtotal = totalAccommodation - longStayDiscount + (property.cleaningFee || 0) + optionsTotal;
         const total = subtotal + touristTax;
+        // Calculer l'acompte
+        let depositAmount = 0;
+        if (paymentConfig) {
+            depositAmount = (0, types_1.calculateDeposit)(paymentConfig, total);
+        }
         return {
             nights,
             basePrice: property.basePrice,
@@ -102,10 +172,13 @@ class PricingService {
             longStayDiscount,
             cleaningFee: property.cleaningFee || 0,
             touristTax,
+            optionsTotal,
+            depositAmount,
             subtotal,
             total,
             averagePricePerNight: Math.round(total / nights * 100) / 100,
             breakdown,
+            selectedOptions: selectedOptionsDetails.length > 0 ? selectedOptionsDetails : undefined,
         };
     }
     async checkAvailability(propertyId, checkIn, checkOut, tenantId, excludeBookingId) {

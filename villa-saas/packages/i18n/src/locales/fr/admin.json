@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bienvenue sur votre tableau de bord Villa SaaS",
+    "stats": {
+      "properties": "Propriétés",
+      "activeProperties": "Propriétés actives",
+      "bookings": "Réservations",
+      "thisMonth": "Ce mois",
+      "revenue": "Revenus",
+      "occupancyRate": "Taux d'occupation",
+      "averageThisMonth": "Moyenne ce mois"
+    },
+    "recentBookings": {
+      "title": "Réservations récentes",
+      "subtitle": "Vos dernières réservations",
+      "empty": "Aucune réservation pour le moment"
+    },
+    "recentActivity": {
+      "title": "Activité récente",
+      "subtitle": "Dernières actions sur votre compte",
+      "empty": "Aucune activité récente"
+    }
+  },
+  "properties": {
+    "title": "Propriétés",
+    "subtitle": "Gérez vos biens immobiliers",
+    "addProperty": "Ajouter une propriété",
+    "loading": "Chargement...",
+    "error": "Erreur lors du chargement des propriétés",
+    "empty": {
+      "title": "Aucune propriété",
+      "description": "Commencez par ajouter votre première propriété"
+    },
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer",
+    "labels": {
+      "bedrooms": "Chambres",
+      "guests": "Personnes",
+      "pricePerNight": "Prix/nuit",
+      "edit": "Modifier"
+    },
+    "types": {
+      "APARTMENT": "Appartement",
+      "HOUSE": "Maison", 
+      "VILLA": "Villa",
+      "STUDIO": "Studio",
+      "LOFT": "Loft",
+      "ROOM": "Chambre",
+      "OTHER": "Autre"
+    },
+    "statuses": {
+      "DRAFT": "Brouillon",
+      "PUBLISHED": "Publié",
+      "ARCHIVED": "Archivé"
+    }
+  },
+  "bookings": {
+    "title": "Réservations",
+    "subtitle": "Gérez vos réservations",
+    "newBooking": "Nouvelle réservation",
+    "search": "Rechercher (référence, nom, email)",
+    "filters": {
+      "allProperties": "Toutes les propriétés",
+      "allStatuses": "Tous les statuts",
+      "apply": "Filtrer"
+    },
+    "table": {
+      "reference": "Référence",
+      "property": "Propriété",
+      "client": "Client",
+      "dates": "Dates",
+      "guests": "Invités",
+      "total": "Total",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "labels": {
+      "nights": "nuits",
+      "night": "nuit",
+      "babies": "bébés",
+      "baby": "bébé",
+      "viewDetails": "Voir détails",
+      "confirm": "Confirmer",
+      "cancel": "Annuler"
+    },
+    "empty": "Aucune réservation trouvée",
+    "pagination": "Page {page} sur {totalPages} ({total} résultats)",
+    "errors": {
+      "loadError": "Impossible de charger les réservations"
+    },
+    "messages": {
+      "confirmSuccess": "La réservation {reference} a été confirmée",
+      "cancelSuccess": "La réservation {reference} a été annulée",
+      "cancelConfirm": "Êtes-vous sûr de vouloir annuler cette réservation ?",
+      "cancelReason": "Annulée par le propriétaire"
+    },
+    "statuses": {
+      "PENDING": "En attente",
+      "CONFIRMED": "Confirmée",
+      "CANCELLED": "Annulée",
+      "COMPLETED": "Terminée",
+      "NO_SHOW": "No-show"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez tous les paramètres de votre compte et de vos propriétés",
+    "sections": {
+      "profile": {
+        "title": "Profil entreprise",
+        "description": "Gérez les informations de votre entreprise"
+      },
+      "payments": {
+        "title": "Paiements",
+        "description": "Configurez vos méthodes de paiement et commissions"
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "description": "Gérez les utilisateurs et leurs permissions"
+      },
+      "emails": {
+        "title": "Emails",
+        "description": "Personnalisez vos templates d'emails"
+      },
+      "autoResponses": {
+        "title": "Réponses automatiques",
+        "description": "Configurez les messages automatiques et le chatbot IA"
+      },
+      "integrations": {
+        "title": "Intégrations",
+        "description": "Connectez vos outils externes (Airbnb, Booking.com, etc.)"
+      },
+      "security": {
+        "title": "Sécurité",
+        "description": "Gérez la sécurité et les accès"
+      },
+      "preferences": {
+        "title": "Préférences",
+        "description": "Personnalisez votre expérience"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Retour à l'accueil",
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Connectez-vous à votre compte Villa SaaS",
+      "email": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "password": "Mot de passe",
+      "errors": {
+        "invalidEmail": "Email invalide",
+        "passwordRequired": "Le mot de passe est requis",
+        "generic": "Une erreur est survenue"
+      },
+      "submit": "Se connecter",
+      "submitting": "Connexion...",
+      "noAccount": "Pas encore de compte ?",
+      "createAccount": "Créer un compte"
+    },
+    "logout": "Se déconnecter"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "properties": "Propriétés",
+    "bookings": "Réservations",
+    "messages": "Messages",
+    "analytics": "Analytics",
+    "bookingOptions": "Options de réservation",
+    "paymentConfiguration": "Configuration paiements",
+    "users": "Utilisateurs",
+    "settings": "Paramètres"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "yes": "Oui",
+    "no": "Non",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "refresh": "Actualiser",
+    "export": "Exporter",
+    "import": "Importer",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "print": "Imprimer",
+    "share": "Partager",
+    "copy": "Copier",
+    "paste": "Coller",
+    "cut": "Couper",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner"
+  }
+}

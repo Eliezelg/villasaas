@@ -15,6 +15,6 @@ interface BookingConfirmationEmailProps {
     tenantLogo?: string;
     tenantSubdomain?: string;
 }
-export declare const BookingConfirmationEmail: ({ locale, bookingReference, guestName, guestEmail, propertyName, checkIn, checkOut, guests, totalAmount, currency, propertyImage, tenantName, tenantLogo, tenantSubdomain, }: BookingConfirmationEmailProps) => React.JSX.Element;
+export declare const BookingConfirmationEmail: ({ locale, bookingReference, guestName, guestEmail, propertyName, checkIn, checkOut, guests, totalAmount, currency, propertyImage, tenantName, tenantLogo, }: BookingConfirmationEmailProps) => React.JSX.Element;
 export default BookingConfirmationEmail;
 //# sourceMappingURL=booking-confirmation.d.ts.map

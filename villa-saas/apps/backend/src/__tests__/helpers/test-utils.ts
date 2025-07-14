@@ -78,5 +78,10 @@ export async function createUser(prisma: PrismaClient, tenantId: string) {
 }
 
 export function generateToken(app: FastifyInstance, payload: { id: string; tenantId: string }) {
-  return app.jwt.sign(payload);
+  return app.jwt.sign({
+    userId: payload.id,
+    tenantId: payload.tenantId,
+    email: 'test@example.com',
+    role: 'OWNER'
+  });
 }

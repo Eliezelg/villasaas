@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Painel de controle",
+    "welcome": "Bem-vindo ao seu painel Villa SaaS",
+    "stats": {
+      "properties": "Propriedades",
+      "activeProperties": "Propriedades ativas",
+      "bookings": "Reservas",
+      "thisMonth": "Este mês",
+      "revenue": "Receitas",
+      "occupancyRate": "Taxa de ocupação",
+      "averageThisMonth": "Média este mês"
+    },
+    "recentBookings": {
+      "title": "Reservas recentes",
+      "subtitle": "Suas últimas reservas",
+      "empty": "Nenhuma reserva no momento"
+    },
+    "recentActivity": {
+      "title": "Atividade recente",
+      "subtitle": "Últimas ações na sua conta",
+      "empty": "Nenhuma atividade recente"
+    }
+  },
+  "properties": {
+    "title": "Propriedades",
+    "subtitle": "Gerencie seus imóveis",
+    "addProperty": "Adicionar propriedade",
+    "loading": "Carregando...",
+    "error": "Erro ao carregar propriedades",
+    "empty": {
+      "title": "Nenhuma propriedade",
+      "description": "Comece adicionando sua primeira propriedade"
+    },
+    "deleteConfirm": "Tem certeza que deseja excluir",
+    "labels": {
+      "bedrooms": "Quartos",
+      "guests": "Hóspedes",
+      "pricePerNight": "Preço/noite",
+      "edit": "Editar"
+    },
+    "types": {
+      "APARTMENT": "Apartamento",
+      "HOUSE": "Casa",
+      "VILLA": "Villa",
+      "STUDIO": "Estúdio",
+      "LOFT": "Loft",
+      "ROOM": "Quarto",
+      "OTHER": "Outro"
+    },
+    "statuses": {
+      "DRAFT": "Rascunho",
+      "PUBLISHED": "Publicado",
+      "ARCHIVED": "Arquivado"
+    }
+  },
+  "bookings": {
+    "title": "Reservas",
+    "subtitle": "Gerencie suas reservas",
+    "newBooking": "Nova reserva",
+    "search": "Pesquisar (referência, nome, email)",
+    "filters": {
+      "allProperties": "Todas as propriedades",
+      "allStatuses": "Todos os estados de reserva",
+      "apply": "Filtrar"
+    },
+    "table": {
+      "reference": "Referência",
+      "property": "Propriedade",
+      "client": "Cliente",
+      "dates": "Datas",
+      "guests": "Hóspedes",
+      "total": "Total",
+      "status": "Status",
+      "actions": "Ações"
+    },
+    "labels": {
+      "nights": "noites",
+      "night": "noite",
+      "babies": "bebês",
+      "baby": "bebê",
+      "viewDetails": "Ver detalhes",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    },
+    "empty": "Nenhuma reserva encontrada",
+    "pagination": "Página {page} de {totalPages} ({total} resultados)",
+    "errors": {
+      "loadError": "Impossível carregar as reservas"
+    },
+    "messages": {
+      "confirmSuccess": "A reserva {reference} foi confirmada",
+      "cancelSuccess": "A reserva {reference} foi cancelada",
+      "cancelConfirm": "Tem certeza que deseja cancelar esta reserva?",
+      "cancelReason": "Cancelada pelo proprietário"
+    },
+    "statuses": {
+      "PENDING": "Pendente",
+      "CONFIRMED": "Confirmada",
+      "CANCELLED": "Cancelada",
+      "COMPLETED": "Concluída",
+      "NO_SHOW": "Não compareceu"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Gerencie todas as configurações da sua conta e propriedades",
+    "sections": {
+      "profile": {
+        "title": "Perfil da empresa",
+        "description": "Gerencie as informações da sua empresa"
+      },
+      "payments": {
+        "title": "Pagamentos",
+        "description": "Configure seus métodos de pagamento e comissões"
+      },
+      "users": {
+        "title": "Usuários",
+        "description": "Gerencie os usuários e suas permissões"
+      },
+      "emails": {
+        "title": "E-mails",
+        "description": "Personalize seus modelos de e-mail"
+      },
+      "autoResponses": {
+        "title": "Respostas automáticas",
+        "description": "Configure as mensagens automáticas e o chatbot IA"
+      },
+      "integrations": {
+        "title": "Integrações",
+        "description": "Conecte suas ferramentas externas (Airbnb, Booking.com, etc.)"
+      },
+      "security": {
+        "title": "Segurança",
+        "description": "Gerencie a segurança e os acessos"
+      },
+      "preferences": {
+        "title": "Preferências",
+        "description": "Personalize sua experiência"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Voltar ao início",
+    "login": {
+      "title": "Login",
+      "subtitle": "Faça login na sua conta Villa SaaS",
+      "email": "E-mail",
+      "emailPlaceholder": "seu@email.com",
+      "password": "Senha",
+      "errors": {
+        "invalidEmail": "E-mail inválido",
+        "passwordRequired": "A senha é obrigatória",
+        "generic": "Ocorreu um erro"
+      },
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "noAccount": "Ainda não tem conta?",
+      "createAccount": "Criar conta"
+    },
+    "logout": "Sair"
+  },
+  "navigation": {
+    "dashboard": "Painel de controle",
+    "properties": "Propriedades",
+    "bookings": "Reservas",
+    "messages": "Mensagens",
+    "analytics": "Analytics",
+    "bookingOptions": "Opções de reserva",
+    "paymentConfiguration": "Configuração de pagamentos",
+    "users": "Usuários",
+    "settings": "Configurações"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "yes": "Sim",
+    "no": "Não",
+    "close": "Fechar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "refresh": "Atualizar",
+    "export": "Exportar",
+    "import": "Importar",
+    "download": "Baixar",
+    "upload": "Enviar",
+    "print": "Imprimir",
+    "share": "Compartilhar",
+    "copy": "Copiar",
+    "paste": "Colar",
+    "cut": "Cortar",
+    "selectAll": "Selecionar tudo",
+    "deselectAll": "Desselecionar tudo"
+  }
+}

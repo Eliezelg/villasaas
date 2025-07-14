@@ -6,6 +6,45 @@ const auth_dto_1 = require("./auth.dto");
 const swagger_schemas_1 = require("../../utils/swagger-schemas");
 async function authRoutes(fastify) {
     const authService = new auth_service_1.AuthService(fastify);
+    // Check subdomain availability
+    fastify.get('/check-subdomain/:subdomain', {
+        schema: {
+            tags: [swagger_schemas_1.swaggerTags.auth],
+            summary: 'Vérifier la disponibilité d\'un sous-domaine',
+            params: {
+                type: 'object',
+                required: ['subdomain'],
+                properties: {
+                    subdomain: { type: 'string', minLength: 3, maxLength: 63 },
+                },
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        available: { type: 'boolean' },
+                    },
+                },
+            },
+        },
+    }, async (request, reply) => {
+        const { subdomain } = request.params;
+        // Valider le format du sous-domaine
+        if (!subdomain || subdomain.length < 3 || !/^[a-z0-9-]+$/.test(subdomain)) {
+            reply.send({ available: false });
+            return;
+        }
+        // Vérifier si le sous-domaine est réservé
+        const reservedSubdomains = ['www', 'app', 'api', 'admin', 'dashboard', 'hub', 'demo', 'test'];
+        if (reservedSubdomains.includes(subdomain)) {
+            reply.send({ available: false });
+            return;
+        }
+        const existingTenant = await fastify.prisma.tenant.findFirst({
+            where: { subdomain },
+        });
+        reply.send({ available: !existingTenant });
+    });
     // Register
     fastify.post('/register', {
         schema: {
@@ -22,6 +61,7 @@ async function authRoutes(fastify) {
                     lastName: { type: 'string', minLength: 1, maxLength: 50 },
                     companyName: { type: 'string', minLength: 1, maxLength: 100 },
                     phone: { type: 'string' },
+                    subdomain: { type: 'string', minLength: 3, maxLength: 63, pattern: '^[a-z0-9-]+$' },
                 },
             },
             response: {
@@ -58,11 +98,38 @@ async function authRoutes(fastify) {
             // Valider avec Zod pour une validation plus stricte
             const validatedData = auth_dto_1.registerSchema.parse(request.body);
             const result = await authService.register(validatedData);
-            reply.status(201).send(result);
+            // Définir les cookies sécurisés pour les tokens
+            const isProduction = process.env.NODE_ENV === 'production';
+            reply.cookie('access_token', result.accessToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax',
+                path: '/',
+                maxAge: 2 * 60 * 60 * 1000, // 2 hours
+            });
+            reply.cookie('refresh_token', result.refreshToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax',
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+            });
+            // Ne pas envoyer les tokens dans la réponse JSON
+            const { accessToken, refreshToken, ...responseData } = result;
+            reply.status(201).send({
+                ...responseData,
+                message: 'Registration successful'
+            });
         }
         catch (error) {
             if (error.message === 'Email already registered') {
                 reply.status(409).send({ error: 'Email already registered' });
+            }
+            else if (error.message === 'Subdomain not available') {
+                reply.status(409).send({ error: 'Subdomain not available' });
+            }
+            else if (error.message === 'Subdomain is reserved') {
+                reply.status(409).send({ error: 'Subdomain is reserved' });
             }
             else {
                 throw error;
@@ -112,12 +179,36 @@ async function authRoutes(fastify) {
     }, async (request, reply) => {
         try {
             const validatedData = auth_dto_1.loginSchema.parse(request.body);
-            const result = await authService.login(validatedData);
-            reply.send(result);
+            const result = await authService.login(validatedData, request.ip);
+            // Définir les cookies sécurisés pour les tokens
+            const isProduction = process.env.NODE_ENV === 'production';
+            reply.cookie('access_token', result.accessToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
+                path: '/',
+                maxAge: 2 * 60 * 60 * 1000, // 2 hours en millisecondes
+            });
+            reply.cookie('refresh_token', result.refreshToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours en millisecondes
+            });
+            // Ne pas envoyer les tokens dans la réponse JSON
+            const { accessToken, refreshToken, ...responseData } = result;
+            reply.send({
+                ...responseData,
+                message: 'Authentication successful'
+            });
         }
         catch (error) {
             if (error.message === 'Invalid credentials' || error.message === 'Account is disabled') {
                 reply.status(401).send({ error: error.message });
+            }
+            else if (error.message.includes('Too many failed attempts')) {
+                reply.status(429).send({ error: error.message });
             }
             else {
                 throw error;
@@ -127,13 +218,6 @@ async function authRoutes(fastify) {
     // Refresh token
     fastify.post('/refresh', {
         schema: {
-            body: {
-                type: 'object',
-                required: ['refreshToken'],
-                properties: {
-                    refreshToken: { type: 'string' },
-                },
-            },
             response: {
                 200: {
                     type: 'object',
@@ -147,9 +231,45 @@ async function authRoutes(fastify) {
         },
     }, async (request, reply) => {
         try {
-            const body = request.body;
-            const result = await authService.refreshToken(body.refreshToken);
-            reply.send(result);
+            // Récupérer le refresh token depuis le cookie, le body ou les headers
+            let refreshToken = request.cookies?.refresh_token;
+            // Fallback sur le body si pas dans les cookies
+            if (!refreshToken && request.body && typeof request.body === 'object') {
+                const body = request.body;
+                refreshToken = body.refreshToken;
+            }
+            // Fallback sur les headers
+            if (!refreshToken && request.headers.authorization) {
+                const authHeader = request.headers.authorization;
+                if (authHeader.startsWith('Bearer ')) {
+                    refreshToken = authHeader.substring(7);
+                }
+            }
+            if (!refreshToken) {
+                return reply.status(401).send({ error: 'No refresh token provided' });
+            }
+            const result = await authService.refreshToken(refreshToken);
+            // Définir les nouveaux cookies
+            const isProduction = process.env.NODE_ENV === 'production';
+            reply.cookie('access_token', result.accessToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax',
+                path: '/',
+                maxAge: 2 * 60 * 60 * 1000, // 2 hours
+            });
+            reply.cookie('refresh_token', result.refreshToken, {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'strict' : 'lax',
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+            });
+            // Ne pas envoyer les tokens dans la réponse JSON
+            reply.send({
+                expiresIn: result.expiresIn,
+                message: 'Token refreshed successfully'
+            });
         }
         catch (error) {
             reply.status(401).send({ error: 'Invalid refresh token' });
@@ -160,6 +280,9 @@ async function authRoutes(fastify) {
         preHandler: [fastify.authenticate],
     }, async (request, reply) => {
         await authService.logout(request.user.userId);
+        // Supprimer les cookies
+        reply.clearCookie('access_token', { path: '/' });
+        reply.clearCookie('refresh_token', { path: '/' });
         reply.send({ message: 'Logged out successfully' });
     });
     // Get current user
@@ -239,8 +362,12 @@ async function authRoutes(fastify) {
                     reply.status(404).send({ error: 'User not found' });
                     return;
                 }
-                // Simuler la vérification du code
-                if (body.code === '123456') {
+                // Générer un code de vérification sécurisé
+                const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+                // TODO: Stocker le code dans Redis avec expiration
+                // await fastify.redis.setex(`verify:${user.id}`, 600, verificationCode);
+                // Pour l'instant, on accepte temporairement le code de test
+                if (body.code === '123456' || body.code === verificationCode) {
                     user = await fastify.prisma.user.update({
                         where: { id: user.id },
                         data: { emailVerified: true },

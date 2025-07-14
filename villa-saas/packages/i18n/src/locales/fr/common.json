@@ -40,18 +40,18 @@
   },
   "messages": {
     "loading": "Chargement...",
-    "error": "Une erreur est survenue",
+    "error": "Une erreur s'est produite",
     "success": "Opération réussie",
     "noResults": "Aucun résultat trouvé",
     "required": "Ce champ est obligatoire",
     "invalidEmail": "Email invalide",
     "invalidPhone": "Numéro de téléphone invalide",
-    "notFound": "Page non trouvée"
+    "notFound": "Page introuvable"
   },
   "footer": {
     "rights": "Tous droits réservés",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation",
-    "cookies": "Gestion des cookies"
+    "cookies": "Paramètres des cookies"
   }
 }

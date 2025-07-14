@@ -1,5 +1,5 @@
 import { PrismaClient } from '@villa-saas/database';
-import { addDays, differenceInDays, eachDayOfInterval } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { PricingService } from '../../services/pricing.service';
 
 export interface BookingPriceCalculation {
@@ -71,7 +71,6 @@ export class BookingService {
     }
 
     // Obtenir les prix pour chaque nuit
-    const dates = eachDayOfInterval({ start: checkIn, end: addDays(checkOut, -1) });
     const breakdown: any[] = [];
     let accommodationTotal = 0;
 
@@ -107,7 +106,7 @@ export class BookingService {
     
     // Frais supplémentaires (animaux, etc.)
     const extraFees: any[] = [];
-    if (guests.pets > 0 && property.petsAllowed) {
+    if (guests.pets > 0 && (property.amenities as any)?.petsAllowed) {
       extraFees.push({
         name: 'Supplément animaux',
         amount: guests.pets * 20 // 20€ par animal

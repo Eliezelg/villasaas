@@ -9,13 +9,27 @@ class AuthService {
         this.fastify = fastify;
     }
     async register(data) {
-        const { email, password, firstName, lastName, companyName, phone } = data;
+        const { email, password, firstName, lastName, companyName, phone, subdomain, domainOption } = data;
         // Vérifier si l'email existe déjà
         const existingTenant = await this.fastify.prisma.tenant.findUnique({
             where: { email },
         });
         if (existingTenant) {
             throw new Error('Email already registered');
+        }
+        // Déterminer le sous-domaine à utiliser
+        const finalSubdomain = subdomain || this.generateSubdomain(companyName);
+        // Vérifier si le sous-domaine est disponible
+        const existingSubdomain = await this.fastify.prisma.tenant.findFirst({
+            where: { subdomain: finalSubdomain },
+        });
+        if (existingSubdomain) {
+            throw new Error('Subdomain not available');
+        }
+        // Vérifier que le sous-domaine n'est pas réservé
+        const reservedSubdomains = ['www', 'app', 'api', 'admin', 'dashboard', 'hub', 'demo', 'test'];
+        if (reservedSubdomains.includes(finalSubdomain)) {
+            throw new Error('Subdomain is reserved');
         }
         // Hasher le mot de passe
         const passwordHash = await (0, utils_1.hashPassword)(password);
@@ -28,7 +42,13 @@ class AuthService {
                     name: `${firstName} ${lastName}`,
                     companyName,
                     phone,
-                    subdomain: this.generateSubdomain(companyName),
+                    subdomain: finalSubdomain,
+                    settings: {
+                        domainOption: domainOption || 'subdomain',
+                        currency: 'EUR',
+                        timezone: 'Europe/Paris',
+                        language: 'fr',
+                    },
                 },
             });
             // Créer l'utilisateur owner
@@ -42,6 +62,35 @@ class AuthService {
                     tenantId: tenant.id,
                     role: 'OWNER',
                     emailVerified: false,
+                },
+            });
+            // Créer le site public avec configuration par défaut
+            await prisma.publicSite.create({
+                data: {
+                    tenantId: tenant.id,
+                    subdomain: subdomain || finalSubdomain,
+                    isActive: true,
+                    theme: {
+                        primaryColor: '#6366F1', // Purple-600
+                        secondaryColor: '#4F46E5', // Purple-700
+                        font: 'Inter',
+                    },
+                    metadata: {
+                        title: companyName,
+                        description: `Bienvenue chez ${companyName}`,
+                        seoTitle: companyName,
+                        seoDescription: `Découvrez et réservez votre séjour chez ${companyName}`,
+                        contactEmail: email,
+                        contactPhone: phone,
+                        socialLinks: {},
+                        footer: {
+                            showSocial: true,
+                            showContact: true,
+                            customText: null,
+                        },
+                    },
+                    defaultLocale: 'fr',
+                    locales: ['fr', 'en'],
                 },
             });
             return { tenant, user };
@@ -64,24 +113,84 @@ class AuthService {
             ...tokens,
         };
     }
-    async login(data) {
+    async login(data, ipAddress) {
         const { email, password } = data;
+        // Protection contre le brute force
+        if (ipAddress && this.fastify.redis) {
+            const attemptsKey = `login_attempts:${email}:${ipAddress}`;
+            const attempts = await this.fastify.redis.incr(attemptsKey);
+            if (attempts === 1) {
+                // Définir l'expiration sur la première tentative
+                await this.fastify.redis.expire(attemptsKey, 900); // 15 minutes
+            }
+            if (attempts > 5) {
+                // Log de sécurité
+                await this.fastify.prisma.auditLog.create({
+                    data: {
+                        action: 'auth.login.blocked',
+                        entity: 'user',
+                        details: { email, ip: ipAddress, attempts },
+                        ip: ipAddress,
+                        tenantId: 'system', // Log système
+                    }
+                });
+                throw new Error('Too many failed attempts. Please try again later.');
+            }
+        }
         // Trouver l'utilisateur avec son tenant
         const user = await this.fastify.prisma.user.findFirst({
             where: { email },
             include: { tenant: true },
         });
         if (!user) {
+            // Log d'échec de connexion
+            if (ipAddress) {
+                await this.fastify.prisma.auditLog.create({
+                    data: {
+                        action: 'auth.login.failed',
+                        entity: 'user',
+                        details: { email, reason: 'user_not_found' },
+                        ip: ipAddress,
+                        tenantId: 'system',
+                    }
+                });
+            }
             throw new Error('Invalid credentials');
         }
         // Vérifier le mot de passe
         const isValid = await (0, utils_1.verifyPassword)(user.passwordHash, password);
         if (!isValid) {
+            // Log d'échec de connexion
+            await this.fastify.prisma.auditLog.create({
+                data: {
+                    action: 'auth.login.failed',
+                    entity: 'user',
+                    entityId: user.id,
+                    details: { email, reason: 'invalid_password' },
+                    ip: ipAddress,
+                    tenantId: user.tenantId,
+                }
+            });
             throw new Error('Invalid credentials');
         }
         // Vérifier que le compte est actif
         if (!user.isActive || !user.tenant.isActive) {
+            await this.fastify.prisma.auditLog.create({
+                data: {
+                    action: 'auth.login.failed',
+                    entity: 'user',
+                    entityId: user.id,
+                    details: { email, reason: 'account_disabled' },
+                    ip: ipAddress,
+                    tenantId: user.tenantId,
+                }
+            });
             throw new Error('Account is disabled');
+        }
+        // Réinitialiser les tentatives de connexion en cas de succès
+        if (ipAddress && this.fastify.redis) {
+            const attemptsKey = `login_attempts:${email}:${ipAddress}`;
+            await this.fastify.redis.del(attemptsKey);
         }
         // Générer les tokens
         const tokens = await this.generateTokens(user);
@@ -91,7 +200,20 @@ class AuthService {
                 userId: user.id,
                 token: tokens.accessToken,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
+                ip: ipAddress,
             },
+        });
+        // Log de connexion réussie
+        await this.fastify.prisma.auditLog.create({
+            data: {
+                action: 'auth.login.success',
+                entity: 'user',
+                entityId: user.id,
+                details: { email },
+                ip: ipAddress,
+                tenantId: user.tenantId,
+                userId: user.id,
+            }
         });
         return {
             user: {
@@ -120,20 +242,33 @@ class AuthService {
             },
         });
         if (!storedToken || storedToken.expiresAt < new Date()) {
+            // Log de sécurité pour token invalide
+            await this.fastify.prisma.auditLog.create({
+                data: {
+                    action: 'auth.refresh.failed',
+                    entity: 'refresh_token',
+                    details: { reason: !storedToken ? 'token_not_found' : 'token_expired' },
+                    tenantId: 'system',
+                }
+            });
             throw new Error('Invalid refresh token');
         }
-        // Supprimer l'ancien refresh token
-        try {
-            await this.fastify.prisma.refreshToken.delete({
-                where: { id: storedToken.id },
-            });
-        }
-        catch (error) {
-            // Le token a peut-être déjà été supprimé par une requête concurrente
-            this.fastify.log.warn('Refresh token already deleted or not found');
-        }
+        // Supprimer l'ancien token (rotation)
+        await this.fastify.prisma.refreshToken.delete({
+            where: { id: storedToken.id }
+        });
         // Générer de nouveaux tokens
         const tokens = await this.generateTokens(storedToken.user);
+        // Log de succès
+        await this.fastify.prisma.auditLog.create({
+            data: {
+                action: 'auth.refresh.success',
+                entity: 'refresh_token',
+                entityId: storedToken.id,
+                userId: storedToken.userId,
+                tenantId: storedToken.user.tenantId,
+            }
+        });
         return tokens;
     }
     async logout(userId) {
@@ -147,15 +282,15 @@ class AuthService {
         });
     }
     async generateTokens(user) {
+        // Ne pas inclure les permissions dans le JWT car elles sont déterminées par le rôle
         const payload = {
             userId: user.id,
             tenantId: user.tenantId,
             email: user.email,
             role: user.role,
-            permissions: user.permissions || [],
         };
         // Access token
-        const accessToken = this.fastify.jwt.sign(payload, {
+        const accessToken = await this.fastify.jwt.sign(payload, {
             expiresIn: process.env.JWT_ACCESS_EXPIRATION || '15m',
         });
         // Refresh token

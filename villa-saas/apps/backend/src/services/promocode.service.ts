@@ -16,8 +16,6 @@ export async function validatePromoCode(params: ValidatePromoCodeParams) {
     code,
     tenantId,
     propertyId,
-    checkIn,
-    checkOut,
     totalAmount,
     nights,
     userId

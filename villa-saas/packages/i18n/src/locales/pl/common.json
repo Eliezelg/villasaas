@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "Strona główna",
+    "properties": "Nieruchomości",
+    "about": "O nas",
+    "contact": "Kontakt",
+    "login": "Zaloguj się",
+    "signup": "Zarejestruj się",
+    "dashboard": "Panel"
+  },
+  "actions": {
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "sort": "Sortuj",
+    "book": "Zarezerwuj",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "save": "Zapisz",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "view": "Zobacz",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "continue": "Kontynuuj",
+    "backToHome": "Powrót do strony głównej"
+  },
+  "labels": {
+    "email": "Email",
+    "password": "Hasło",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "phone": "Telefon",
+    "address": "Adres",
+    "city": "Miasto",
+    "country": "Kraj",
+    "postalCode": "Kod pocztowy",
+    "language": "Język",
+    "currency": "Waluta"
+  },
+  "messages": {
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "success": "Operacja zakończona sukcesem",
+    "noResults": "Nie znaleziono wyników",
+    "required": "To pole jest wymagane",
+    "invalidEmail": "Nieprawidłowy email",
+    "invalidPhone": "Nieprawidłowy numer telefonu",
+    "notFound": "Strona nie została znaleziona"
+  },
+  "footer": {
+    "rights": "Wszelkie prawa zastrzeżone",
+    "privacy": "Polityka prywatności",
+    "terms": "Warunki usługi",
+    "cookies": "Ustawienia cookies"
+  }
+}

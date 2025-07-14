@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Panel główny",
+    "welcome": "Witamy w panelu Villa SaaS",
+    "stats": {
+      "properties": "Nieruchomości",
+      "activeProperties": "Aktywne nieruchomości",
+      "bookings": "Rezerwacje",
+      "thisMonth": "Ten miesiąc",
+      "revenue": "Przychody",
+      "occupancyRate": "Wskaźnik obłożenia",
+      "averageThisMonth": "Średnia w tym miesiącu"
+    },
+    "recentBookings": {
+      "title": "Ostatnie rezerwacje",
+      "subtitle": "Twoje ostatnie rezerwacje",
+      "empty": "Brak rezerwacji w tej chwili"
+    },
+    "recentActivity": {
+      "title": "Ostatnia aktywność",
+      "subtitle": "Ostatnie działania na Twoim koncie",
+      "empty": "Brak ostatniej aktywności"
+    }
+  },
+  "properties": {
+    "title": "Nieruchomości",
+    "subtitle": "Zarządzaj swoimi nieruchomościami",
+    "addProperty": "Dodaj nieruchomość",
+    "loading": "Ładowanie...",
+    "error": "Błąd podczas ładowania nieruchomości",
+    "empty": {
+      "title": "Brak nieruchomości",
+      "description": "Zacznij od dodania swojej pierwszej nieruchomości"
+    },
+    "deleteConfirm": "Czy na pewno chcesz usunąć",
+    "labels": {
+      "bedrooms": "Sypialnie",
+      "guests": "Goście",
+      "pricePerNight": "Cena/noc",
+      "edit": "Edytuj"
+    },
+    "types": {
+      "APARTMENT": "Apartament",
+      "HOUSE": "Dom",
+      "VILLA": "Willa",
+      "STUDIO": "Studio",
+      "LOFT": "Loft",
+      "ROOM": "Pokój",
+      "OTHER": "Inne"
+    },
+    "statuses": {
+      "DRAFT": "Szkic",
+      "PUBLISHED": "Opublikowane",
+      "ARCHIVED": "Zarchiwizowane"
+    }
+  },
+  "bookings": {
+    "title": "Rezerwacje",
+    "subtitle": "Zarządzaj swoimi rezerwacjami",
+    "newBooking": "Nowa rezerwacja",
+    "search": "Szukaj (referencja, nazwa, e-mail)",
+    "filters": {
+      "allProperties": "Wszystkie nieruchomości",
+      "allStatuses": "Wszystkie statusy",
+      "apply": "Filtruj"
+    },
+    "table": {
+      "reference": "Referencja",
+      "property": "Nieruchomość",
+      "client": "Klient",
+      "dates": "Daty",
+      "guests": "Goście",
+      "total": "Suma",
+      "status": "Status",
+      "actions": "Akcje"
+    },
+    "labels": {
+      "nights": "noce",
+      "night": "noc",
+      "babies": "niemowlęta",
+      "baby": "niemowlę",
+      "viewDetails": "Zobacz szczegóły",
+      "confirm": "Potwierdź",
+      "cancel": "Anuluj"
+    },
+    "empty": "Nie znaleziono rezerwacji",
+    "pagination": "Strona {page} z {totalPages} ({total} wyników)",
+    "errors": {
+      "loadError": "Nie można załadować rezerwacji"
+    },
+    "messages": {
+      "confirmSuccess": "Rezerwacja {reference} została potwierdzona",
+      "cancelSuccess": "Rezerwacja {reference} została anulowana",
+      "cancelConfirm": "Czy na pewno chcesz anulować tę rezerwację?",
+      "cancelReason": "Anulowana przez właściciela"
+    },
+    "statuses": {
+      "PENDING": "Oczekujące",
+      "CONFIRMED": "Potwierdzona",
+      "CANCELLED": "Anulowana",
+      "COMPLETED": "Zakończona",
+      "NO_SHOW": "Nieobecność"
+    }
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "subtitle": "Zarządzaj wszystkimi ustawieniami konta i nieruchomości",
+    "sections": {
+      "profile": {
+        "title": "Profil firmy",
+        "description": "Zarządzaj informacjami o swojej firmie"
+      },
+      "payments": {
+        "title": "Płatności",
+        "description": "Skonfiguruj metody płatności i prowizje"
+      },
+      "users": {
+        "title": "Użytkownicy",
+        "description": "Zarządzaj użytkownikami i ich uprawnieniami"
+      },
+      "emails": {
+        "title": "E-maile",
+        "description": "Personalizuj szablony e-maili"
+      },
+      "autoResponses": {
+        "title": "Automatyczne odpowiedzi",
+        "description": "Skonfiguruj automatyczne wiadomości i chatbota AI"
+      },
+      "integrations": {
+        "title": "Integracje",
+        "description": "Połącz swoje zewnętrzne narzędzia (Airbnb, Booking.com, itp.)"
+      },
+      "security": {
+        "title": "Bezpieczeństwo",
+        "description": "Zarządzaj bezpieczeństwem i dostępami"
+      },
+      "preferences": {
+        "title": "Preferencje",
+        "description": "Personalizuj swoje doświadczenie"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Powrót do strony głównej",
+    "login": {
+      "title": "Logowanie",
+      "subtitle": "Zaloguj się do swojego konta Villa SaaS",
+      "email": "E-mail",
+      "emailPlaceholder": "twoj@email.com",
+      "password": "Hasło",
+      "errors": {
+        "invalidEmail": "Nieprawidłowy e-mail",
+        "passwordRequired": "Hasło jest wymagane",
+        "generic": "Wystąpił błąd"
+      },
+      "submit": "Zaloguj się",
+      "submitting": "Logowanie...",
+      "noAccount": "Nie masz jeszcze konta?",
+      "createAccount": "Utwórz konto"
+    },
+    "logout": "Wyloguj się"
+  },
+  "navigation": {
+    "dashboard": "Panel główny",
+    "properties": "Nieruchomości",
+    "bookings": "Rezerwacje",
+    "messages": "Wiadomości",
+    "analytics": "Analityka",
+    "bookingOptions": "Opcje rezerwacji",
+    "paymentConfiguration": "Konfiguracja płatności",
+    "users": "Użytkownicy",
+    "settings": "Ustawienia"
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "confirm": "Potwierdź",
+    "back": "Wstecz",
+    "next": "Następny",
+    "previous": "Poprzedni",
+    "yes": "Tak",
+    "no": "Nie",
+    "close": "Zamknij",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "sort": "Sortuj",
+    "refresh": "Odśwież",
+    "export": "Eksportuj",
+    "import": "Importuj",
+    "download": "Pobierz",
+    "upload": "Prześlij",
+    "print": "Drukuj",
+    "share": "Udostępnij",
+    "copy": "Kopiuj",
+    "paste": "Wklej",
+    "cut": "Wytnij",
+    "selectAll": "Zaznacz wszystko",
+    "deselectAll": "Odznacz wszystko"
+  }
+}

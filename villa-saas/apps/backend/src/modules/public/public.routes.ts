@@ -850,22 +850,21 @@ export async function publicRoutes(fastify: FastifyInstance) {
           guestEmail: email.toLowerCase(),
           reference: reference.toUpperCase(),
           status: {
-            notIn: ['DRAFT'] // Exclure les brouillons
+            notIn: ['CANCELLED'] // Exclure les annulées
           }
         },
         include: {
           property: {
             include: {
               images: true,
-              address: true,
             }
           },
           tenant: {
             select: {
+              id: true,
               name: true,
-              logo: true,
-              contactEmail: true,
-              contactPhone: true,
+              email: true,
+              subdomain: true
             }
           }
         }
@@ -878,22 +877,17 @@ export async function publicRoutes(fastify: FastifyInstance) {
       // Générer un token temporaire pour l'accès
       const token = await fastify.jwt.sign(
         { 
-          bookingId: booking.id,
+          userId: `guest-${booking.id}`,
+          tenantId: booking.tenantId,
           email: booking.guestEmail,
-          type: 'booking-access'
+          role: 'GUEST'
         },
         { expiresIn: '1h' } // Token valide 1 heure
       );
       
       // Nettoyer les infos sensibles
       const safeBooking = {
-        ...booking,
-        tenant: {
-          name: booking.tenant.name,
-          logo: booking.tenant.logo,
-          contactEmail: booking.tenant.contactEmail,
-          contactPhone: booking.tenant.contactPhone,
-        }
+        ...booking
       };
       
       return {
@@ -924,9 +918,9 @@ export async function publicRoutes(fastify: FastifyInstance) {
     
     try {
       // Vérifier le token
-      const decoded = await fastify.jwt.verify(token) as any;
+      const decoded = await fastify.jwt.verify<{ userId: string; role: string }>(token || '');
       
-      if (decoded.type !== 'booking-access' || decoded.bookingId !== id) {
+      if (decoded.role !== 'GUEST' || !decoded.userId.startsWith('guest-')) {
         return reply.code(403).send({ error: 'Invalid token' });
       }
       
@@ -937,17 +931,13 @@ export async function publicRoutes(fastify: FastifyInstance) {
           property: {
             include: {
               images: true,
-              address: true,
-              amenities: true,
             }
           },
           tenant: {
             select: {
               name: true,
-              logo: true,
-              contactEmail: true,
-              contactPhone: true,
-              website: true,
+              email: true,
+              subdomain: true,
             }
           }
         }

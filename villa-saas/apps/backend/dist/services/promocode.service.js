@@ -4,7 +4,7 @@ exports.validatePromoCode = validatePromoCode;
 exports.applyPromoCode = applyPromoCode;
 const database_1 = require("@villa-saas/database");
 async function validatePromoCode(params) {
-    const { code, tenantId, propertyId, checkIn, checkOut, totalAmount, nights, userId } = params;
+    const { code, tenantId, propertyId, totalAmount, nights, userId } = params;
     const promoCode = await database_1.prisma.promoCode.findFirst({
         where: {
             code: code.toUpperCase(),

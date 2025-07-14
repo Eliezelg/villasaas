@@ -89,10 +89,10 @@ export declare class ResendEmailService implements EmailService {
     sendBookingConfirmation(params: BookingConfirmationParams): Promise<void>;
     sendPaymentFailedNotification(params: PaymentFailedParams): Promise<void>;
     sendBookingCancellation(params: BookingCancellationParams): Promise<void>;
-    sendBookingNotificationToOwner(params: OwnerNotificationParams): Promise<void>;
-    sendCheckInReminder(params: CheckInReminderParams): Promise<void>;
-    sendCheckInInstructions(params: CheckInInstructionsParams): Promise<void>;
-    sendReviewRequest(params: ReviewRequestParams): Promise<void>;
+    sendBookingNotificationToOwner(_params: OwnerNotificationParams): Promise<void>;
+    sendCheckInReminder(_params: CheckInReminderParams): Promise<void>;
+    sendCheckInInstructions(_params: CheckInInstructionsParams): Promise<void>;
+    sendReviewRequest(_params: ReviewRequestParams): Promise<void>;
 }
 export declare class MockEmailService implements EmailService {
     private fastify;

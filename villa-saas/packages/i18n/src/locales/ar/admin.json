@@ -1,0 +1,206 @@
+{
+  "dashboard": {
+    "title": "لوحة القيادة",
+    "welcome": "مرحبا بك في لوحة تحكم Villa SaaS",
+    "stats": {
+      "properties": "العقارات",
+      "activeProperties": "العقارات النشطة",
+      "bookings": "الحجوزات",
+      "thisMonth": "هذا الشهر",
+      "revenue": "الإيرادات",
+      "occupancyRate": "معدل الإشغال",
+      "averageThisMonth": "المتوسط هذا الشهر"
+    },
+    "recentBookings": {
+      "title": "الحجوزات الأخيرة",
+      "subtitle": "آخر حجوزاتك",
+      "empty": "لا توجد حجوزات حالياً"
+    },
+    "recentActivity": {
+      "title": "النشاط الأخير",
+      "subtitle": "آخر الإجراءات على حسابك",
+      "empty": "لا يوجد نشاط حديث"
+    }
+  },
+  "properties": {
+    "title": "العقارات",
+    "subtitle": "إدارة عقاراتك",
+    "addProperty": "إضافة عقار",
+    "loading": "جاري التحميل...",
+    "error": "خطأ في تحميل العقارات",
+    "empty": {
+      "title": "لا توجد عقارات",
+      "description": "ابدأ بإضافة عقارك الأول"
+    },
+    "deleteConfirm": "هل أنت متأكد من رغبتك في الحذف",
+    "labels": {
+      "bedrooms": "غرف النوم",
+      "guests": "الضيوف",
+      "pricePerNight": "السعر/ليلة",
+      "edit": "تعديل"
+    },
+    "types": {
+      "APARTMENT": "شقة",
+      "HOUSE": "منزل",
+      "VILLA": "فيلا",
+      "STUDIO": "استوديو",
+      "LOFT": "لوفت",
+      "ROOM": "غرفة",
+      "OTHER": "آخر"
+    },
+    "statuses": {
+      "DRAFT": "مسودة",
+      "PUBLISHED": "منشور",
+      "ARCHIVED": "مؤرشف"
+    }
+  },
+  "bookings": {
+    "title": "الحجوزات",
+    "subtitle": "إدارة حجوزاتك",
+    "newBooking": "حجز جديد",
+    "search": "البحث (المرجع، الاسم، البريد الإلكتروني)",
+    "filters": {
+      "allProperties": "جميع العقارات",
+      "allStatuses": "جميع الحالات",
+      "apply": "تصفية"
+    },
+    "table": {
+      "reference": "المرجع",
+      "property": "العقار",
+      "client": "العميل",
+      "dates": "التواريخ",
+      "guests": "الضيوف",
+      "total": "المجموع",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "labels": {
+      "nights": "ليالي",
+      "night": "ليلة",
+      "babies": "أطفال رضع",
+      "baby": "طفل رضيع",
+      "viewDetails": "عرض التفاصيل",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء"
+    },
+    "empty": "لم يتم العثور على حجوزات",
+    "pagination": "صفحة {page} من {totalPages} ({total} نتائج)",
+    "errors": {
+      "loadError": "تعذر تحميل الحجوزات"
+    },
+    "messages": {
+      "confirmSuccess": "تم تأكيد الحجز {reference}",
+      "cancelSuccess": "تم إلغاء الحجز {reference}",
+      "cancelConfirm": "هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟",
+      "cancelReason": "ملغاة من قبل المالك"
+    },
+    "statuses": {
+      "PENDING": "قيد الانتظار",
+      "CONFIRMED": "مؤكد",
+      "CANCELLED": "ملغى",
+      "COMPLETED": "مكتمل",
+      "NO_SHOW": "لم يحضر"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "إدارة جميع إعدادات حسابك وعقاراتك",
+    "sections": {
+      "profile": {
+        "title": "ملف الشركة",
+        "description": "إدارة معلومات شركتك"
+      },
+      "payments": {
+        "title": "المدفوعات",
+        "description": "تكوين طرق الدفع والعمولات"
+      },
+      "users": {
+        "title": "المستخدمون",
+        "description": "إدارة المستخدمين وصلاحياتهم"
+      },
+      "emails": {
+        "title": "رسائل البريد الإلكتروني",
+        "description": "تخصيص قوالب البريد الإلكتروني"
+      },
+      "autoResponses": {
+        "title": "الردود التلقائية",
+        "description": "تكوين الرسائل التلقائية وروبوت الدردشة الذكي"
+      },
+      "integrations": {
+        "title": "التكاملات",
+        "description": "ربط أدواتك الخارجية (Airbnb، Booking.com، إلخ)"
+      },
+      "security": {
+        "title": "الأمان",
+        "description": "إدارة الأمان والوصول"
+      },
+      "preferences": {
+        "title": "التفضيلات",
+        "description": "تخصيص تجربتك"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "العودة إلى الصفحة الرئيسية",
+    "login": {
+      "title": "تسجيل الدخول",
+      "subtitle": "تسجيل الدخول إلى حساب Villa SaaS",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "بريدك@الإلكتروني.com",
+      "password": "كلمة المرور",
+      "errors": {
+        "invalidEmail": "بريد إلكتروني غير صالح",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "generic": "حدث خطأ"
+      },
+      "submit": "تسجيل الدخول",
+      "submitting": "جاري تسجيل الدخول...",
+      "noAccount": "ليس لديك حساب بعد؟",
+      "createAccount": "إنشاء حساب"
+    },
+    "logout": "تسجيل الخروج"
+  },
+  "navigation": {
+    "dashboard": "لوحة القيادة",
+    "properties": "العقارات",
+    "bookings": "الحجوزات",
+    "messages": "الرسائل",
+    "analytics": "التحليلات",
+    "bookingOptions": "خيارات الحجز",
+    "paymentConfiguration": "تكوين المدفوعات",
+    "users": "المستخدمون",
+    "settings": "الإعدادات"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "yes": "نعم",
+    "no": "لا",
+    "close": "إغلاق",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "refresh": "تحديث",
+    "export": "تصدير",
+    "import": "استيراد",
+    "download": "تنزيل",
+    "upload": "رفع",
+    "print": "طباعة",
+    "share": "مشاركة",
+    "copy": "نسخ",
+    "paste": "لصق",
+    "cut": "قص",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء تحديد الكل"
+  },
+  "_rtl": true
+}

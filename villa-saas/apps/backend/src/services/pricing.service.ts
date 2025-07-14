@@ -122,7 +122,7 @@ export class PricingService {
       totalWeekendPremium += weekendPremium;
 
       breakdown.push({
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split('T')[0] || '',
         basePrice,
         weekendPremium,
         finalPrice,
@@ -145,7 +145,7 @@ export class PricingService {
     // Vérifier la durée minimum de séjour
     const minNightsRequired = Math.max(
       property.minNights,
-      ...periods.map(p => p.minNights).filter(Boolean)
+      ...periods.map(p => p.minNights || 0).filter(Boolean)
     );
 
     if (nights < minNightsRequired) {

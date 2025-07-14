@@ -41,7 +41,6 @@ export const BookingConfirmationEmail = ({
   propertyImage,
   tenantName = 'Villa Booking',
   tenantLogo,
-  tenantSubdomain = 'booking',
 }: BookingConfirmationEmailProps) => {
   const i18n = new I18nEmailService(locale);
   const previewText = i18n.t('emails.bookingConfirmation.subject', { reference: bookingReference });
@@ -162,10 +161,6 @@ const codeHelp = {
   margin: '0',
 };
 
-const buttonSection = {
-  textAlign: 'center' as const,
-  margin: '32px 0',
-};
 
 
 export default BookingConfirmationEmail;

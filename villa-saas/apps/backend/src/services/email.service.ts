@@ -4,7 +4,7 @@ import { FastifyInstance } from 'fastify';
 import BookingConfirmationEmail from '../emails/templates/booking-confirmation';
 import PaymentFailedEmail from '../emails/templates/payment-failed';
 import BookingCancelledEmail from '../emails/templates/booking-cancelled';
-import { extractLocale, I18nEmailService } from './i18n-email.service';
+import { I18nEmailService } from './i18n-email.service';
 
 export interface EmailService {
   sendBookingConfirmation(params: BookingConfirmationParams): Promise<void>;
@@ -126,7 +126,7 @@ export class ResendEmailService implements EmailService {
         from: this.fromEmail,
         to: params.to,
         subject,
-        html: emailHtml,
+        html: await emailHtml,
       });
 
       if (error) {
@@ -179,7 +179,7 @@ export class ResendEmailService implements EmailService {
         from: this.fromEmail,
         to: params.to,
         subject: `Échec du paiement - Réservation ${params.bookingReference}`,
-        html: emailHtml,
+        html: await emailHtml,
       });
 
       if (error) {
@@ -232,7 +232,7 @@ export class ResendEmailService implements EmailService {
         from: this.fromEmail,
         to: params.to,
         subject: `Annulation de votre réservation ${params.bookingReference}`,
-        html: emailHtml,
+        html: await emailHtml,
       });
 
       if (error) {
@@ -276,22 +276,22 @@ export class ResendEmailService implements EmailService {
     }
   }
 
-  async sendBookingNotificationToOwner(params: OwnerNotificationParams): Promise<void> {
+  async sendBookingNotificationToOwner(_params: OwnerNotificationParams): Promise<void> {
     // TODO: Créer le template et implémenter
     this.fastify.log.info('Owner notification not implemented yet');
   }
 
-  async sendCheckInReminder(params: CheckInReminderParams): Promise<void> {
+  async sendCheckInReminder(_params: CheckInReminderParams): Promise<void> {
     // TODO: Créer le template et implémenter
     this.fastify.log.info('Check-in reminder not implemented yet');
   }
 
-  async sendCheckInInstructions(params: CheckInInstructionsParams): Promise<void> {
+  async sendCheckInInstructions(_params: CheckInInstructionsParams): Promise<void> {
     // TODO: Créer le template et implémenter
     this.fastify.log.info('Check-in instructions not implemented yet');
   }
 
-  async sendReviewRequest(params: ReviewRequestParams): Promise<void> {
+  async sendReviewRequest(_params: ReviewRequestParams): Promise<void> {
     // TODO: Créer le template et implémenter
     this.fastify.log.info('Review request not implemented yet');
   }

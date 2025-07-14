@@ -1,0 +1,58 @@
+{
+  "navigation": {
+    "home": "الرئيسية",
+    "properties": "العقارات",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "dashboard": "لوحة التحكم"
+  },
+  "actions": {
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "book": "احجز",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "continue": "متابعة",
+    "backToHome": "العودة إلى الرئيسية"
+  },
+  "labels": {
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "phone": "الهاتف",
+    "address": "العنوان",
+    "city": "المدينة",
+    "country": "البلد",
+    "postalCode": "الرمز البريدي",
+    "language": "اللغة",
+    "currency": "العملة"
+  },
+  "messages": {
+    "loading": "جار التحميل...",
+    "error": "حدث خطأ",
+    "success": "تمت العملية بنجاح",
+    "noResults": "لم يتم العثور على نتائج",
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "بريد إلكتروني غير صالح",
+    "invalidPhone": "رقم هاتف غير صالح",
+    "notFound": "الصفحة غير موجودة"
+  },
+  "footer": {
+    "rights": "جميع الحقوق محفوظة",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة",
+    "cookies": "إعدادات ملفات تعريف الارتباط"
+  },
+  "_rtl": true
+}

@@ -6,6 +6,50 @@ import { swaggerTags } from '../../utils/swagger-schemas';
 export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   const authService = new AuthService(fastify);
 
+  // Check subdomain availability
+  fastify.get('/check-subdomain/:subdomain', {
+    schema: {
+      tags: [swaggerTags.auth],
+      summary: 'Vérifier la disponibilité d\'un sous-domaine',
+      params: {
+        type: 'object',
+        required: ['subdomain'],
+        properties: {
+          subdomain: { type: 'string', minLength: 3, maxLength: 63 },
+        },
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            available: { type: 'boolean' },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { subdomain } = request.params as { subdomain: string };
+    
+    // Valider le format du sous-domaine
+    if (!subdomain || subdomain.length < 3 || !/^[a-z0-9-]+$/.test(subdomain)) {
+      reply.send({ available: false });
+      return;
+    }
+    
+    // Vérifier si le sous-domaine est réservé
+    const reservedSubdomains = ['www', 'app', 'api', 'admin', 'dashboard', 'hub', 'demo', 'test'];
+    if (reservedSubdomains.includes(subdomain)) {
+      reply.send({ available: false });
+      return;
+    }
+    
+    const existingTenant = await fastify.prisma.tenant.findFirst({
+      where: { subdomain },
+    });
+    
+    reply.send({ available: !existingTenant });
+  });
+
   // Register
   fastify.post('/register', {
     schema: {
@@ -22,6 +66,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
           lastName: { type: 'string', minLength: 1, maxLength: 50 },
           companyName: { type: 'string', minLength: 1, maxLength: 100 },
           phone: { type: 'string' },
+          subdomain: { type: 'string', minLength: 3, maxLength: 63, pattern: '^[a-z0-9-]+$' },
         },
       },
       response: {
@@ -67,7 +112,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         secure: isProduction,
         sameSite: isProduction ? 'strict' : 'lax',
         path: '/',
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
       
       reply.cookie('refresh_token', result.refreshToken, {
@@ -87,6 +132,10 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     } catch (error: any) {
       if (error.message === 'Email already registered') {
         reply.status(409).send({ error: 'Email already registered' });
+      } else if (error.message === 'Subdomain not available') {
+        reply.status(409).send({ error: 'Subdomain not available' });
+      } else if (error.message === 'Subdomain is reserved') {
+        reply.status(409).send({ error: 'Subdomain is reserved' });
       } else {
         throw error;
       }
@@ -146,7 +195,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         secure: isProduction,
         sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
         path: '/',
-        maxAge: 15 * 60 * 1000, // 15 minutes en millisecondes
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours en millisecondes
       });
       
       reply.cookie('refresh_token', result.refreshToken, {
@@ -190,8 +239,22 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
   }, async (request, reply) => {
     try {
-      // Récupérer le refresh token depuis le cookie
-      const refreshToken = request.cookies?.refresh_token;
+      // Récupérer le refresh token depuis le cookie, le body ou les headers
+      let refreshToken = request.cookies?.refresh_token;
+      
+      // Fallback sur le body si pas dans les cookies
+      if (!refreshToken && request.body && typeof request.body === 'object') {
+        const body = request.body as { refreshToken?: string };
+        refreshToken = body.refreshToken;
+      }
+      
+      // Fallback sur les headers
+      if (!refreshToken && request.headers.authorization) {
+        const authHeader = request.headers.authorization;
+        if (authHeader.startsWith('Bearer ')) {
+          refreshToken = authHeader.substring(7);
+        }
+      }
       
       if (!refreshToken) {
         return reply.status(401).send({ error: 'No refresh token provided' });
@@ -207,7 +270,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         secure: isProduction,
         sameSite: isProduction ? 'strict' : 'lax',
         path: '/',
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
       
       reply.cookie('refresh_token', result.refreshToken, {

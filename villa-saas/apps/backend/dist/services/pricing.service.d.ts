@@ -4,7 +4,13 @@ interface PricingRequest {
     checkIn: Date;
     checkOut: Date;
     guests: number;
+    adults?: number;
+    children?: number;
     tenantId: string;
+    selectedOptions?: Array<{
+        optionId: string;
+        quantity: number;
+    }>;
 }
 interface PricingDetails {
     nights: number;
@@ -15,10 +21,19 @@ interface PricingDetails {
     longStayDiscount: number;
     cleaningFee: number;
     touristTax: number;
+    optionsTotal: number;
+    depositAmount: number;
     subtotal: number;
     total: number;
     averagePricePerNight: number;
     breakdown: DailyBreakdown[];
+    selectedOptions?: Array<{
+        optionId: string;
+        name: string;
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+    }>;
 }
 interface DailyBreakdown {
     date: string;

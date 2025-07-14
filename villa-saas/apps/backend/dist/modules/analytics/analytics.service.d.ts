@@ -49,6 +49,8 @@ export declare class AnalyticsService {
     getOverview(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<OverviewData>;
     getOccupancy(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<OccupancyData>;
     getRevenue(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<RevenueData>;
+    getTopProperties(tenantId: string, dateRange: DateRange, limit?: number, sortBy?: 'revenue' | 'bookings'): Promise<any[]>;
+    getBookingSources(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<any[]>;
     exportData(tenantId: string, dateRange: DateRange, propertyId?: string): Promise<Buffer>;
 }
 export {};

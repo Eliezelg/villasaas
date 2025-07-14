@@ -32,11 +32,14 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = icalRoutes;
 const utils_1 = require("@villa-saas/utils");
-const ical = __importStar(require("ical-generator"));
-const ical_1 = require("ical");
+const ical_generator_1 = __importDefault(require("ical-generator"));
+const icalParser = __importStar(require("ical"));
 async function icalRoutes(fastify) {
     // Exporter le calendrier iCal
     fastify.get('/export/:propertyId', {
@@ -65,7 +68,7 @@ async function icalRoutes(fastify) {
             return reply.code(404).send({ error: 'Property not found' });
         }
         // Créer le calendrier iCal
-        const calendar = ical({
+        const calendar = (0, ical_generator_1.default)({
             name: property.name,
             description: `Calendrier de disponibilité pour ${property.name}`,
             timezone: 'Europe/Paris',
@@ -85,16 +88,14 @@ async function icalRoutes(fastify) {
         });
         // Ajouter les réservations au calendrier
         for (const booking of bookings) {
-            calendar.createEvent({
+            const event = calendar.createEvent({
                 start: booking.checkIn,
                 end: booking.checkOut,
                 summary: `Réservation ${booking.reference}`,
                 description: `${booking.guestFirstName} ${booking.guestLastName} - ${booking.adults + booking.children} personnes`,
-                location: `${property.address}, ${property.city}`,
-                status: booking.status === 'CONFIRMED' ? 'CONFIRMED' : 'TENTATIVE',
-                busystatus: 'BUSY',
-                uid: booking.id
+                location: `${property.address}, ${property.city}`
             });
+            event.uid(booking.id);
         }
         // Récupérer les périodes bloquées
         const blockedPeriods = await fastify.prisma.blockedPeriod.findMany({
@@ -103,15 +104,13 @@ async function icalRoutes(fastify) {
         });
         // Ajouter les périodes bloquées
         for (const blocked of blockedPeriods) {
-            calendar.createEvent({
+            const event = calendar.createEvent({
                 start: blocked.startDate,
                 end: blocked.endDate,
                 summary: blocked.reason || 'Indisponible',
-                description: blocked.notes || '',
-                status: 'CONFIRMED',
-                busystatus: 'BUSY',
-                uid: `blocked-${blocked.id}`
+                description: blocked.notes || ''
             });
+            event.uid(`blocked-${blocked.id}`);
         }
         // Retourner le calendrier
         reply.header('Content-Type', 'text/calendar; charset=utf-8');
@@ -151,7 +150,7 @@ async function icalRoutes(fastify) {
             catch (error) {
                 return reply.code(400).send({
                     error: 'Failed to fetch iCal from URL',
-                    details: error.message
+                    details: error instanceof Error ? error.message : 'Unknown error'
                 });
             }
         }
@@ -161,12 +160,12 @@ async function icalRoutes(fastify) {
         // Parser le contenu iCal
         let events;
         try {
-            events = (0, ical_1.parse)(icalContent);
+            events = icalParser.parseICS(icalContent);
         }
         catch (error) {
             return reply.code(400).send({
                 error: 'Invalid iCal format',
-                details: error.message
+                details: error instanceof Error ? error.message : 'Unknown error'
             });
         }
         let imported = 0;
@@ -174,7 +173,7 @@ async function icalRoutes(fastify) {
         const errors = [];
         // Traiter chaque événement
         for (const [uid, event] of Object.entries(events)) {
-            if (event.type !== 'VEVENT')
+            if (!event || event.type !== 'VEVENT')
                 continue;
             try {
                 const startDate = new Date(event.start);
@@ -224,7 +223,7 @@ async function icalRoutes(fastify) {
                 imported++;
             }
             catch (error) {
-                errors.push(`Error processing event ${uid}: ${error.message}`);
+                errors.push(`Error processing event ${uid}: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 skipped++;
             }
         }

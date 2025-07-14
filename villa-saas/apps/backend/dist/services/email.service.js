@@ -35,7 +35,7 @@ class ResendEmailService {
                 from: this.fromEmail,
                 to: params.to,
                 subject,
-                html: emailHtml,
+                html: await emailHtml,
             });
             if (error) {
                 this.fastify.log.error({ error }, 'Failed to send booking confirmation email');
@@ -84,7 +84,7 @@ class ResendEmailService {
                 from: this.fromEmail,
                 to: params.to,
                 subject: `Échec du paiement - Réservation ${params.bookingReference}`,
-                html: emailHtml,
+                html: await emailHtml,
             });
             if (error) {
                 this.fastify.log.error({ error }, 'Failed to send payment failed email');
@@ -133,7 +133,7 @@ class ResendEmailService {
                 from: this.fromEmail,
                 to: params.to,
                 subject: `Annulation de votre réservation ${params.bookingReference}`,
-                html: emailHtml,
+                html: await emailHtml,
             });
             if (error) {
                 this.fastify.log.error({ error }, 'Failed to send booking cancellation email');
@@ -174,19 +174,19 @@ class ResendEmailService {
             throw error;
         }
     }
-    async sendBookingNotificationToOwner(params) {
+    async sendBookingNotificationToOwner(_params) {
         // TODO: Créer le template et implémenter
         this.fastify.log.info('Owner notification not implemented yet');
     }
-    async sendCheckInReminder(params) {
+    async sendCheckInReminder(_params) {
         // TODO: Créer le template et implémenter
         this.fastify.log.info('Check-in reminder not implemented yet');
     }
-    async sendCheckInInstructions(params) {
+    async sendCheckInInstructions(_params) {
         // TODO: Créer le template et implémenter
         this.fastify.log.info('Check-in instructions not implemented yet');
     }
-    async sendReviewRequest(params) {
+    async sendReviewRequest(_params) {
         // TODO: Créer le template et implémenter
         this.fastify.log.info('Review request not implemented yet');
     }

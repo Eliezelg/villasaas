@@ -1,0 +1,94 @@
+{
+  "bookingConfirmation": {
+    "subject": "Boekingsbevestiging {{reference}}",
+    "title": "Boeking bevestigd!",
+    "greeting": "Hallo {{guestName}},",
+    "intro": "We bevestigen graag uw boeking. Hier zijn de details:",
+    "details": {
+      "title": "Boekingsdetails",
+      "reference": "Referentie",
+      "property": "Accommodatie",
+      "checkIn": "Inchecken",
+      "checkOut": "Uitchecken",
+      "guests": "Gasten",
+      "total": "Totaalbedrag"
+    },
+    "thankYou": "We kijken ernaar uit u te verwelkomen!",
+    "footer": "Deze email werd verzonden door {{tenantName}}. Als u deze boeking niet heeft gemaakt, negeer dan deze email."
+  },
+  "paymentFailed": {
+    "subject": "Betaling mislukt voor boeking {{reference}}",
+    "title": "Betaling mislukt",
+    "greeting": "Hallo {{guestName}},",
+    "intro": "We konden de betaling voor uw boeking niet verwerken. Hier zijn uw boekingsdetails:",
+    "warning": "⚠️ Uw boeking wordt automatisch geannuleerd binnen 24 uur als de betaling niet wordt voltooid.",
+    "retryButton": "Betaling opnieuw proberen",
+    "contact": "Als u problemen ondervindt, aarzel dan niet om contact met ons op te nemen.",
+    "footer": "Deze email werd verzonden door {{tenantName}}. Als u deze boeking niet heeft gemaakt, negeer dan deze email."
+  },
+  "bookingCancelled": {
+    "subject": "Boeking geannuleerd {{reference}}",
+    "title": "Boeking geannuleerd",
+    "greeting": "Hallo {{guestName}},",
+    "intro": "Uw boeking is geannuleerd vanwege een mislukte betaling.",
+    "details": {
+      "title": "Details van geannuleerde boeking",
+      "reference": "Referentie",
+      "property": "Accommodatie",
+      "checkIn": "Geplande inchecking",
+      "checkOut": "Geplande uitchecking"
+    },
+    "newBooking": "U kunt op elk moment een nieuwe boeking maken op onze website.",
+    "footer": "Deze email werd verzonden door {{tenantName}}."
+  },
+  "ownerNotification": {
+    "subject": "Nieuwe boeking: {{propertyName}}",
+    "title": "Nieuwe boeking",
+    "greeting": "Hallo,",
+    "intro": "Er is een nieuwe boeking gemaakt voor uw accommodatie.",
+    "details": {
+      "title": "Boekingsdetails",
+      "reference": "Referentie",
+      "property": "Accommodatie",
+      "guest": "Gast",
+      "checkIn": "Inchecken",
+      "checkOut": "Uitchecken",
+      "guests": "Gasten",
+      "total": "Totaalbedrag"
+    },
+    "footer": "Deze email werd verzonden door {{tenantName}}."
+  },
+  "checkInReminder": {
+    "subject": "Herinnering: Uw aankomst nadert - {{propertyName}}",
+    "title": "Uw aankomst nadert!",
+    "greeting": "Hallo {{guestName}},",
+    "intro": "We kijken ernaar uit u morgen te verwelkomen in {{propertyName}}.",
+    "checkInTime": "Incheck tijd: vanaf 16:00",
+    "instructions": "U ontvangt gedetailleerde aankomstinstructies in een toekomstige email.",
+    "contact": "Als u vragen heeft, aarzel dan niet om contact met ons op te nemen.",
+    "footer": "Deze email werd verzonden door {{tenantName}}."
+  },
+  "checkInInstructions": {
+    "subject": "Aankomstinstructies - {{propertyName}}",
+    "title": "Aankomstinstructies",
+    "greeting": "Hallo {{guestName}},",
+    "intro": "Hier is alle informatie die u nodig heeft voor uw aankomst:",
+    "address": "Adres",
+    "accessCode": "Toegangscode",
+    "wifiPassword": "WiFi wachtwoord",
+    "checkOut": "Uitcheck tijd: voor 10:00",
+    "emergency": "In geval van nood",
+    "enjoyStay": "We wensen u een uitstekend verblijf!",
+    "footer": "Deze email werd verzonden door {{tenantName}}."
+  },
+  "reviewRequest": {
+    "subject": "Hoe was uw verblijf in {{propertyName}}?",
+    "title": "Uw mening telt!",
+    "greeting": "Hallo {{guestName}},",
+    "intro": "We hopen dat u een prachtig verblijf heeft gehad in {{propertyName}}.",
+    "request": "Uw feedback is waardevol voor ons en helpt toekomstige reizigers. Zou u enkele minuten kunnen nemen om uw ervaring te delen?",
+    "reviewButton": "Beoordeling achterlaten",
+    "thankYou": "Dank u voor het vertrouwen en tot ziens!",
+    "footer": "Deze email werd verzonden door {{tenantName}}."
+  }
+}

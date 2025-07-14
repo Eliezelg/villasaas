@@ -15,7 +15,7 @@ interface Props {
 
 async function getProperty(id: string) {
   const headersList = headers()
-  const tenant = headersList.get('x-tenant') || 'demo'
+  const tenant = headersList.get('x-tenant') || ''
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   
   try {
@@ -43,7 +43,7 @@ async function getProperty(id: string) {
 
 async function getTenant() {
   const headersList = headers()
-  const tenantSubdomain = headersList.get('x-tenant') || 'demo'
+  const tenantSubdomain = headersList.get('x-tenant')
   
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/public/tenant/${tenantSubdomain}`, {

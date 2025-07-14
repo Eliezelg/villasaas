@@ -76,6 +76,11 @@ async function createUser(prisma, tenantId) {
     });
 }
 function generateToken(app, payload) {
-    return app.jwt.sign(payload);
+    return app.jwt.sign({
+        userId: payload.id,
+        tenantId: payload.tenantId,
+        email: 'test@example.com',
+        role: 'OWNER'
+    });
 }
 //# sourceMappingURL=test-utils.js.map

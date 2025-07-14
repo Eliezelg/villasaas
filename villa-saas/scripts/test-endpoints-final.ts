@@ -92,6 +92,11 @@ class FinalEndpointTester {
       const errorMsg = result.error ? `: ${result.error}` : '';
       console.log(`${icon} ${method} ${endpoint} - ${response.status}${errorMsg}`);
       
+      // Log more details for 500 errors
+      if (response.status === 500 && response.data) {
+        console.log('     Error details:', JSON.stringify(response.data, null, 2));
+      }
+      
       return result;
     } catch (error: any) {
       const result: TestResult = {
@@ -298,12 +303,13 @@ class FinalEndpointTester {
   private async testPropertyImages() {
     console.log('\n📸 Testing Property Images...');
 
-    // Test image upload metadata (S3 version)
+    // Test image upload with base64 format
+    // Create a small test image (1x1 pixel transparent PNG)
+    const base64Image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    
     const imageData = {
-      url: faker.image.url(),
-      key: `properties/${this.propertyId}/test-image-${Date.now()}.jpg`,
-      size: faker.number.int({ min: 100000, max: 5000000 }),
-      order: 1,
+      image: base64Image,
+      filename: `test-image-${Date.now()}.png`,
     };
 
     const createResult = await this.testEndpoint(
@@ -338,11 +344,11 @@ class FinalEndpointTester {
       name: 'High Season 2025',
       startDate: '2025-07-01T00:00:00.000Z',
       endDate: '2025-08-31T23:59:59.000Z',
-      nightlyRate: 500,
-      weeklyRate: 3000,
-      monthlyRate: 10000,
-      minimumStay: 7,
+      basePrice: 500,
+      weekendPremium: 50,
+      minNights: 7,
       priority: 10,
+      isActive: true,
     };
 
     const createResult = await this.testEndpoint('POST', `/api/periods`, {
@@ -354,15 +360,14 @@ class FinalEndpointTester {
       this.periodId = createResult.data.id;
 
       // Get periods for property
-      await this.testEndpoint('GET', `/api/properties/${this.propertyId}/pricing-periods`);
+      await this.testEndpoint('GET', `/api/periods?propertyId=${this.propertyId}`);
       
       // Get all periods
       await this.testEndpoint('GET', '/api/periods');
       
       // Update period
-      await this.testEndpoint('PUT', `/api/periods/${this.periodId}`, {
-        ...periodData,
-        nightlyRate: 600,
+      await this.testEndpoint('PATCH', `/api/periods/${this.periodId}`, {
+        basePrice: 600,
       });
       
       // Delete period
@@ -442,10 +447,9 @@ class FinalEndpointTester {
       propertyId: this.propertyId,
       checkIn: '2025-07-15T00:00:00.000Z',
       checkOut: '2025-07-22T00:00:00.000Z',
+      guests: 4,
       adults: 2,
       children: 2,
-      infants: 0,
-      pets: 0,
     };
 
     await this.testEndpoint('POST', '/api/pricing/calculate', pricingData);
@@ -611,14 +615,12 @@ class FinalEndpointTester {
       await this.testEndpoint('GET', `/api/public/properties/${this.propertyId}?tenantId=${this.tenantSubdomain}`, {}, false);
     }
     
-    // Public pricing calculation
-    await this.testEndpoint('POST', '/api/public/pricing/calculate', {
+    // Public pricing calculation - tenantId should be in query params, not body
+    await this.testEndpoint('POST', `/api/public/pricing/calculate?tenantId=${this.tenantSubdomain}`, {
       propertyId: this.propertyId,
       checkIn: '2025-06-01T00:00:00.000Z',
       checkOut: '2025-06-08T00:00:00.000Z',
-      adults: 2,
-      children: 2,
-      tenantId: this.tenantSubdomain,
+      guests: 4, // Total guests, not separated by adults/children
     }, false);
   }
 
@@ -636,28 +638,30 @@ class FinalEndpointTester {
       isActive: true,
     };
 
-    const promoResult = await this.testEndpoint('POST', '/api/promo-codes', promoCodeData);
+    const promoResult = await this.testEndpoint('POST', '/api/promocodes', promoCodeData);
     
     if (promoResult.status === 'success' && promoResult.data) {
       const promoCodeId = promoResult.data.id;
       
       // Get all promo codes
-      await this.testEndpoint('GET', '/api/promo-codes');
+      await this.testEndpoint('GET', '/api/promocodes');
       
       // Validate promo code
-      await this.testEndpoint('POST', '/api/public/promo-codes/validate', {
+      await this.testEndpoint('POST', '/api/public/promocodes/validate', {
         code: 'SUMMER2025',
-        bookingTotal: 1000,
-        tenantId: this.tenantSubdomain,
+        propertyId: this.propertyId,
+        checkIn: '2025-06-01T00:00:00.000Z',
+        checkOut: '2025-06-08T00:00:00.000Z',
+        totalAmount: 1000,
+        nights: 7,
       }, false);
       
       // Delete promo code
-      await this.testEndpoint('DELETE', `/api/promo-codes/${promoCodeId}`);
+      await this.testEndpoint('DELETE', `/api/promocodes/${promoCodeId}`);
     }
 
     // Test booking options
     const bookingOptionData = {
-      propertyId: this.propertyId,
       name: {
         fr: 'Petit-déjeuner',
         en: 'Breakfast',
@@ -666,8 +670,10 @@ class FinalEndpointTester {
         fr: 'Petit-déjeuner continental',
         en: 'Continental breakfast',
       },
-      price: 15,
-      pricingType: 'PER_PERSON_PER_NIGHT',
+      category: 'CATERING',
+      pricePerUnit: 15,
+      pricingType: 'PER_PERSON',
+      pricingPeriod: 'PER_NIGHT',
       isActive: true,
     };
 
@@ -677,8 +683,8 @@ class FinalEndpointTester {
     if (optionsResult.status === 'success' && optionsResult.data && optionsResult.data.length > 0) {
       const optionId = optionsResult.data[0].id;
       // Update option
-      await this.testEndpoint('PUT', `/api/booking-options/${optionId}`, {
-        price: 20,
+      await this.testEndpoint('PATCH', `/api/booking-options/${optionId}`, {
+        pricePerUnit: 20,
       });
       
       // Delete option

@@ -2,7 +2,6 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import fs from 'fs/promises';
 import path from 'path';
-import crypto from 'crypto';
 import { getTenantId } from '@villa-saas/utils';
 import { optimizeImage, deleteImageVariants } from '../../utils/image-optimizer';
 import { validateFileUpload, sanitizeFilename, generateSecureFilename } from '../../utils/file-validator';
@@ -73,7 +72,7 @@ export async function propertyImageRoutes(fastify: FastifyInstance): Promise<voi
     }
 
     const declaredMimeType = base64Match[1];
-    const base64Data = base64Match[2];
+    const base64Data = base64Match[2] || '';
     const buffer = Buffer.from(base64Data, 'base64');
 
     // Validate file before processing
@@ -107,7 +106,7 @@ export async function propertyImageRoutes(fastify: FastifyInstance): Promise<voi
       const propertyImage = await fastify.prisma.propertyImage.create({
         data: {
           propertyId,
-          url: urls.medium || urls.original, // Default display URL
+          url: urls.medium || urls.original || '', // Default display URL
           urls: urls, // Store all sizes
           order: (maxOrder?.order ?? -1) + 1,
         },

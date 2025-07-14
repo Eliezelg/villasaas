@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "ダッシュボード",
+    "welcome": "Villa SaaSダッシュボードへようこそ",
+    "stats": {
+      "properties": "物件",
+      "activeProperties": "アクティブな物件",
+      "bookings": "予約",
+      "thisMonth": "今月",
+      "revenue": "収益",
+      "occupancyRate": "稼働率",
+      "averageThisMonth": "今月の平均"
+    },
+    "recentBookings": {
+      "title": "最近の予約",
+      "subtitle": "最新の予約",
+      "empty": "現在予約はありません"
+    },
+    "recentActivity": {
+      "title": "最近のアクティビティ",
+      "subtitle": "アカウントの最新アクション",
+      "empty": "最近のアクティビティはありません"
+    }
+  },
+  "properties": {
+    "title": "物件",
+    "subtitle": "物件を管理する",
+    "addProperty": "物件を追加",
+    "loading": "読み込み中...",
+    "error": "物件の読み込みエラー",
+    "empty": {
+      "title": "物件がありません",
+      "description": "最初の物件を追加して始めましょう"
+    },
+    "deleteConfirm": "本当に削除しますか",
+    "labels": {
+      "bedrooms": "ベッドルーム",
+      "guests": "ゲスト",
+      "pricePerNight": "料金/泊",
+      "edit": "編集"
+    },
+    "types": {
+      "APARTMENT": "アパート",
+      "HOUSE": "一軒家",
+      "VILLA": "ヴィラ",
+      "STUDIO": "スタジオ",
+      "LOFT": "ロフト",
+      "ROOM": "部屋",
+      "OTHER": "その他"
+    },
+    "statuses": {
+      "DRAFT": "下書き",
+      "PUBLISHED": "公開済み",
+      "ARCHIVED": "アーカイブ済み"
+    }
+  },
+  "bookings": {
+    "title": "予約",
+    "subtitle": "予約を管理する",
+    "newBooking": "新規予約",
+    "search": "検索（参照番号、名前、メール）",
+    "filters": {
+      "allProperties": "すべての物件",
+      "allStatuses": "すべてのステータス",
+      "apply": "フィルター"
+    },
+    "table": {
+      "reference": "参照番号",
+      "property": "物件",
+      "client": "顧客",
+      "dates": "日付",
+      "guests": "ゲスト",
+      "total": "合計",
+      "status": "ステータス",
+      "actions": "アクション"
+    },
+    "labels": {
+      "nights": "泊",
+      "night": "泊",
+      "babies": "乳児",
+      "baby": "乳児",
+      "viewDetails": "詳細を見る",
+      "confirm": "確認",
+      "cancel": "キャンセル"
+    },
+    "empty": "予約が見つかりません",
+    "pagination": "ページ {page} / {totalPages} ({total} 件)",
+    "errors": {
+      "loadError": "予約を読み込めません"
+    },
+    "messages": {
+      "confirmSuccess": "予約 {reference} が確認されました",
+      "cancelSuccess": "予約 {reference} がキャンセルされました",
+      "cancelConfirm": "この予約をキャンセルしてもよろしいですか？",
+      "cancelReason": "オーナーによりキャンセル"
+    },
+    "statuses": {
+      "PENDING": "保留中",
+      "CONFIRMED": "確認済み",
+      "CANCELLED": "キャンセル済み",
+      "COMPLETED": "完了",
+      "NO_SHOW": "ノーショー"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "アカウントと物件のすべての設定を管理",
+    "sections": {
+      "profile": {
+        "title": "企業プロフィール",
+        "description": "企業情報を管理"
+      },
+      "payments": {
+        "title": "支払い",
+        "description": "支払い方法と手数料を設定"
+      },
+      "users": {
+        "title": "ユーザー",
+        "description": "ユーザーと権限を管理"
+      },
+      "emails": {
+        "title": "メール",
+        "description": "メールテンプレートをカスタマイズ"
+      },
+      "autoResponses": {
+        "title": "自動応答",
+        "description": "自動メッセージとAIチャットボットを設定"
+      },
+      "integrations": {
+        "title": "統合",
+        "description": "外部ツールを接続（Airbnb、Booking.comなど）"
+      },
+      "security": {
+        "title": "セキュリティ",
+        "description": "セキュリティとアクセスを管理"
+      },
+      "preferences": {
+        "title": "設定",
+        "description": "体験をカスタマイズ"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "ホームに戻る",
+    "login": {
+      "title": "ログイン",
+      "subtitle": "Villa SaaSアカウントにログイン",
+      "email": "メール",
+      "emailPlaceholder": "your@email.com",
+      "password": "パスワード",
+      "errors": {
+        "invalidEmail": "無効なメール",
+        "passwordRequired": "パスワードが必要です",
+        "generic": "エラーが発生しました"
+      },
+      "submit": "ログイン",
+      "submitting": "ログイン中...",
+      "noAccount": "アカウントをお持ちでないですか？",
+      "createAccount": "アカウントを作成"
+    },
+    "logout": "ログアウト"
+  },
+  "navigation": {
+    "dashboard": "ダッシュボード",
+    "properties": "物件",
+    "bookings": "予約",
+    "messages": "メッセージ",
+    "analytics": "分析",
+    "bookingOptions": "予約オプション",
+    "paymentConfiguration": "支払い設定",
+    "users": "ユーザー",
+    "settings": "設定"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "confirm": "確認",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "yes": "はい",
+    "no": "いいえ",
+    "close": "閉じる",
+    "search": "検索",
+    "filter": "フィルター",
+    "sort": "並べ替え",
+    "refresh": "更新",
+    "export": "エクスポート",
+    "import": "インポート",
+    "download": "ダウンロード",
+    "upload": "アップロード",
+    "print": "印刷",
+    "share": "共有",
+    "copy": "コピー",
+    "paste": "貼り付け",
+    "cut": "切り取り",
+    "selectAll": "すべて選択",
+    "deselectAll": "選択解除"
+  }
+}

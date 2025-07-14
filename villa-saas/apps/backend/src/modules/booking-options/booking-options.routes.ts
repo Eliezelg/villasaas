@@ -5,7 +5,6 @@ import { getTenantId } from '@villa-saas/utils';
 import { 
   createBookingOptionSchema, 
   updateBookingOptionSchema,
-  propertyBookingOptionSchema,
   paymentConfigurationSchema,
   updatePaymentConfigurationSchema
 } from '@villa-saas/types';

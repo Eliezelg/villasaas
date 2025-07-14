@@ -7,7 +7,7 @@ export class AuthService {
   constructor(private fastify: FastifyInstance) {}
 
   async register(data: RegisterDto) {
-    const { email, password, firstName, lastName, companyName, phone } = data;
+    const { email, password, firstName, lastName, companyName, phone, subdomain, domainOption } = data;
 
     // Vérifier si l'email existe déjà
     const existingTenant = await this.fastify.prisma.tenant.findUnique({
@@ -16,6 +16,24 @@ export class AuthService {
 
     if (existingTenant) {
       throw new Error('Email already registered');
+    }
+
+    // Déterminer le sous-domaine à utiliser
+    const finalSubdomain = subdomain || this.generateSubdomain(companyName);
+
+    // Vérifier si le sous-domaine est disponible
+    const existingSubdomain = await this.fastify.prisma.tenant.findFirst({
+      where: { subdomain: finalSubdomain },
+    });
+
+    if (existingSubdomain) {
+      throw new Error('Subdomain not available');
+    }
+
+    // Vérifier que le sous-domaine n'est pas réservé
+    const reservedSubdomains = ['www', 'app', 'api', 'admin', 'dashboard', 'hub', 'demo', 'test'];
+    if (reservedSubdomains.includes(finalSubdomain)) {
+      throw new Error('Subdomain is reserved');
     }
 
     // Hasher le mot de passe
@@ -30,7 +48,13 @@ export class AuthService {
           name: `${firstName} ${lastName}`,
           companyName,
           phone,
-          subdomain: this.generateSubdomain(companyName),
+          subdomain: finalSubdomain,
+          settings: {
+            domainOption: domainOption || 'subdomain',
+            currency: 'EUR',
+            timezone: 'Europe/Paris',
+            language: 'fr',
+          },
         },
       });
 
@@ -45,6 +69,36 @@ export class AuthService {
           tenantId: tenant.id,
           role: 'OWNER',
           emailVerified: false,
+        },
+      });
+
+      // Créer le site public avec configuration par défaut
+      await prisma.publicSite.create({
+        data: {
+          tenantId: tenant.id,
+          subdomain: subdomain || finalSubdomain,
+          isActive: true,
+          theme: {
+            primaryColor: '#6366F1', // Purple-600
+            secondaryColor: '#4F46E5', // Purple-700
+            font: 'Inter',
+          },
+          metadata: {
+            title: companyName,
+            description: `Bienvenue chez ${companyName}`,
+            seoTitle: companyName,
+            seoDescription: `Découvrez et réservez votre séjour chez ${companyName}`,
+            contactEmail: email,
+            contactPhone: phone,
+            socialLinks: {},
+            footer: {
+              showSocial: true,
+              showContact: true,
+              customText: null,
+            },
+          },
+          defaultLocale: 'fr',
+          locales: ['fr', 'en'],
         },
       });
 
@@ -227,36 +281,9 @@ export class AuthService {
       throw new Error('Invalid refresh token');
     }
 
-    // Vérifier si le token a déjà été utilisé (protection contre le replay)
-    if (storedToken.usedAt) {
-      // Token déjà utilisé - potentielle attaque
-      await this.fastify.prisma.auditLog.create({
-        data: {
-          action: 'auth.refresh.replay_attack',
-          entity: 'refresh_token',
-          entityId: storedToken.id,
-          userId: storedToken.userId,
-          tenantId: storedToken.user.tenantId,
-          details: { 
-            tokenId: storedToken.id,
-            usedAt: storedToken.usedAt,
-            attemptedAt: new Date()
-          },
-        }
-      });
-      
-      // Révoquer tous les refresh tokens de l'utilisateur par sécurité
-      await this.fastify.prisma.refreshToken.deleteMany({
-        where: { userId: storedToken.userId }
-      });
-      
-      throw new Error('Token already used - security violation');
-    }
-
-    // Marquer le token comme utilisé (rotation)
-    await this.fastify.prisma.refreshToken.update({
-      where: { id: storedToken.id },
-      data: { usedAt: new Date() }
+    // Supprimer l'ancien token (rotation)
+    await this.fastify.prisma.refreshToken.delete({
+      where: { id: storedToken.id }
     });
 
     // Générer de nouveaux tokens
@@ -289,16 +316,16 @@ export class AuthService {
   }
 
   private async generateTokens(user: any) {
+    // Ne pas inclure les permissions dans le JWT car elles sont déterminées par le rôle
     const payload = {
       userId: user.id,
       tenantId: user.tenantId,
       email: user.email,
       role: user.role,
-      permissions: user.permissions || [],
     };
 
     // Access token
-    const accessToken = this.fastify.jwt.sign(payload, {
+    const accessToken = await this.fastify.jwt.sign(payload, {
       expiresIn: process.env.JWT_ACCESS_EXPIRATION || '15m',
     });
 

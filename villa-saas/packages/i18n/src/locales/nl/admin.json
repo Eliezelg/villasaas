@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welkom op uw Villa SaaS dashboard",
+    "stats": {
+      "properties": "Eigendommen",
+      "activeProperties": "Actieve eigendommen",
+      "bookings": "Reserveringen",
+      "thisMonth": "Deze maand",
+      "revenue": "Inkomsten",
+      "occupancyRate": "Bezettingsgraad",
+      "averageThisMonth": "Gemiddelde deze maand"
+    },
+    "recentBookings": {
+      "title": "Recente reserveringen",
+      "subtitle": "Uw laatste reserveringen",
+      "empty": "Geen reserveringen op dit moment"
+    },
+    "recentActivity": {
+      "title": "Recente activiteit",
+      "subtitle": "Laatste acties op uw account",
+      "empty": "Geen recente activiteit"
+    }
+  },
+  "properties": {
+    "title": "Eigendommen",
+    "subtitle": "Beheer uw onroerend goed",
+    "addProperty": "Eigendom toevoegen",
+    "loading": "Laden...",
+    "error": "Fout bij het laden van eigendommen",
+    "empty": {
+      "title": "Geen eigendommen",
+      "description": "Begin met het toevoegen van uw eerste eigendom"
+    },
+    "deleteConfirm": "Weet u zeker dat u wilt verwijderen",
+    "labels": {
+      "bedrooms": "Slaapkamers",
+      "guests": "Gasten",
+      "pricePerNight": "Prijs/nacht",
+      "edit": "Bewerken"
+    },
+    "types": {
+      "APARTMENT": "Appartement",
+      "HOUSE": "Huis",
+      "VILLA": "Villa",
+      "STUDIO": "Studio",
+      "LOFT": "Loft",
+      "ROOM": "Kamer",
+      "OTHER": "Andere"
+    },
+    "statuses": {
+      "DRAFT": "Concept",
+      "PUBLISHED": "Gepubliceerd",
+      "ARCHIVED": "Gearchiveerd"
+    }
+  },
+  "bookings": {
+    "title": "Reserveringen",
+    "subtitle": "Beheer uw reserveringen",
+    "newBooking": "Nieuwe reservering",
+    "search": "Zoeken (referentie, naam, e-mail)",
+    "filters": {
+      "allProperties": "Alle eigendommen",
+      "allStatuses": "Alle statussen",
+      "apply": "Filteren"
+    },
+    "table": {
+      "reference": "Referentie",
+      "property": "Eigendom",
+      "client": "Klant",
+      "dates": "Data",
+      "guests": "Gasten",
+      "total": "Totaal",
+      "status": "Status",
+      "actions": "Acties"
+    },
+    "labels": {
+      "nights": "nachten",
+      "night": "nacht",
+      "babies": "baby's",
+      "baby": "baby",
+      "viewDetails": "Details bekijken",
+      "confirm": "Bevestigen",
+      "cancel": "Annuleren"
+    },
+    "empty": "Geen reserveringen gevonden",
+    "pagination": "Pagina {page} van {totalPages} ({total} resultaten)",
+    "errors": {
+      "loadError": "Kan reserveringen niet laden"
+    },
+    "messages": {
+      "confirmSuccess": "Reservering {reference} is bevestigd",
+      "cancelSuccess": "Reservering {reference} is geannuleerd",
+      "cancelConfirm": "Weet u zeker dat u deze reservering wilt annuleren?",
+      "cancelReason": "Geannuleerd door de eigenaar"
+    },
+    "statuses": {
+      "PENDING": "In afwachting",
+      "CONFIRMED": "Bevestigd",
+      "CANCELLED": "Geannuleerd",
+      "COMPLETED": "Voltooid",
+      "NO_SHOW": "Niet verschenen"
+    }
+  },
+  "settings": {
+    "title": "Instellingen",
+    "subtitle": "Beheer alle instellingen van uw account en eigendommen",
+    "sections": {
+      "profile": {
+        "title": "Bedrijfsprofiel",
+        "description": "Beheer uw bedrijfsinformatie"
+      },
+      "payments": {
+        "title": "Betalingen",
+        "description": "Configureer uw betaalmethoden en commissies"
+      },
+      "users": {
+        "title": "Gebruikers",
+        "description": "Beheer gebruikers en hun rechten"
+      },
+      "emails": {
+        "title": "E-mails",
+        "description": "Personaliseer uw e-mailsjablonen"
+      },
+      "autoResponses": {
+        "title": "Automatische antwoorden",
+        "description": "Configureer automatische berichten en de AI-chatbot"
+      },
+      "integrations": {
+        "title": "Integraties",
+        "description": "Verbind uw externe tools (Airbnb, Booking.com, etc.)"
+      },
+      "security": {
+        "title": "Beveiliging",
+        "description": "Beheer beveiliging en toegangen"
+      },
+      "preferences": {
+        "title": "Voorkeuren",
+        "description": "Personaliseer uw ervaring"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "Terug naar home",
+    "login": {
+      "title": "Inloggen",
+      "subtitle": "Log in op uw Villa SaaS account",
+      "email": "E-mail",
+      "emailPlaceholder": "uw@email.com",
+      "password": "Wachtwoord",
+      "errors": {
+        "invalidEmail": "Ongeldige e-mail",
+        "passwordRequired": "Wachtwoord is verplicht",
+        "generic": "Er is een fout opgetreden"
+      },
+      "submit": "Inloggen",
+      "submitting": "Inloggen...",
+      "noAccount": "Nog geen account?",
+      "createAccount": "Account aanmaken"
+    },
+    "logout": "Uitloggen"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "properties": "Eigendommen",
+    "bookings": "Reserveringen",
+    "messages": "Berichten",
+    "analytics": "Analytics",
+    "bookingOptions": "Reserveringsopties",
+    "paymentConfiguration": "Betalingsconfiguratie",
+    "users": "Gebruikers",
+    "settings": "Instellingen"
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "confirm": "Bevestigen",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "yes": "Ja",
+    "no": "Nee",
+    "close": "Sluiten",
+    "search": "Zoeken",
+    "filter": "Filteren",
+    "sort": "Sorteren",
+    "refresh": "Vernieuwen",
+    "export": "Exporteren",
+    "import": "Importeren",
+    "download": "Downloaden",
+    "upload": "Uploaden",
+    "print": "Afdrukken",
+    "share": "Delen",
+    "copy": "Kopiëren",
+    "paste": "Plakken",
+    "cut": "Knippen",
+    "selectAll": "Alles selecteren",
+    "deselectAll": "Alles deselecteren"
+  }
+}

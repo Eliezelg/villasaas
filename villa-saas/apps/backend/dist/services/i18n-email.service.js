@@ -106,7 +106,7 @@ function extractLocale(headers, defaultValue = i18n_1.defaultLocale) {
         const acceptLanguage = headers['accept-language'];
         const languages = acceptLanguage
             .split(',')
-            .map((lang) => lang.split(';')[0].trim().toLowerCase());
+            .map((lang) => lang.split(';')[0]?.trim().toLowerCase());
         for (const lang of languages) {
             const locale = lang.split('-')[0];
             if (locale === 'fr' || locale === 'en') {

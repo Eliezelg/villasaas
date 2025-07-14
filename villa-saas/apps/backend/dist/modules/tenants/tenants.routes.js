@@ -156,13 +156,11 @@ async function tenantRoutes(fastify) {
             const accessToken = await reply.jwtSign({
                 userId: result.user.id,
                 tenantId: result.tenant.id,
-                role: result.user.role,
+                email: result.user.email,
+                role: result.user.role
             }, { expiresIn: '7d' });
-            const refreshToken = await reply.jwtSign({
-                userId: result.user.id,
-                tenantId: result.tenant.id,
-                type: 'refresh',
-            }, { expiresIn: '30d' });
+            // Générer un refresh token simple (non JWT)
+            const refreshToken = require('crypto').randomBytes(32).toString('hex');
             // Créer le refresh token en DB
             await fastify.prisma.refreshToken.create({
                 data: {
@@ -196,6 +194,27 @@ async function tenantRoutes(fastify) {
             }
             throw error;
         }
+    });
+    // Get tenant by subdomain (public endpoint for booking sites)
+    fastify.get('/info/:subdomain', async (request, reply) => {
+        const { subdomain } = request.params;
+        const tenant = await fastify.prisma.tenant.findFirst({
+            where: { subdomain },
+            select: {
+                id: true,
+                name: true,
+                companyName: true,
+                subdomain: true,
+                customDomain: true,
+                settings: true,
+                // Ne pas exposer les infos sensibles
+            },
+        });
+        if (!tenant) {
+            reply.status(404).send({ error: 'Tenant not found' });
+            return;
+        }
+        reply.send(tenant);
     });
     // Get current tenant
     fastify.get('/current', {

@@ -20,10 +20,9 @@ class S3Service {
     /**
      * Upload une image avec génération automatique de différentes tailles
      */
-    async uploadImage(file, mimetype, options = {}) {
+    async uploadImage(file, _mimetype, options = {}) {
         const folder = options.folder || 'properties';
         const fileId = (0, crypto_1.randomUUID)();
-        const extension = mimetype.split('/')[1] || 'jpg';
         const baseKey = `${folder}/${fileId}`;
         // Tailles par défaut
         const sizes = options.sizes || [
@@ -36,40 +35,53 @@ class S3Service {
         // Upload de chaque taille
         for (const size of sizes) {
             let processedImage;
-            if (size.name === 'original') {
-                // Pour l'original, on optimise juste la qualité
-                processedImage = await (0, sharp_1.default)(file)
-                    .jpeg({ quality: size.quality, progressive: true })
-                    .toBuffer();
+            try {
+                if (size.name === 'original') {
+                    // Pour l'original, on optimise juste la qualité
+                    processedImage = await (0, sharp_1.default)(file)
+                        .jpeg({ quality: size.quality, progressive: true })
+                        .toBuffer();
+                }
+                else {
+                    // Pour les autres tailles, on redimensionne
+                    processedImage = await (0, sharp_1.default)(file)
+                        .resize(size.width, size.height, {
+                        fit: 'cover',
+                        withoutEnlargement: true
+                    })
+                        .jpeg({ quality: size.quality, progressive: true })
+                        .toBuffer();
+                }
+                console.log(`Processed image ${size.name}: ${processedImage.length} bytes`);
             }
-            else {
-                // Pour les autres tailles, on redimensionne
-                processedImage = await (0, sharp_1.default)(file)
-                    .resize(size.width, size.height, {
-                    fit: 'cover',
-                    withoutEnlargement: true
-                })
-                    .jpeg({ quality: size.quality, progressive: true })
-                    .toBuffer();
+            catch (sharpError) {
+                console.error(`Sharp processing failed for ${size.name}:`, sharpError);
+                throw new Error(`Image processing failed: ${sharpError.message}`);
             }
             const key = `${baseKey}-${size.name}.jpg`;
             // Upload vers S3
-            await this.s3.send(new client_s3_1.PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: processedImage,
-                ContentType: 'image/jpeg',
-                CacheControl: 'public, max-age=31536000', // 1 an
-                Metadata: {
-                    'x-amz-meta-size': size.name,
-                    'x-amz-meta-width': size.width.toString(),
-                }
-            }));
+            try {
+                await this.s3.send(new client_s3_1.PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: key,
+                    Body: processedImage,
+                    ContentType: 'image/jpeg',
+                    CacheControl: 'public, max-age=31536000', // 1 an
+                    Metadata: {
+                        'x-amz-meta-size': size.name,
+                        'x-amz-meta-width': size.width.toString(),
+                    }
+                }));
+            }
+            catch (uploadError) {
+                console.error(`Failed to upload ${key}:`, uploadError);
+                throw uploadError;
+            }
             // Générer l'URL (CDN ou S3 direct)
             urls[size.name] = this.getPublicUrl(key);
         }
         return {
-            url: urls.large || urls.original,
+            url: urls.large || urls.original || '',
             urls,
             key: baseKey,
         };
@@ -101,14 +113,19 @@ class S3Service {
      */
     getPublicUrl(key) {
         if (this.cdnDomain) {
-            return `https://${this.cdnDomain}/${key}`;
+            return `${this.cdnDomain}/${key}`;
+        }
+        // Pour R2, utiliser le domaine public par défaut
+        if (process.env.AWS_S3_ENDPOINT?.includes('r2.cloudflarestorage.com')) {
+            const accountId = process.env.AWS_S3_ENDPOINT.match(/https:\/\/([^.]+)/)?.[1];
+            return `https://pub-${accountId}.r2.dev/${key}`;
         }
         return `https://${this.bucketName}.s3.${process.env.AWS_REGION || 'eu-central-1'}.amazonaws.com/${key}`;
     }
     /**
      * Copie les images d'une propriété (pour la duplication)
      */
-    async copyPropertyImages(sourceFolder, targetFolder) {
+    async copyPropertyImages(_sourceFolder, _targetFolder) {
         // TODO: Implémenter la copie des images
         // Utiliser ListObjectsV2Command et CopyObjectCommand
     }

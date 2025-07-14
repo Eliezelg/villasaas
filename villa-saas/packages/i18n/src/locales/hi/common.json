@@ -1,0 +1,57 @@
+{
+  "navigation": {
+    "home": "होम",
+    "properties": "संपत्तियाँ",
+    "about": "हमारे बारे में",
+    "contact": "संपर्क",
+    "login": "लॉग इन",
+    "signup": "साइन अप",
+    "dashboard": "डैशबोर्ड"
+  },
+  "actions": {
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "sort": "क्रमबद्ध करें",
+    "book": "बुक करें",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "save": "सहेजें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "view": "देखें",
+    "back": "वापस",
+    "next": "अगला",
+    "previous": "पिछला",
+    "continue": "जारी रखें",
+    "backToHome": "होम पर वापस जाएं"
+  },
+  "labels": {
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "phone": "फ़ोन",
+    "address": "पता",
+    "city": "शहर",
+    "country": "देश",
+    "postalCode": "पोस्टल कोड",
+    "language": "भाषा",
+    "currency": "मुद्रा"
+  },
+  "messages": {
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "success": "सफलतापूर्वक पूर्ण",
+    "noResults": "कोई परिणाम नहीं मिला",
+    "required": "यह फ़ील्ड आवश्यक है",
+    "invalidEmail": "अमान्य ईमेल",
+    "invalidPhone": "अमान्य फ़ोन नंबर",
+    "notFound": "पृष्ठ नहीं मिला"
+  },
+  "footer": {
+    "rights": "सर्वाधिकार सुरक्षित",
+    "privacy": "गोपनीयता नीति",
+    "terms": "सेवा की शर्तें",
+    "cookies": "कुकी सेटिंग्स"
+  }
+}

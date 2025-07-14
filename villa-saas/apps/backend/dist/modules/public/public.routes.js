@@ -215,7 +215,8 @@ async function publicRoutes(fastify) {
             min: validation.data['priceRange[min]'],
             max: validation.data['priceRange[max]'],
         };
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }
@@ -341,7 +342,8 @@ async function publicRoutes(fastify) {
         }
     }, async (request, reply) => {
         const { id } = request.params;
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }
@@ -393,7 +395,8 @@ async function publicRoutes(fastify) {
             return reply.code(400).send({ error: validation.error });
         }
         const { propertyId, checkIn, checkOut, guests } = validation.data;
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }
@@ -438,7 +441,8 @@ async function publicRoutes(fastify) {
         }
     }, async (request, reply) => {
         const { propertyId, startDate, endDate } = request.query;
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }
@@ -530,7 +534,8 @@ async function publicRoutes(fastify) {
             return reply.code(400).send({ error: validation.error });
         }
         const data = validation.data;
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }
@@ -665,7 +670,8 @@ async function publicRoutes(fastify) {
         }
     }, async (request, reply) => {
         const { paymentIntentId } = request.params;
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }
@@ -754,22 +760,21 @@ async function publicRoutes(fastify) {
                     guestEmail: email.toLowerCase(),
                     reference: reference.toUpperCase(),
                     status: {
-                        notIn: ['DRAFT'] // Exclure les brouillons
+                        notIn: ['CANCELLED'] // Exclure les annulées
                     }
                 },
                 include: {
                     property: {
                         include: {
                             images: true,
-                            address: true,
                         }
                     },
                     tenant: {
                         select: {
+                            id: true,
                             name: true,
-                            logo: true,
-                            contactEmail: true,
-                            contactPhone: true,
+                            email: true,
+                            subdomain: true
                         }
                     }
                 }
@@ -779,20 +784,15 @@ async function publicRoutes(fastify) {
             }
             // Générer un token temporaire pour l'accès
             const token = await fastify.jwt.sign({
-                bookingId: booking.id,
+                userId: `guest-${booking.id}`,
+                tenantId: booking.tenantId,
                 email: booking.guestEmail,
-                type: 'booking-access'
+                role: 'GUEST'
             }, { expiresIn: '1h' } // Token valide 1 heure
             );
             // Nettoyer les infos sensibles
             const safeBooking = {
-                ...booking,
-                tenant: {
-                    name: booking.tenant.name,
-                    logo: booking.tenant.logo,
-                    contactEmail: booking.tenant.contactEmail,
-                    contactPhone: booking.tenant.contactPhone,
-                }
+                ...booking
             };
             return {
                 booking: safeBooking,
@@ -819,8 +819,8 @@ async function publicRoutes(fastify) {
         const token = authHeader.split(' ')[1];
         try {
             // Vérifier le token
-            const decoded = await fastify.jwt.verify(token);
-            if (decoded.type !== 'booking-access' || decoded.bookingId !== id) {
+            const decoded = await fastify.jwt.verify(token || '');
+            if (decoded.role !== 'GUEST' || !decoded.userId.startsWith('guest-')) {
                 return reply.code(403).send({ error: 'Invalid token' });
             }
             // Récupérer la réservation
@@ -830,17 +830,13 @@ async function publicRoutes(fastify) {
                     property: {
                         include: {
                             images: true,
-                            address: true,
-                            amenities: true,
                         }
                     },
                     tenant: {
                         select: {
                             name: true,
-                            logo: true,
-                            contactEmail: true,
-                            contactPhone: true,
-                            website: true,
+                            email: true,
+                            subdomain: true,
                         }
                     }
                 }
@@ -866,7 +862,8 @@ async function publicRoutes(fastify) {
         }
     }, async (request, reply) => {
         const { propertyId, startDate, endDate } = request.query;
-        const tenantSubdomain = request.headers['x-tenant'];
+        // Check for tenant in header or query params
+        const tenantSubdomain = request.headers['x-tenant'] || request.query.tenantId;
         if (!tenantSubdomain) {
             return reply.code(400).send({ error: 'Tenant not specified' });
         }

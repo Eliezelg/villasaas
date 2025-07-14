@@ -33,11 +33,11 @@ class AnalyticsService {
         const occupancyData = await this.getOccupancy(tenantId, dateRange, propertyId);
         // Group by property for top properties
         const propertyStats = bookings.reduce((acc, booking) => {
-            const propId = booking.property.id;
+            const propId = booking.propertyId;
             if (!acc[propId]) {
                 acc[propId] = {
                     id: propId,
-                    name: booking.property.name,
+                    name: booking.property?.name || 'Unknown',
                     revenue: 0,
                     bookings: 0
                 };
@@ -51,7 +51,7 @@ class AnalyticsService {
             .slice(0, 5);
         // Group by booking source
         const sourceStats = bookings.reduce((acc, booking) => {
-            const source = booking.source;
+            const source = booking.source || 'UNKNOWN';
             if (!acc[source]) {
                 acc[source] = {
                     source,
@@ -219,6 +219,90 @@ class AnalyticsService {
             averageRevenuePerBooking: Math.round(averageRevenuePerBooking * 100) / 100,
             monthlyData
         };
+    }
+    async getTopProperties(tenantId, dateRange, limit = 10, sortBy = 'revenue') {
+        const bookings = await this.db.booking.findMany({
+            where: {
+                tenantId,
+                status: { in: ['CONFIRMED', 'COMPLETED'] },
+                checkIn: { gte: dateRange.startDate },
+                checkOut: { lte: dateRange.endDate }
+            },
+            include: {
+                property: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+        // Group by property
+        const propertyStats = new Map();
+        for (const booking of bookings) {
+            const propId = booking.propertyId;
+            const stats = propertyStats.get(propId) || {
+                id: propId,
+                name: booking.property.name,
+                revenue: 0,
+                bookings: 0,
+                nights: 0
+            };
+            stats.revenue += Number(booking.total);
+            stats.bookings += 1;
+            stats.nights += (0, date_fns_1.differenceInDays)(booking.checkOut, booking.checkIn);
+            propertyStats.set(propId, stats);
+        }
+        // Calculate occupancy rates
+        const propertiesArray = Array.from(propertyStats.values());
+        const totalDays = (0, date_fns_1.differenceInDays)(dateRange.endDate, dateRange.startDate) + 1;
+        const results = propertiesArray.map(prop => ({
+            ...prop,
+            occupancyRate: Math.round((prop.nights / totalDays) * 100),
+            averageNightlyRate: prop.nights > 0 ? Math.round(prop.revenue / prop.nights) : 0
+        }));
+        // Sort by specified criteria
+        results.sort((a, b) => b[sortBy] - a[sortBy]);
+        return results.slice(0, limit);
+    }
+    async getBookingSources(tenantId, dateRange, propertyId) {
+        const bookingFilter = {
+            tenantId,
+            status: { in: ['CONFIRMED', 'COMPLETED'] },
+            checkIn: { gte: dateRange.startDate },
+            checkOut: { lte: dateRange.endDate },
+            ...(propertyId && { propertyId })
+        };
+        const bookings = await this.db.booking.findMany({
+            where: bookingFilter,
+            select: {
+                total: true,
+                source: true
+            }
+        });
+        // Group by source
+        const sourceStats = new Map();
+        let totalRevenue = 0;
+        for (const booking of bookings) {
+            const source = booking.source || 'DIRECT';
+            const stats = sourceStats.get(source) || {
+                source,
+                count: 0,
+                revenue: 0
+            };
+            stats.count += 1;
+            stats.revenue += Number(booking.total);
+            totalRevenue += Number(booking.total);
+            sourceStats.set(source, stats);
+        }
+        // Calculate percentages
+        const results = Array.from(sourceStats.values()).map(source => ({
+            ...source,
+            percentage: totalRevenue > 0 ? Math.round((source.revenue / totalRevenue) * 100) : 0
+        }));
+        // Sort by revenue
+        results.sort((a, b) => b.revenue - a.revenue);
+        return results;
     }
     async exportData(tenantId, dateRange, propertyId) {
         // Get all data

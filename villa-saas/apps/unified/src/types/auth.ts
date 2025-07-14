@@ -4,14 +4,35 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'OWNER' | 'ADMIN' | 'USER';
+  onboardingCompleted?: boolean;
 }
 
 export interface Tenant {
   id: string;
   name: string;
+  email: string;
+  phone?: string;
+  companyName?: string;
   subdomain?: string;
   customDomain?: string;
-  settings?: any;
+  stripeAccountId?: string;
+  stripeAccountStatus?: string;
+  stripeDetailsSubmitted: boolean;
+  stripeChargesEnabled: boolean;
+  stripePayoutsEnabled: boolean;
+  settings?: {
+    description?: string;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+    website?: string;
+    commissionRate?: number;
+    minimumPayout?: number;
+    payoutDelay?: number;
+    automaticPayouts?: boolean;
+    [key: string]: any;
+  };
 }
 
 export interface AuthTokens {

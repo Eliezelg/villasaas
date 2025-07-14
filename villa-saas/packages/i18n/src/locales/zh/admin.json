@@ -1,0 +1,205 @@
+{
+  "dashboard": {
+    "title": "仪表板",
+    "welcome": "欢迎来到您的Villa SaaS仪表板",
+    "stats": {
+      "properties": "房产",
+      "activeProperties": "活跃房产",
+      "bookings": "预订",
+      "thisMonth": "本月",
+      "revenue": "收入",
+      "occupancyRate": "入住率",
+      "averageThisMonth": "本月平均"
+    },
+    "recentBookings": {
+      "title": "最近预订",
+      "subtitle": "您的最新预订",
+      "empty": "目前没有预订"
+    },
+    "recentActivity": {
+      "title": "最近活动",
+      "subtitle": "您账户的最新操作",
+      "empty": "没有最近活动"
+    }
+  },
+  "properties": {
+    "title": "房产",
+    "subtitle": "管理您的房产",
+    "addProperty": "添加房产",
+    "loading": "加载中...",
+    "error": "加载房产时出错",
+    "empty": {
+      "title": "没有房产",
+      "description": "从添加您的第一个房产开始"
+    },
+    "deleteConfirm": "您确定要删除",
+    "labels": {
+      "bedrooms": "卧室",
+      "guests": "客人",
+      "pricePerNight": "价格/晚",
+      "edit": "编辑"
+    },
+    "types": {
+      "APARTMENT": "公寓",
+      "HOUSE": "房子",
+      "VILLA": "别墅",
+      "STUDIO": "工作室",
+      "LOFT": "阁楼",
+      "ROOM": "房间",
+      "OTHER": "其他"
+    },
+    "statuses": {
+      "DRAFT": "草稿",
+      "PUBLISHED": "已发布",
+      "ARCHIVED": "已归档"
+    }
+  },
+  "bookings": {
+    "title": "预订",
+    "subtitle": "管理您的预订",
+    "newBooking": "新预订",
+    "search": "搜索（参考号、姓名、电子邮件）",
+    "filters": {
+      "allProperties": "所有房产",
+      "allStatuses": "所有状态",
+      "apply": "筛选"
+    },
+    "table": {
+      "reference": "参考号",
+      "property": "房产",
+      "client": "客户",
+      "dates": "日期",
+      "guests": "客人",
+      "total": "总计",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "labels": {
+      "nights": "晚",
+      "night": "晚",
+      "babies": "婴儿",
+      "baby": "婴儿",
+      "viewDetails": "查看详情",
+      "confirm": "确认",
+      "cancel": "取消"
+    },
+    "empty": "未找到预订",
+    "pagination": "第 {page} 页，共 {totalPages} 页（{total} 个结果）",
+    "errors": {
+      "loadError": "无法加载预订"
+    },
+    "messages": {
+      "confirmSuccess": "预订 {reference} 已确认",
+      "cancelSuccess": "预订 {reference} 已取消",
+      "cancelConfirm": "您确定要取消此预订吗？",
+      "cancelReason": "由业主取消"
+    },
+    "statuses": {
+      "PENDING": "待处理",
+      "CONFIRMED": "已确认",
+      "CANCELLED": "已取消",
+      "COMPLETED": "已完成",
+      "NO_SHOW": "未出现"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "管理您账户和房产的所有设置",
+    "sections": {
+      "profile": {
+        "title": "公司资料",
+        "description": "管理您的公司信息"
+      },
+      "payments": {
+        "title": "付款",
+        "description": "配置您的付款方式和佣金"
+      },
+      "users": {
+        "title": "用户",
+        "description": "管理用户及其权限"
+      },
+      "emails": {
+        "title": "电子邮件",
+        "description": "自定义您的电子邮件模板"
+      },
+      "autoResponses": {
+        "title": "自动回复",
+        "description": "配置自动消息和AI聊天机器人"
+      },
+      "integrations": {
+        "title": "集成",
+        "description": "连接您的外部工具（Airbnb、Booking.com等）"
+      },
+      "security": {
+        "title": "安全",
+        "description": "管理安全和访问权限"
+      },
+      "preferences": {
+        "title": "偏好设置",
+        "description": "个性化您的体验"
+      }
+    }
+  },
+  "auth": {
+    "backToHome": "返回首页",
+    "login": {
+      "title": "登录",
+      "subtitle": "登录您的Villa SaaS账户",
+      "email": "电子邮件",
+      "emailPlaceholder": "your@email.com",
+      "password": "密码",
+      "errors": {
+        "invalidEmail": "无效的电子邮件",
+        "passwordRequired": "需要密码",
+        "generic": "发生错误"
+      },
+      "submit": "登录",
+      "submitting": "登录中...",
+      "noAccount": "还没有账户？",
+      "createAccount": "创建账户"
+    },
+    "logout": "退出"
+  },
+  "navigation": {
+    "dashboard": "仪表板",
+    "properties": "房产",
+    "bookings": "预订",
+    "messages": "消息",
+    "analytics": "分析",
+    "bookingOptions": "预订选项",
+    "paymentConfiguration": "付款配置",
+    "users": "用户",
+    "settings": "设置"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "yes": "是",
+    "no": "否",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "refresh": "刷新",
+    "export": "导出",
+    "import": "导入",
+    "download": "下载",
+    "upload": "上传",
+    "print": "打印",
+    "share": "分享",
+    "copy": "复制",
+    "paste": "粘贴",
+    "cut": "剪切",
+    "selectAll": "全选",
+    "deselectAll": "取消全选"
+  }
+}

@@ -54,6 +54,14 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.r2.dev',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pub-85fe05f2657948159cf737500dd6f474.r2.dev',
       }
     ],
     formats: ['image/avif', 'image/webp'],

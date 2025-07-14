@@ -19,11 +19,14 @@ import websocketPlugin from './plugins/websocket';
 
 import { healthRoutes } from './modules/health/health.routes';
 import { authRoutes } from './modules/auth/auth.routes';
+import { authSignupRoutes } from './modules/auth/auth-signup.routes';
+import { signupSessionRoutes } from './modules/auth/signup-session.routes';
 import { tenantRoutes } from './modules/tenants/tenants.routes';
 import { userRoutes } from './modules/users/users.routes';
 import { propertyRoutes } from './modules/properties/properties.routes';
 // import { propertyImageRoutes } from './modules/properties/images.routes';
 import { propertyImageS3Routes } from './modules/properties/images-s3.routes';
+import { propertyQuotaRoutes } from './modules/properties/property-quota.routes';
 import { periodRoutes } from './modules/periods/periods.routes';
 import { pricingRoutes } from './modules/pricing/pricing.routes';
 import availabilityRoutes from './modules/availability/availability.routes';
@@ -31,11 +34,14 @@ import { bookingRoutes } from './modules/bookings/booking.routes';
 import { analyticsRoutes } from './modules/analytics/analytics.routes';
 import { publicRoutes } from './modules/public/public.routes';
 import { paymentsRoutes } from './modules/payments/payments.routes';
+import { subscriptionsRoutes } from './modules/subscriptions/subscriptions.routes';
 import { promocodesRoutes } from './modules/promocodes/promocodes.routes';
 import { publicPromoCodesRoutes } from './modules/public/promocodes.public.routes';
 import { messagingRoutes } from './modules/messaging/messaging.routes';
 import { autoResponseRoutes } from './modules/messaging/auto-response.routes';
 import { bookingOptionsRoutes } from './modules/booking-options/booking-options.routes';
+import { domainsRoutes } from './modules/domains/domains.routes';
+import { domainLookupRoutes } from './modules/public/domain-lookup.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -81,7 +87,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         cb(null, true);
       } else {
         app.log.warn(`CORS blocked origin: ${origin}`);
-        cb(new Error('Not allowed by CORS'));
+        cb(new Error('Not allowed by CORS'), false);
       }
     },
     credentials: true,
@@ -161,25 +167,31 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // Routes
   await app.register(healthRoutes, { prefix: '/health' });
   await app.register(authRoutes, { prefix: '/api/auth' });
+  await app.register(authSignupRoutes, { prefix: '/api' });
+  await app.register(signupSessionRoutes, { prefix: '/api' });
   await app.register(tenantRoutes, { prefix: '/api/tenants' });
   await app.register(userRoutes, { prefix: '/api/users' });
   await app.register(propertyRoutes, { prefix: '/api/properties' });
   // await app.register(propertyImageRoutes, { prefix: '/api/properties' }); // Old local storage
   await app.register(propertyImageS3Routes, { prefix: '/api/properties' }); // New S3 storage
+  await app.register(propertyQuotaRoutes, { prefix: '/api' });
   await app.register(periodRoutes, { prefix: '/api/periods' });
   await app.register(pricingRoutes, { prefix: '/api/pricing' });
   await app.register(availabilityRoutes, { prefix: '/api/availability' });
   await app.register(bookingRoutes, { prefix: '/api' });
   await app.register(analyticsRoutes, { prefix: '/api/analytics' });
   await app.register(paymentsRoutes, { prefix: '/api' });
+  await app.register(subscriptionsRoutes, { prefix: '/api' });
   await app.register(promocodesRoutes, { prefix: '/api' });
   await app.register(messagingRoutes, { prefix: '/api/messaging' });
-  await app.register(autoResponseRoutes, { prefix: '/api/messaging/auto-response' });
+  await app.register(autoResponseRoutes, { prefix: '/api/messaging' });
   await app.register(bookingOptionsRoutes, { prefix: '/api' });
+  await app.register(domainsRoutes);
   
   // Public routes (no auth required)
   await app.register(publicRoutes, { prefix: '/api' });
   await app.register(publicPromoCodesRoutes, { prefix: '/api' });
+  await app.register(domainLookupRoutes);
 
   return app;
 }

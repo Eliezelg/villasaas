@@ -47,7 +47,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
   // Lister tous les codes promo
   fastify.get('/promocodes', {
     onRequest: [fastify.authenticate],
-  }, async (request, reply) => {
+  }, async (request) => {
     const tenantId = getTenantId(request)
 
     const promoCodes = await prisma.promoCode.findMany({
@@ -239,7 +239,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(400).send({ error: validation.error })
     }
 
-    const { code, propertyId, checkIn, checkOut, totalAmount, nights, userId } = validation.data
+    const { code, propertyId, totalAmount, nights, userId } = validation.data
 
     const promoCode = await prisma.promoCode.findFirst({
       where: {
@@ -254,7 +254,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     const now = new Date()
-    const checkInDate = new Date(checkIn)
+    // const _checkInDate = new Date(checkIn)
 
     // Vérifier la période de validité
     if (now < promoCode.validFrom || now > promoCode.validUntil) {

@@ -9,7 +9,7 @@ const utils_1 = require("@villa-saas/utils");
 const ical_routes_1 = __importDefault(require("./ical.routes"));
 // Schémas de validation Zod pour les validations manuelles
 const blockedPeriodSchema = zod_1.z.object({
-    propertyId: zod_1.z.string().cuid(),
+    propertyId: zod_1.z.string().min(1),
     startDate: zod_1.z.string().datetime(),
     endDate: zod_1.z.string().datetime(),
     reason: zod_1.z.string().optional(),
@@ -22,10 +22,10 @@ const updateBlockedPeriodSchema = zod_1.z.object({
     notes: zod_1.z.string().optional()
 });
 const checkAvailabilitySchema = zod_1.z.object({
-    propertyId: zod_1.z.string().cuid(),
+    propertyId: zod_1.z.string().min(1),
     checkIn: zod_1.z.string().datetime(),
     checkOut: zod_1.z.string().datetime(),
-    excludeBookingId: zod_1.z.string().cuid().optional()
+    excludeBookingId: zod_1.z.string().min(1).optional()
 });
 async function availabilityRoutes(fastify) {
     // Enregistrer les routes iCal
