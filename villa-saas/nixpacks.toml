@@ -6,9 +6,9 @@ cmds = ["npm ci"]
 
 [phases.build]
 cmds = [
-  "npx prisma generate --schema=packages/database/prisma/schema.prisma",
+  "cd packages/database && npx prisma generate && npm run build",
   "cd apps/backend && npm run build"
 ]
 
 [start]
-cmd = "cd apps/backend && node dist/server.js"
+cmd = "cd apps/backend && npm start"

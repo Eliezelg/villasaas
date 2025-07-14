@@ -7,19 +7,19 @@ export declare function createAuthHeader(token: string): {
     authorization: string;
 };
 export declare function createTenant(prisma: PrismaClient): Promise<{
-    name: string;
-    address: string | null;
     id: string;
-    email: string;
     createdAt: Date;
     updatedAt: Date;
+    email: string;
+    phone: string | null;
+    isActive: boolean;
+    name: string;
+    address: string | null;
     city: string | null;
     postalCode: string | null;
     country: string;
     subdomain: string | null;
     customDomain: string | null;
-    phone: string | null;
-    isActive: boolean;
     companyName: string | null;
     siret: string | null;
     vatNumber: string | null;
@@ -36,20 +36,20 @@ export declare function createTenant(prisma: PrismaClient): Promise<{
     subscriptionEndDate: Date | null;
 }>;
 export declare function createUser(prisma: PrismaClient, tenantId: string): Promise<{
-    metadata: import("@prisma/client/runtime/library").JsonValue | null;
     id: string;
-    role: import(".prisma/client").$Enums.UserRole;
-    email: string;
     createdAt: Date;
     tenantId: string;
     updatedAt: Date;
+    email: string;
     passwordHash: string;
     firstName: string;
     lastName: string;
     phone: string | null;
     isActive: boolean;
     emailVerified: boolean;
+    role: import(".prisma/client").$Enums.UserRole;
     permissions: import("@prisma/client/runtime/library").JsonValue;
+    metadata: import("@prisma/client/runtime/library").JsonValue | null;
 }>;
 export declare function generateToken(app: FastifyInstance, payload: {
     id: string;

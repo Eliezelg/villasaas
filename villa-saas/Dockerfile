@@ -17,9 +17,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client and build database package
 WORKDIR /app/packages/database
 RUN npx prisma generate
+RUN npm run build
 
 # Build backend
 WORKDIR /app/apps/backend
@@ -45,8 +46,13 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
 COPY --from=builder /app/apps/backend/src/emails ./apps/backend/src/emails
 
-# Copy packages
-COPY --from=builder /app/packages ./packages
+# Copy packages with built database
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/database/prisma ./packages/database/prisma
+COPY --from=builder /app/packages/database/package.json ./packages/database/
+COPY --from=builder /app/packages/types ./packages/types
+COPY --from=builder /app/packages/utils ./packages/utils
+COPY --from=builder /app/packages/i18n ./packages/i18n
 
 # Generate Prisma client in production
 WORKDIR /app/packages/database
