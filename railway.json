@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd villa-saas && npm install && cd apps/backend && npm run build",
+    "buildCommand": "cd villa-saas && npm install && npm run build:backend",
     "watchPatterns": [
       "villa-saas/apps/backend/**"
     ]
@@ -13,12 +13,5 @@
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
-  },
-  "environments": {
-    "production": {
-      "build": {
-        "builder": "NIXPACKS"
-      }
-    }
   }
 }
