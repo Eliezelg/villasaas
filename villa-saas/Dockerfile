@@ -1,21 +1,21 @@
-# Build stage - Depuis la racine du monorepo
+# Build stage
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files - structure monorepo
-COPY ../../package*.json ./
-COPY package*.json ./apps/backend/
-COPY ../../packages/database/package*.json ./packages/database/
-COPY ../../packages/types/package*.json ./packages/types/
-COPY ../../packages/utils/package*.json ./packages/utils/
-COPY ../../packages/i18n/package*.json ./packages/i18n/
+# Copy package files
+COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
+COPY packages/database/package*.json ./packages/database/
+COPY packages/types/package*.json ./packages/types/
+COPY packages/utils/package*.json ./packages/utils/
+COPY packages/i18n/package*.json ./packages/i18n/
 
 # Install dependencies
 RUN npm ci
 
 # Copy source code
-COPY ../.. .
+COPY . .
 
 # Generate Prisma client
 WORKDIR /app/packages/database
@@ -31,12 +31,12 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files
-COPY ../../package*.json ./
-COPY package*.json ./apps/backend/
-COPY ../../packages/database/package*.json ./packages/database/
-COPY ../../packages/types/package*.json ./packages/types/
-COPY ../../packages/utils/package*.json ./packages/utils/
-COPY ../../packages/i18n/package*.json ./packages/i18n/
+COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
+COPY packages/database/package*.json ./packages/database/
+COPY packages/types/package*.json ./packages/types/
+COPY packages/utils/package*.json ./packages/utils/
+COPY packages/i18n/package*.json ./packages/i18n/
 
 # Install production dependencies only
 RUN npm ci --omit=dev

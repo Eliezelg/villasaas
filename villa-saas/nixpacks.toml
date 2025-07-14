@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs-20_x", "npm-9_x"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = [
+  "npx prisma generate --schema=packages/database/prisma/schema.prisma",
+  "cd apps/backend && npm run build"
+]
+
+[start]
+cmd = "cd apps/backend && node dist/server.js"
