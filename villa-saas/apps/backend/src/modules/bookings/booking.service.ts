@@ -1,4 +1,4 @@
-import { PrismaClient } from '@villa-saas/database';
+import { PrismaClient } from '@prisma/client';
 import { differenceInDays } from 'date-fns';
 import { PricingService } from '../../services/pricing.service';
 
@@ -204,7 +204,7 @@ export class BookingService {
 
     // Trouver la durée minimum applicable
     const applicablePeriod = property.periods.find(
-      period => checkIn >= new Date(period.startDate) && checkIn <= new Date(period.endDate)
+      (period: any) => checkIn >= new Date(period.startDate) && checkIn <= new Date(period.endDate)
     );
     
     const minNights = applicablePeriod?.minNights || property.minNights;

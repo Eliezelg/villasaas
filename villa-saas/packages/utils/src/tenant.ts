@@ -1,6 +1,10 @@
 import type { FastifyRequest } from 'fastify';
 
-export function getTenantId(request: FastifyRequest): string {
+interface RequestWithTenant extends FastifyRequest {
+  tenantId?: string;
+}
+
+export function getTenantId(request: RequestWithTenant): string {
   if (!request.tenantId) {
     throw new Error('Tenant ID not found in request');
   }

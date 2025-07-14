@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.promocodesRoutes = void 0;
 const zod_1 = require("zod");
-const database_1 = require("@villa-saas/database");
 const utils_1 = require("@villa-saas/utils");
 // Schémas de validation
 const createPromoCodeSchema = zod_1.z.object({
@@ -47,7 +46,7 @@ const promocodesRoutes = async (fastify) => {
         onRequest: [fastify.authenticate],
     }, async (request) => {
         const tenantId = (0, utils_1.getTenantId)(request);
-        const promoCodes = await database_1.prisma.promoCode.findMany({
+        const promoCodes = await fastify.prisma.promoCode.findMany({
             where: { tenantId },
             orderBy: { createdAt: 'desc' },
             include: {
@@ -64,7 +63,7 @@ const promocodesRoutes = async (fastify) => {
     }, async (request, reply) => {
         const tenantId = (0, utils_1.getTenantId)(request);
         const { id } = request.params;
-        const promoCode = await database_1.prisma.promoCode.findFirst({
+        const promoCode = await fastify.prisma.promoCode.findFirst({
             where: { id, tenantId },
             include: {
                 _count: {
@@ -88,7 +87,7 @@ const promocodesRoutes = async (fastify) => {
         }
         const data = validation.data;
         // Vérifier si le code existe déjà
-        const existing = await database_1.prisma.promoCode.findUnique({
+        const existing = await fastify.prisma.promoCode.findUnique({
             where: { code: data.code }
         });
         if (existing) {
@@ -100,7 +99,7 @@ const promocodesRoutes = async (fastify) => {
         }
         // Vérifier que les propriétés appartiennent bien au tenant
         if (data.propertyIds && data.propertyIds.length > 0) {
-            const propertyCount = await database_1.prisma.property.count({
+            const propertyCount = await fastify.prisma.property.count({
                 where: {
                     id: { in: data.propertyIds },
                     tenantId
@@ -110,7 +109,7 @@ const promocodesRoutes = async (fastify) => {
                 return reply.code(400).send({ error: 'Une ou plusieurs propriétés sont invalides' });
             }
         }
-        const promoCode = await database_1.prisma.promoCode.create({
+        const promoCode = await fastify.prisma.promoCode.create({
             data: {
                 ...data,
                 tenantId,
@@ -131,7 +130,7 @@ const promocodesRoutes = async (fastify) => {
         }
         const data = validation.data;
         // Vérifier que le code promo existe et appartient au tenant
-        const existing = await database_1.prisma.promoCode.findFirst({
+        const existing = await fastify.prisma.promoCode.findFirst({
             where: { id, tenantId }
         });
         if (!existing) {
@@ -145,7 +144,7 @@ const promocodesRoutes = async (fastify) => {
         }
         // Vérifier les propriétés si modifiées
         if (data.propertyIds && data.propertyIds.length > 0) {
-            const propertyCount = await database_1.prisma.property.count({
+            const propertyCount = await fastify.prisma.property.count({
                 where: {
                     id: { in: data.propertyIds },
                     tenantId
@@ -155,7 +154,7 @@ const promocodesRoutes = async (fastify) => {
                 return reply.code(400).send({ error: 'Une ou plusieurs propriétés sont invalides' });
             }
         }
-        const promoCode = await database_1.prisma.promoCode.update({
+        const promoCode = await fastify.prisma.promoCode.update({
             where: { id },
             data: {
                 ...data,
@@ -171,14 +170,14 @@ const promocodesRoutes = async (fastify) => {
         const tenantId = (0, utils_1.getTenantId)(request);
         const { id } = request.params;
         // Vérifier que le code promo existe et appartient au tenant
-        const existing = await database_1.prisma.promoCode.findFirst({
+        const existing = await fastify.prisma.promoCode.findFirst({
             where: { id, tenantId }
         });
         if (!existing) {
             return reply.code(404).send({ error: 'Code promo non trouvé' });
         }
         // Vérifier s'il y a des réservations associées
-        const bookingCount = await database_1.prisma.booking.count({
+        const bookingCount = await fastify.prisma.booking.count({
             where: { promoCodeId: id }
         });
         if (bookingCount > 0) {
@@ -186,7 +185,7 @@ const promocodesRoutes = async (fastify) => {
                 error: 'Impossible de supprimer ce code promo car il est utilisé dans des réservations'
             });
         }
-        await database_1.prisma.promoCode.delete({
+        await fastify.prisma.promoCode.delete({
             where: { id }
         });
         return reply.code(204).send();
@@ -201,7 +200,7 @@ const promocodesRoutes = async (fastify) => {
             return reply.code(400).send({ error: validation.error });
         }
         const { code, propertyId, totalAmount, nights, userId } = validation.data;
-        const promoCode = await database_1.prisma.promoCode.findFirst({
+        const promoCode = await fastify.prisma.promoCode.findFirst({
             where: {
                 code,
                 tenantId,
@@ -239,7 +238,7 @@ const promocodesRoutes = async (fastify) => {
         }
         // Vérifier la limite d'utilisation par utilisateur
         if (promoCode.maxUsesPerUser && userId) {
-            const userUsageCount = await database_1.prisma.booking.count({
+            const userUsageCount = await fastify.prisma.booking.count({
                 where: {
                     promoCodeId: promoCode.id,
                     userId,
@@ -277,7 +276,7 @@ const promocodesRoutes = async (fastify) => {
     }, async (request, reply) => {
         const tenantId = (0, utils_1.getTenantId)(request);
         const { id } = request.params;
-        const promoCode = await database_1.prisma.promoCode.findFirst({
+        const promoCode = await fastify.prisma.promoCode.findFirst({
             where: { id, tenantId },
             include: {
                 bookings: {

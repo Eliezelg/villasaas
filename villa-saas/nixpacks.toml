@@ -2,11 +2,14 @@
 nixPkgs = ["nodejs-20_x", "npm-9_x"]
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm ci", "cd packages/database && npx prisma generate"]
 
 [phases.build]
 cmds = [
-  "cd packages/database && npx prisma generate && npm run build",
+  "cd packages/database && npm run build",
+  "cd packages/types && npm run build",
+  "cd packages/utils && npm run build",
+  "cd packages/i18n && npm run build",
   "cd apps/backend && npm run build"
 ]
 

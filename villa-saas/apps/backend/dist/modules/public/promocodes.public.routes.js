@@ -36,7 +36,7 @@ const publicPromoCodesRoutes = async (fastify) => {
                 return reply.code(404).send({ error: 'Tenant not found' });
             }
             const { code, propertyId, checkIn, checkOut, totalAmount, nights } = validation.data;
-            const result = await (0, promocode_service_1.validatePromoCode)({
+            const result = await (0, promocode_service_1.validatePromoCode)(fastify.prisma, {
                 code,
                 tenantId: tenant.id,
                 propertyId,

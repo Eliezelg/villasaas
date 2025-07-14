@@ -1,6 +1,6 @@
 import 'fastify';
 import type { JWT } from '@fastify/jwt';
-import type { PrismaClient } from '@villa-saas/database';
+import type { PrismaClient } from '@prisma/client';
 import type { Redis } from 'ioredis';
 
 declare module 'fastify' {

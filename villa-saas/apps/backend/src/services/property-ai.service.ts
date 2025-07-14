@@ -1,4 +1,4 @@
-import { Property } from '@villa-saas/database';
+import { Property } from '@prisma/client';
 import OpenAI from 'openai';
 
 export class PropertyAIService {

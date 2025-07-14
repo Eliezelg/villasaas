@@ -4,9 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
-const database_1 = require("@villa-saas/database");
+const client_1 = require("@prisma/client");
 async function prismaPlugin(fastify) {
-    const prisma = new database_1.PrismaClient({
+    const prisma = new client_1.PrismaClient({
         log: process.env.NODE_ENV === 'development'
             ? ['query', 'info', 'warn', 'error']
             : ['error'],

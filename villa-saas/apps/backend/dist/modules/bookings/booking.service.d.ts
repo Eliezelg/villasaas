@@ -1,4 +1,4 @@
-import { PrismaClient } from '@villa-saas/database';
+import { PrismaClient } from '@prisma/client';
 export interface BookingPriceCalculation {
     nights: number;
     accommodationTotal: number;

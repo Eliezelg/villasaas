@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import { PrismaClient } from '@villa-saas/database';
+import { PrismaClient } from '@prisma/client';
 import type { FastifyInstance } from 'fastify';
 
 async function prismaPlugin(fastify: FastifyInstance): Promise<void> {
@@ -11,7 +11,7 @@ async function prismaPlugin(fastify: FastifyInstance): Promise<void> {
   });
 
   // Middleware pour le multi-tenancy automatique
-  prisma.$use(async (params, next) => {
+  prisma.$use(async (params: any, next: any) => {
     // Ne pas appliquer sur les modèles qui n'ont pas de tenantId
     const modelsWithoutTenant = ['RefreshToken', 'Session'];
     

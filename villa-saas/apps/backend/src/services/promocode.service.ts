@@ -1,4 +1,4 @@
-import { prisma } from '@villa-saas/database'
+import { PrismaClient } from '@prisma/client'
 
 interface ValidatePromoCodeParams {
   code: string
@@ -11,7 +11,7 @@ interface ValidatePromoCodeParams {
   userId?: string
 }
 
-export async function validatePromoCode(params: ValidatePromoCodeParams) {
+export async function validatePromoCode(prisma: PrismaClient, params: ValidatePromoCodeParams) {
   const {
     code,
     tenantId,
@@ -104,7 +104,7 @@ export async function validatePromoCode(params: ValidatePromoCodeParams) {
   }
 }
 
-export async function applyPromoCode(promoCodeId: string): Promise<void> {
+export async function applyPromoCode(prisma: PrismaClient, promoCodeId: string): Promise<void> {
   await prisma.promoCode.update({
     where: { id: promoCodeId },
     data: {

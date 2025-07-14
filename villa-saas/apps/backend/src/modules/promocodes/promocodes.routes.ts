@@ -1,6 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '@villa-saas/database'
 import { getTenantId } from '@villa-saas/utils'
 
 // Schémas de validation
@@ -50,7 +49,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
   }, async (request) => {
     const tenantId = getTenantId(request)
 
-    const promoCodes = await prisma.promoCode.findMany({
+    const promoCodes = await fastify.prisma.promoCode.findMany({
       where: { tenantId },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -70,7 +69,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     const tenantId = getTenantId(request)
     const { id } = request.params as { id: string }
 
-    const promoCode = await prisma.promoCode.findFirst({
+    const promoCode = await fastify.prisma.promoCode.findFirst({
       where: { id, tenantId },
       include: {
         _count: {
@@ -100,7 +99,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     const data = validation.data
 
     // Vérifier si le code existe déjà
-    const existing = await prisma.promoCode.findUnique({
+    const existing = await fastify.prisma.promoCode.findUnique({
       where: { code: data.code }
     })
 
@@ -115,7 +114,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Vérifier que les propriétés appartiennent bien au tenant
     if (data.propertyIds && data.propertyIds.length > 0) {
-      const propertyCount = await prisma.property.count({
+      const propertyCount = await fastify.prisma.property.count({
         where: {
           id: { in: data.propertyIds },
           tenantId
@@ -127,7 +126,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
       }
     }
 
-    const promoCode = await prisma.promoCode.create({
+    const promoCode = await fastify.prisma.promoCode.create({
       data: {
         ...data,
         tenantId,
@@ -153,7 +152,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     const data = validation.data
 
     // Vérifier que le code promo existe et appartient au tenant
-    const existing = await prisma.promoCode.findFirst({
+    const existing = await fastify.prisma.promoCode.findFirst({
       where: { id, tenantId }
     })
 
@@ -171,7 +170,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Vérifier les propriétés si modifiées
     if (data.propertyIds && data.propertyIds.length > 0) {
-      const propertyCount = await prisma.property.count({
+      const propertyCount = await fastify.prisma.property.count({
         where: {
           id: { in: data.propertyIds },
           tenantId
@@ -183,7 +182,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
       }
     }
 
-    const promoCode = await prisma.promoCode.update({
+    const promoCode = await fastify.prisma.promoCode.update({
       where: { id },
       data: {
         ...data,
@@ -202,7 +201,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     const { id } = request.params as { id: string }
 
     // Vérifier que le code promo existe et appartient au tenant
-    const existing = await prisma.promoCode.findFirst({
+    const existing = await fastify.prisma.promoCode.findFirst({
       where: { id, tenantId }
     })
 
@@ -211,7 +210,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     // Vérifier s'il y a des réservations associées
-    const bookingCount = await prisma.booking.count({
+    const bookingCount = await fastify.prisma.booking.count({
       where: { promoCodeId: id }
     })
 
@@ -221,7 +220,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
       })
     }
 
-    await prisma.promoCode.delete({
+    await fastify.prisma.promoCode.delete({
       where: { id }
     })
 
@@ -241,7 +240,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
 
     const { code, propertyId, totalAmount, nights, userId } = validation.data
 
-    const promoCode = await prisma.promoCode.findFirst({
+    const promoCode = await fastify.prisma.promoCode.findFirst({
       where: {
         code,
         tenantId,
@@ -287,7 +286,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Vérifier la limite d'utilisation par utilisateur
     if (promoCode.maxUsesPerUser && userId) {
-      const userUsageCount = await prisma.booking.count({
+      const userUsageCount = await fastify.prisma.booking.count({
         where: {
           promoCodeId: promoCode.id,
           userId,
@@ -329,7 +328,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
     const tenantId = getTenantId(request)
     const { id } = request.params as { id: string }
 
-    const promoCode = await prisma.promoCode.findFirst({
+    const promoCode = await fastify.prisma.promoCode.findFirst({
       where: { id, tenantId },
       include: {
         bookings: {
@@ -354,7 +353,7 @@ export const promocodesRoutes: FastifyPluginAsync = async (fastify) => {
       code: promoCode.code,
       totalUses: promoCode.bookings.length,
       currentUses: promoCode.currentUses,
-      totalDiscountGiven: promoCode.bookings.reduce((sum, b) => sum + b.discountAmount, 0),
+      totalDiscountGiven: promoCode.bookings.reduce((sum: number, b: any) => sum + b.discountAmount, 0),
       bookings: promoCode.bookings,
       conversionRate: promoCode.maxUses 
         ? (promoCode.currentUses / promoCode.maxUses) * 100 

@@ -1,4 +1,4 @@
-import { Property } from '@villa-saas/database';
+import { Property } from '@prisma/client';
 export declare class PropertyAIService {
     /**
      * Génère le contenu searchable à partir des données de la propriété

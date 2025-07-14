@@ -146,7 +146,7 @@ class BookingService {
             return { available: false, reason: 'Property not found' };
         }
         // Trouver la durée minimum applicable
-        const applicablePeriod = property.periods.find(period => checkIn >= new Date(period.startDate) && checkIn <= new Date(period.endDate));
+        const applicablePeriod = property.periods.find((period) => checkIn >= new Date(period.startDate) && checkIn <= new Date(period.endDate));
         const minNights = applicablePeriod?.minNights || property.minNights;
         if (minNights && nights < minNights) {
             return {

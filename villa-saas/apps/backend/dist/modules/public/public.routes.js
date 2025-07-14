@@ -298,10 +298,10 @@ async function publicRoutes(fastify) {
                     select: { propertyId: true },
                     distinct: ['propertyId'],
                 });
-                const bookedPropertyIds = bookedProperties.map(b => b.propertyId);
+                const bookedPropertyIds = bookedProperties.map((b) => b.propertyId);
                 availablePropertyIds = allProperties
-                    .map(p => p.id)
-                    .filter(id => !bookedPropertyIds.includes(id));
+                    .map((p) => p.id)
+                    .filter((id) => !bookedPropertyIds.includes(id));
                 where.id = { in: availablePropertyIds };
             }
             // Compter le total
@@ -589,7 +589,7 @@ async function publicRoutes(fastify) {
             let promoCodeDiscount = 0;
             let promoCodeId = null;
             if (data.promoCode) {
-                const promoValidation = await (0, promocode_service_1.validatePromoCode)({
+                const promoValidation = await (0, promocode_service_1.validatePromoCode)(fastify.prisma, {
                     code: data.promoCode,
                     tenantId: tenant.id,
                     propertyId: data.propertyId,

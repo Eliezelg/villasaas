@@ -9,10 +9,10 @@ export type {
   PropertyStatus,
   BookingStatus,
   PaymentStatus,
-} from '@villa-saas/database';
+} from '@prisma/client';
 
 // Import for use in interfaces below
-import type { PropertyType, PropertyStatus } from '@villa-saas/database';
+import type { PropertyType, PropertyStatus } from '@prisma/client';
 
 // API Types
 export interface ApiResponse<T> {

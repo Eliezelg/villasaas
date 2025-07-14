@@ -319,10 +319,10 @@ export async function publicRoutes(fastify: FastifyInstance) {
           distinct: ['propertyId'],
         });
 
-        const bookedPropertyIds = bookedProperties.map(b => b.propertyId);
+        const bookedPropertyIds = bookedProperties.map((b: any) => b.propertyId);
         availablePropertyIds = allProperties
-          .map(p => p.id)
-          .filter(id => !bookedPropertyIds.includes(id));
+          .map((p: any) => p.id)
+          .filter((id: any) => !bookedPropertyIds.includes(id));
 
         where.id = { in: availablePropertyIds };
       }
@@ -662,7 +662,7 @@ export async function publicRoutes(fastify: FastifyInstance) {
       let promoCodeId: string | null = null;
       
       if (data.promoCode) {
-        const promoValidation = await validatePromoCode({
+        const promoValidation = await validatePromoCode(fastify.prisma, {
           code: data.promoCode,
           tenantId: tenant.id,
           propertyId: data.propertyId,

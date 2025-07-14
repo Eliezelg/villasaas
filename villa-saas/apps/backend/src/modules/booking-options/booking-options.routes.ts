@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { prisma } from '@villa-saas/database';
 import { getTenantId } from '@villa-saas/utils';
 import { 
   createBookingOptionSchema, 
@@ -18,7 +17,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
   }, async (request, reply) => {
     const tenantId = getTenantId(request);
     
-    const options = await prisma.bookingOption.findMany({
+    const options = await fastify.prisma.bookingOption.findMany({
       where: { tenantId },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }]
     });
@@ -41,7 +40,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     const { id } = validation.data;
     const tenantId = getTenantId(request);
     
-    const option = await prisma.bookingOption.findFirst({
+    const option = await fastify.prisma.bookingOption.findFirst({
       where: { id, tenantId },
       include: {
         properties: {
@@ -76,7 +75,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     
     const tenantId = getTenantId(request);
     
-    const option = await prisma.bookingOption.create({
+    const option = await fastify.prisma.bookingOption.create({
       data: {
         ...validation.data,
         tenantId
@@ -108,7 +107,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     const tenantId = getTenantId(request);
     
     // Vérifier que l'option appartient au tenant
-    const existing = await prisma.bookingOption.findFirst({
+    const existing = await fastify.prisma.bookingOption.findFirst({
       where: { id, tenantId }
     });
     
@@ -116,7 +115,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
       return reply.code(404).send({ error: 'Option not found' });
     }
     
-    const option = await prisma.bookingOption.update({
+    const option = await fastify.prisma.bookingOption.update({
       where: { id },
       data: bodyValidation.data
     });
@@ -140,7 +139,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     const tenantId = getTenantId(request);
     
     // Vérifier que l'option appartient au tenant
-    const existing = await prisma.bookingOption.findFirst({
+    const existing = await fastify.prisma.bookingOption.findFirst({
       where: { id, tenantId }
     });
     
@@ -149,7 +148,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     }
     
     // Vérifier qu'aucune réservation n'utilise cette option
-    const usedInBookings = await prisma.bookingSelectedOption.findFirst({
+    const usedInBookings = await fastify.prisma.bookingSelectedOption.findFirst({
       where: { optionId: id }
     });
     
@@ -159,7 +158,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
       });
     }
     
-    await prisma.bookingOption.delete({
+    await fastify.prisma.bookingOption.delete({
       where: { id }
     });
     
@@ -184,7 +183,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     const tenantId = getTenantId(request);
     
     // Vérifier que la propriété appartient au tenant
-    const property = await prisma.property.findFirst({
+    const property = await fastify.prisma.property.findFirst({
       where: { id: propertyId, tenantId }
     });
     
@@ -193,7 +192,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     }
     
     // Récupérer toutes les options du tenant avec leur statut pour cette propriété
-    const allOptions = await prisma.bookingOption.findMany({
+    const allOptions = await fastify.prisma.bookingOption.findMany({
       where: { tenantId, isActive: true },
       include: {
         properties: {
@@ -241,15 +240,15 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     
     // Vérifier que la propriété et l'option appartiennent au tenant
     const [property, option] = await Promise.all([
-      prisma.property.findFirst({ where: { id: propertyId, tenantId } }),
-      prisma.bookingOption.findFirst({ where: { id: optionId, tenantId } })
+      fastify.prisma.property.findFirst({ where: { id: propertyId, tenantId } }),
+      fastify.prisma.bookingOption.findFirst({ where: { id: optionId, tenantId } })
     ]);
     
     if (!property || !option) {
       return reply.code(404).send({ error: 'Property or option not found' });
     }
     
-    const propertyOption = await prisma.propertyBookingOption.upsert({
+    const propertyOption = await fastify.prisma.propertyBookingOption.upsert({
       where: {
         propertyId_optionId: {
           propertyId,
@@ -284,7 +283,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     const tenantId = getTenantId(request);
     
     // Vérifier que la propriété appartient au tenant
-    const property = await prisma.property.findFirst({
+    const property = await fastify.prisma.property.findFirst({
       where: { id: propertyId, tenantId }
     });
     
@@ -292,7 +291,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
       return reply.code(404).send({ error: 'Property not found' });
     }
     
-    await prisma.propertyBookingOption.updateMany({
+    await fastify.prisma.propertyBookingOption.updateMany({
       where: { propertyId, optionId },
       data: { isEnabled: false }
     });
@@ -308,13 +307,13 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
   }, async (request, reply) => {
     const tenantId = getTenantId(request);
     
-    let config = await prisma.paymentConfiguration.findUnique({
+    let config = await fastify.prisma.paymentConfiguration.findUnique({
       where: { tenantId }
     });
     
     // Créer une configuration par défaut si elle n'existe pas
     if (!config) {
-      config = await prisma.paymentConfiguration.create({
+      config = await fastify.prisma.paymentConfiguration.create({
         data: {
           tenantId,
           depositType: 'PERCENTAGE',
@@ -343,7 +342,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     
     const tenantId = getTenantId(request);
     
-    const config = await prisma.paymentConfiguration.upsert({
+    const config = await fastify.prisma.paymentConfiguration.upsert({
       where: { tenantId },
       create: {
         ...validation.data,
@@ -368,7 +367,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
     const tenantId = getTenantId(request);
     
     // Vérifier que la configuration existe
-    const existing = await prisma.paymentConfiguration.findUnique({
+    const existing = await fastify.prisma.paymentConfiguration.findUnique({
       where: { tenantId }
     });
     
@@ -378,7 +377,7 @@ export async function bookingOptionsRoutes(fastify: FastifyInstance) {
       });
     }
     
-    const config = await prisma.paymentConfiguration.update({
+    const config = await fastify.prisma.paymentConfiguration.update({
       where: { tenantId },
       data: validation.data
     });

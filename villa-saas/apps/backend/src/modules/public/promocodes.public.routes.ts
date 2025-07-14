@@ -42,7 +42,7 @@ export const publicPromoCodesRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { code, propertyId, checkIn, checkOut, totalAmount, nights } = validation.data
 
-      const result = await validatePromoCode({
+      const result = await validatePromoCode(fastify.prisma, {
         code,
         tenantId: tenant.id,
         propertyId,
