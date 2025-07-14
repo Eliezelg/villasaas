@@ -1,10 +1,10 @@
 {
-  "name": "villacustom-monorepo",
+  "name": "villa-saas-root",
   "version": "1.0.0",
   "private": true,
-  "description": "Villa Custom Monorepo",
   "scripts": {
-    "build:backend": "cd villa-saas/apps/backend && npm ci && npm run build",
-    "start:backend": "cd villa-saas/apps/backend && npm start"
+    "install": "cd villa-saas && npm install",
+    "build": "cd villa-saas && npm run build:backend",
+    "start": "cd villa-saas/apps/backend && npm start"
   }
 }

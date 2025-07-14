@@ -3,8 +3,11 @@ set -e
 
 echo "🚀 Building Villa SaaS Backend..."
 
-# Navigate to villa-saas directory
-cd villa-saas
+# Check if we're already in villa-saas directory
+if [ -d "villa-saas" ]; then
+    echo "📂 Navigating to villa-saas directory..."
+    cd villa-saas
+fi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
