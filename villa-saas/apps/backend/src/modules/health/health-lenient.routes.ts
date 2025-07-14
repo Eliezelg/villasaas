@@ -19,8 +19,15 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
       checks.status = 'error';
     }
 
-    // Redis check removed - optional service
-    checks.redis = 'not_configured';
+    try {
+      // Check Redis (mais ne pas faire échouer le health check)
+      await fastify.redis.ping();
+      checks.redis = 'ok';
+    } catch (error) {
+      checks.redis = 'error';
+      // NE PAS changer le status global pour Redis
+      // checks.status = 'error';
+    }
 
     const statusCode = checks.status === 'ok' ? 200 : 503;
     reply.status(statusCode).send(checks);
