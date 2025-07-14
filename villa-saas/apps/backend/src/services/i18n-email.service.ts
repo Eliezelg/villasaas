@@ -116,7 +116,7 @@ export function extractLocale(
     const acceptLanguage = headers['accept-language'];
     const languages = acceptLanguage
       .split(',')
-      .map((lang: string) => lang.split(';')[0]?.trim().toLowerCase());
+      .map((lang: string) => lang.split(';')[0]?.trim().toLowerCase() || '');
 
     for (const lang of languages) {
       const locale = lang.split('-')[0];

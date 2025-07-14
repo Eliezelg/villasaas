@@ -110,7 +110,7 @@ const websocketPlugin = async (fastify) => {
                         conversationId: data.conversationId,
                         senderId: user?.userId,
                         content: data.content,
-                        type: data.type || 'TEXT',
+                        type: (data.type || 'TEXT'),
                     },
                     include: {
                         sender: {

@@ -140,7 +140,8 @@ class PropertyAIService {
                 model: "text-embedding-3-small",
                 input: text,
             });
-            return response.data[0]?.embedding || [];
+            const embedding = response.data[0]?.embedding;
+            return embedding || [];
         }
         catch (error) {
             console.error('❌ Erreur génération embedding:', error);

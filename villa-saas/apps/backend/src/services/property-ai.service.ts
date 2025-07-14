@@ -145,7 +145,8 @@ export class PropertyAIService {
         input: text,
       });
 
-      return response.data[0]?.embedding || [];
+      const embedding = response.data[0]?.embedding;
+      return embedding || [];
     } catch (error) {
       console.error('❌ Erreur génération embedding:', error);
       // Retourner un vecteur vide en cas d'erreur pour ne pas bloquer

@@ -81,7 +81,7 @@ class S3Service {
             urls[size.name] = this.getPublicUrl(key);
         }
         return {
-            url: urls.large || urls.original || '',
+            url: urls.large || urls.original || urls.medium || urls.small || '',
             urls,
             key: baseKey,
         };

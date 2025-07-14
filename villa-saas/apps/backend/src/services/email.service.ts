@@ -1,9 +1,9 @@
 import { render } from '@react-email/components';
 import { Resend } from 'resend';
 import { FastifyInstance } from 'fastify';
-import BookingConfirmationEmail from '../emails/templates/booking-confirmation';
-import PaymentFailedEmail from '../emails/templates/payment-failed';
-import BookingCancelledEmail from '../emails/templates/booking-cancelled';
+import BookingConfirmationEmail from '../emails/templates/booking-confirmation.js';
+import PaymentFailedEmail from '../emails/templates/payment-failed.js';
+import BookingCancelledEmail from '../emails/templates/booking-cancelled.js';
 import { I18nEmailService } from './i18n-email.service';
 
 export interface EmailService {
@@ -119,14 +119,14 @@ export class ResendEmailService implements EmailService {
         guestEmail: params.to, // Ajouter l'email pour la génération du lien
       };
       
-      const emailHtml = render(BookingConfirmationEmail(templateParams));
+      const emailHtml = await render(BookingConfirmationEmail(templateParams));
       const subject = i18n.t('emails.bookingConfirmation.subject', { reference: params.bookingReference });
 
       const { data, error } = await this.resend.emails.send({
         from: this.fromEmail,
         to: params.to,
         subject,
-        html: await emailHtml,
+        html: emailHtml as string,
       });
 
       if (error) {
@@ -173,13 +173,13 @@ export class ResendEmailService implements EmailService {
   async sendPaymentFailedNotification(params: PaymentFailedParams): Promise<void> {
     try {
       const locale = params.locale || 'fr';
-      const emailHtml = render(PaymentFailedEmail({ ...params, locale }));
+      const emailHtml = await render(PaymentFailedEmail({ ...params, locale }));
 
       const { data, error } = await this.resend.emails.send({
         from: this.fromEmail,
         to: params.to,
         subject: `Échec du paiement - Réservation ${params.bookingReference}`,
-        html: await emailHtml,
+        html: emailHtml as string,
       });
 
       if (error) {
@@ -226,13 +226,13 @@ export class ResendEmailService implements EmailService {
   async sendBookingCancellation(params: BookingCancellationParams): Promise<void> {
     try {
       const locale = params.locale || 'fr';
-      const emailHtml = render(BookingCancelledEmail({ ...params, locale }));
+      const emailHtml = await render(BookingCancelledEmail({ ...params, locale }));
 
       const { data, error } = await this.resend.emails.send({
         from: this.fromEmail,
         to: params.to,
         subject: `Annulation de votre réservation ${params.bookingReference}`,
-        html: await emailHtml,
+        html: emailHtml as string,
       });
 
       if (error) {

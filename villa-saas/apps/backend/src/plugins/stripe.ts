@@ -14,7 +14,7 @@ async function stripePlugin(fastify: FastifyInstance) {
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-06-30.basil',
+    apiVersion: '2024-12-18.acacia' as any,
     typescript: true,
   });
 

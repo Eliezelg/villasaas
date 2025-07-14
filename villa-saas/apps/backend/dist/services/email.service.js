@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MockEmailService = exports.ResendEmailService = void 0;
 exports.createEmailService = createEmailService;
 const components_1 = require("@react-email/components");
-const booking_confirmation_1 = __importDefault(require("../emails/templates/booking-confirmation"));
-const payment_failed_1 = __importDefault(require("../emails/templates/payment-failed"));
-const booking_cancelled_1 = __importDefault(require("../emails/templates/booking-cancelled"));
+const booking_confirmation_js_1 = __importDefault(require("../emails/templates/booking-confirmation.js"));
+const payment_failed_js_1 = __importDefault(require("../emails/templates/payment-failed.js"));
+const booking_cancelled_js_1 = __importDefault(require("../emails/templates/booking-cancelled.js"));
 const i18n_email_service_1 = require("./i18n-email.service");
 class ResendEmailService {
     resend;
@@ -29,13 +29,13 @@ class ResendEmailService {
                 locale,
                 guestEmail: params.to, // Ajouter l'email pour la génération du lien
             };
-            const emailHtml = (0, components_1.render)((0, booking_confirmation_1.default)(templateParams));
+            const emailHtml = await (0, components_1.render)((0, booking_confirmation_js_1.default)(templateParams));
             const subject = i18n.t('emails.bookingConfirmation.subject', { reference: params.bookingReference });
             const { data, error } = await this.resend.emails.send({
                 from: this.fromEmail,
                 to: params.to,
                 subject,
-                html: await emailHtml,
+                html: emailHtml,
             });
             if (error) {
                 this.fastify.log.error({ error }, 'Failed to send booking confirmation email');
@@ -79,12 +79,12 @@ class ResendEmailService {
     async sendPaymentFailedNotification(params) {
         try {
             const locale = params.locale || 'fr';
-            const emailHtml = (0, components_1.render)((0, payment_failed_1.default)({ ...params, locale }));
+            const emailHtml = await (0, components_1.render)((0, payment_failed_js_1.default)({ ...params, locale }));
             const { data, error } = await this.resend.emails.send({
                 from: this.fromEmail,
                 to: params.to,
                 subject: `Échec du paiement - Réservation ${params.bookingReference}`,
-                html: await emailHtml,
+                html: emailHtml,
             });
             if (error) {
                 this.fastify.log.error({ error }, 'Failed to send payment failed email');
@@ -128,12 +128,12 @@ class ResendEmailService {
     async sendBookingCancellation(params) {
         try {
             const locale = params.locale || 'fr';
-            const emailHtml = (0, components_1.render)((0, booking_cancelled_1.default)({ ...params, locale }));
+            const emailHtml = await (0, components_1.render)((0, booking_cancelled_js_1.default)({ ...params, locale }));
             const { data, error } = await this.resend.emails.send({
                 from: this.fromEmail,
                 to: params.to,
                 subject: `Annulation de votre réservation ${params.bookingReference}`,
-                html: await emailHtml,
+                html: emailHtml,
             });
             if (error) {
                 this.fastify.log.error({ error }, 'Failed to send booking cancellation email');

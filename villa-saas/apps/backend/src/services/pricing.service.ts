@@ -121,8 +121,9 @@ export class PricingService {
       totalAccommodation += finalPrice;
       totalWeekendPremium += weekendPremium;
 
+      const dateStr = date.toISOString().split('T')[0];
       breakdown.push({
-        date: date.toISOString().split('T')[0] || '',
+        date: dateStr || date.toISOString(),
         basePrice,
         weekendPremium,
         finalPrice,
@@ -144,7 +145,7 @@ export class PricingService {
 
     // Vérifier la durée minimum de séjour
     const minNightsRequired = Math.max(
-      property.minNights,
+      property.minNights || 1,
       ...periods.map(p => p.minNights || 0).filter(Boolean)
     );
 

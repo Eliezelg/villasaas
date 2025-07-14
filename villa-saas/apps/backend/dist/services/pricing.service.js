@@ -65,8 +65,9 @@ class PricingService {
             const finalPrice = basePrice + weekendPremium;
             totalAccommodation += finalPrice;
             totalWeekendPremium += weekendPremium;
+            const dateStr = date.toISOString().split('T')[0];
             breakdown.push({
-                date: date.toISOString().split('T')[0] || '',
+                date: dateStr || date.toISOString(),
                 basePrice,
                 weekendPremium,
                 finalPrice,
@@ -84,7 +85,7 @@ class PricingService {
         }
         longStayDiscount = Math.round(totalAccommodation * discountRate * 100) / 100;
         // Vérifier la durée minimum de séjour
-        const minNightsRequired = Math.max(property.minNights, ...periods.map(p => p.minNights || 0).filter(Boolean));
+        const minNightsRequired = Math.max(property.minNights || 1, ...periods.map(p => p.minNights || 0).filter(Boolean));
         if (nights < minNightsRequired) {
             throw new Error(`Minimum stay is ${minNightsRequired} nights for these dates`);
         }

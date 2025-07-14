@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
 import { Server as SocketIOServer } from 'socket.io';
 
-
+// SocketData interface is defined for socket.io typing below
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -139,7 +139,7 @@ const websocketPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => 
             conversationId: data.conversationId,
             senderId: user?.userId,
             content: data.content,
-            type: data.type || 'TEXT' as any,
+            type: (data.type || 'TEXT') as any,
           },
           include: {
             sender: {

@@ -7,22 +7,22 @@ export declare function createAuthHeader(token: string): {
     authorization: string;
 };
 export declare function createTenant(prisma: PrismaClient): Promise<{
-    email: string;
-    phone: string | null;
+    name: string;
+    address: string | null;
     id: string;
+    email: string;
     createdAt: Date;
     updatedAt: Date;
-    isActive: boolean;
-    name: string;
-    companyName: string | null;
-    siret: string | null;
-    vatNumber: string | null;
-    address: string | null;
     city: string | null;
     postalCode: string | null;
     country: string;
     subdomain: string | null;
     customDomain: string | null;
+    phone: string | null;
+    isActive: boolean;
+    companyName: string | null;
+    siret: string | null;
+    vatNumber: string | null;
     settings: import("@prisma/client/runtime/library").JsonValue;
     stripeAccountId: string | null;
     stripeAccountStatus: string | null;
@@ -36,20 +36,20 @@ export declare function createTenant(prisma: PrismaClient): Promise<{
     subscriptionEndDate: Date | null;
 }>;
 export declare function createUser(prisma: PrismaClient, tenantId: string): Promise<{
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: import(".prisma/client").$Enums.UserRole;
-    phone: string | null;
+    metadata: import("@prisma/client/runtime/library").JsonValue | null;
     id: string;
+    role: import(".prisma/client").$Enums.UserRole;
+    email: string;
     createdAt: Date;
+    tenantId: string;
     updatedAt: Date;
     passwordHash: string;
+    firstName: string;
+    lastName: string;
+    phone: string | null;
     isActive: boolean;
     emailVerified: boolean;
-    tenantId: string;
     permissions: import("@prisma/client/runtime/library").JsonValue;
-    metadata: import("@prisma/client/runtime/library").JsonValue | null;
 }>;
 export declare function generateToken(app: FastifyInstance, payload: {
     id: string;
