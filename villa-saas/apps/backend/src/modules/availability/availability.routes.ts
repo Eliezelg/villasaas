@@ -322,7 +322,12 @@ export default async function availabilityRoutes(fastify: FastifyInstance) {
         return reply.code(400).send({ error: 'Check-out must be after check-in' });
       }
 
-      const conflicts = [];
+      const conflicts: Array<{
+        type: 'booking' | 'blocked';
+        id: string;
+        startDate: string;
+        endDate: string;
+      }> = [];
 
       // Vérifier les réservations existantes
       const bookingWhere: any = {
@@ -516,7 +521,13 @@ export default async function availabilityRoutes(fastify: FastifyInstance) {
       });
 
       // Construire le calendrier jour par jour
-      const dates = [];
+      const dates: Array<{
+        date: string | undefined;
+        available: boolean;
+        price: number | undefined;
+        minNights: number | undefined;
+        reason: 'blocked' | 'booked' | 'past' | undefined;
+      }> = [];
       const current = new Date(start);
       const today = new Date();
       today.setHours(0, 0, 0, 0);

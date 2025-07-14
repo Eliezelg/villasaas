@@ -184,7 +184,13 @@ export class AnalyticsService {
     ]);
 
     // Calculate monthly occupancy
-    const monthlyData = [];
+    const monthlyData: Array<{
+      month: string;
+      year: number;
+      occupiedDays: number;
+      totalDays: number;
+      occupancyRate: number;
+    }> = [];
     let currentMonth = new Date(dateRange.startDate);
     
     while (currentMonth <= dateRange.endDate) {
@@ -268,7 +274,12 @@ export class AnalyticsService {
     });
 
     // Calculate monthly revenue
-    const monthlyData = [];
+    const monthlyData: Array<{
+      month: string;
+      year: number;
+      revenue: number;
+      bookings: number;
+    }> = [];
     let currentMonth = new Date(dateRange.startDate);
     
     while (currentMonth <= dateRange.endDate) {

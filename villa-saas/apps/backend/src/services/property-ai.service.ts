@@ -81,7 +81,7 @@ export class PropertyAIService {
     }
 
     // Capacité
-    const capacity = [];
+    const capacity: string[] = [];
     if (property.bedrooms) capacity.push(`${property.bedrooms} chambres`);
     if (property.bathrooms) capacity.push(`${property.bathrooms} salles de bain`);
     if (property.maxGuests) capacity.push(`${property.maxGuests} personnes maximum`);

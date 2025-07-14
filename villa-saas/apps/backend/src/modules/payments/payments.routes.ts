@@ -335,7 +335,14 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       }
 
       // Si la réservation a un payment intent, récupérer les détails depuis Stripe
-      let paymentDetails = null;
+      let paymentDetails: {
+        id: string;
+        amount: number;
+        currency: string;
+        status: string;
+        created: Date;
+        paymentMethod: string | null;
+      } | null = null;
       if (booking.stripePaymentId) {
         try {
           const paymentIntent = await fastify.stripe.paymentIntents.retrieve(booking.stripePaymentId);
@@ -345,7 +352,9 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
             currency: paymentIntent.currency,
             status: paymentIntent.status,
             created: new Date(paymentIntent.created * 1000),
-            paymentMethod: paymentIntent.payment_method,
+            paymentMethod: typeof paymentIntent.payment_method === 'string' 
+              ? paymentIntent.payment_method 
+              : paymentIntent.payment_method?.id || null,
           };
         } catch (stripeError) {
           fastify.log.error(stripeError, 'Failed to retrieve payment intent from Stripe');

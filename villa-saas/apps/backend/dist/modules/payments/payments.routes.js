@@ -335,7 +335,9 @@ async function paymentsRoutes(fastify) {
                         currency: paymentIntent.currency,
                         status: paymentIntent.status,
                         created: new Date(paymentIntent.created * 1000),
-                        paymentMethod: paymentIntent.payment_method,
+                        paymentMethod: typeof paymentIntent.payment_method === 'string'
+                            ? paymentIntent.payment_method
+                            : paymentIntent.payment_method?.id || null,
                     };
                 }
                 catch (stripeError) {
