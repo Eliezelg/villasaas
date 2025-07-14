@@ -12,7 +12,6 @@
   "keywords": ["i18n", "internationalization", "villa-saas"],
   "author": "Villa SaaS",
   "license": "MIT",
-  "type": "module",
   "devDependencies": {
     "typescript": "^5.3.3"
   }
