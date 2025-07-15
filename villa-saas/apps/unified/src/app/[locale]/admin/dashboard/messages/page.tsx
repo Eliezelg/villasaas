@@ -33,7 +33,7 @@ function MessagesContent() {
   }, [user]);
 
   useEffect(() => {
-    // Si un ID de conversation est passé en paramètre, le charger
+    // Si un ID de conversation est passé en paramètre, le charger 
     if (conversationId && !selectedConversation) {
       loadConversation(conversationId);
     }
