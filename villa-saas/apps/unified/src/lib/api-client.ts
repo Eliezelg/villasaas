@@ -89,6 +89,7 @@ class ApiClient {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({}), // Fastify requires a body for JSON content-type
       });
 
       return response.ok;
