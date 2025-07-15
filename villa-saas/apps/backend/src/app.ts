@@ -5,6 +5,7 @@ import rateLimit from '@fastify/rate-limit';
 import jwt from '@fastify/jwt';
 import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart';
+import rawBody from 'fastify-raw-body';
 
 import { errorHandler } from './utils/error-handler';
 import authPlugin from './plugins/auth';
@@ -149,6 +150,15 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       fileSize: 10 * 1024 * 1024, // 10MB
       files: 10, // Max 10 files per request
     },
+  });
+
+  // Register raw body plugin for Stripe webhooks
+  await app.register(rawBody, {
+    field: 'rawBody',
+    global: false,
+    encoding: 'utf8',
+    runFirst: true,
+    routes: ['/api/public/stripe/webhook', '/api/public/stripe/subscription-webhook']
   });
 
   // Register Swagger before routes

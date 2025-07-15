@@ -5,7 +5,7 @@ import { getTenantId } from '@villa-saas/utils'
 import { DomainRegistrarService } from '../../services/domain-registrar.service'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-06-30.basil'
+  apiVersion: '2025-06-30.basil' as any
 })
 
 // Schémas de validation
