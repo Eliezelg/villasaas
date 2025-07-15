@@ -115,7 +115,10 @@ export async function middleware(request: NextRequest) {
     // Si ce n'est pas le domaine principal, c'est un domaine personnalisé
     const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'location.com'
     
-    if (hostname !== mainDomain && !hostname.endsWith(`.${mainDomain}`)) {
+    // Ignorer les domaines Vercel preview
+    const isVercelPreview = hostname.endsWith('.vercel.app') && hostname !== mainDomain
+    
+    if (hostname !== mainDomain && !hostname.endsWith(`.${mainDomain}`) && !isVercelPreview) {
       // C'est un domaine personnalisé, chercher le tenant
       const cached = tenantCache.get(hostname)
       if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
