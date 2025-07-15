@@ -19,15 +19,8 @@ async function healthRoutes(fastify) {
             checks.database = 'error';
             checks.status = 'error';
         }
-        try {
-            // Check Redis
-            await fastify.redis.ping();
-            checks.redis = 'ok';
-        }
-        catch (error) {
-            checks.redis = 'error';
-            checks.status = 'error';
-        }
+        // Redis check removed - optional service
+        checks.redis = 'not_configured';
         const statusCode = checks.status === 'ok' ? 200 : 503;
         reply.status(statusCode).send(checks);
     });
