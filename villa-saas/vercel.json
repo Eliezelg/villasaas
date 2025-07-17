@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd apps/unified && npm run build",
+  "outputDirectory": "apps/unified/.next",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
