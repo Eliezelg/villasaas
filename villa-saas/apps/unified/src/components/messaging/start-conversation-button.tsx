@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { MessageSquare, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@villa-saas/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+} from '@villa-saas/ui/dialog';
+import { Input } from '@villa-saas/ui/input';
+import { Label } from '@villa-saas/ui/label';
+import { Textarea } from '@villa-saas/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { messagingService } from '@/services/messaging.service';
 import { useAuthStore } from '@/store/auth.store';

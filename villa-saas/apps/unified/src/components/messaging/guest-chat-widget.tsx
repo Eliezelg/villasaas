@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@villa-saas/ui/button';
+import { Input } from '@villa-saas/ui/input';
+import { Card } from '@villa-saas/ui/card';
+import { ScrollArea } from '@villa-saas/ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@villa-saas/ui/dialog';
+import { Label } from '@villa-saas/ui/label';
+import { Textarea } from '@villa-saas/ui/textarea';
 import { messagingService } from '@/services/messaging.service';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
