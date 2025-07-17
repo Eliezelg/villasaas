@@ -1,5 +1,6 @@
 {
-  "buildCommand": "bash scripts/build-vercel.sh",
+  "buildCommand": "cd packages/database && npx prisma generate && cd ../../apps/unified && npm run build",
   "outputDirectory": "apps/unified/.next",
+  "installCommand": "npm ci",
   "framework": "nextjs"
 }
