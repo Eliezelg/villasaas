@@ -11,7 +11,7 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
     };
 
     try {
-      // Check database  
+      // Check database
       await fastify.prisma.$queryRaw`SELECT 1`;
       checks.database = 'ok';
     } catch (error) {
