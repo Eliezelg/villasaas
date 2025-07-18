@@ -11,6 +11,7 @@ const rate_limit_1 = __importDefault(require("@fastify/rate-limit"));
 const jwt_1 = __importDefault(require("@fastify/jwt"));
 const cookie_1 = __importDefault(require("@fastify/cookie"));
 const multipart_1 = __importDefault(require("@fastify/multipart"));
+const fastify_raw_body_1 = __importDefault(require("fastify-raw-body"));
 const error_handler_1 = require("./utils/error-handler");
 const auth_1 = __importDefault(require("./plugins/auth"));
 const prisma_1 = __importDefault(require("./plugins/prisma"));
@@ -141,6 +142,14 @@ async function buildApp(opts = {}) {
             fileSize: 10 * 1024 * 1024, // 10MB
             files: 10, // Max 10 files per request
         },
+    });
+    // Register raw body plugin for Stripe webhooks
+    await app.register(fastify_raw_body_1.default, {
+        field: 'rawBody',
+        global: false,
+        encoding: 'utf8',
+        runFirst: true,
+        routes: ['/api/public/stripe/webhook', '/api/public/stripe/subscription-webhook']
     });
     // Register Swagger before routes
     await app.register(swagger_1.default);
