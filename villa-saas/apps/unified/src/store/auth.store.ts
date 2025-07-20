@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
           accessToken: string;
           refreshToken: string;
           expiresIn: number;
-        }>('/api/auth/refresh', {});
+        }>('/api/auth/refresh');
 
         if (error || !data) {
           set({

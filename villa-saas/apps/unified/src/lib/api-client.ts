@@ -86,10 +86,8 @@ class ApiClient {
       const response = await fetch(`${API_URL}/api/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({}), // Fastify requires a body for JSON content-type
+        // No Content-Type header needed since we're not sending a body
+        // The refresh token is sent via cookies
       });
 
       return response.ok;

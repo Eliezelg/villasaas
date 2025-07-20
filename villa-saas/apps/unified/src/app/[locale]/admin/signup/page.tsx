@@ -471,7 +471,8 @@ function SignupPageContent() {
           description: "Votre compte a été créé avec succès",
         });
 
-        // Rediriger vers l'onboarding
+        // Forcer un rechargement complet de la page pour s'assurer que les cookies sont bien pris en compte
+        // Cela permettra au middleware de détecter correctement l'authentification
         window.location.href = `/${locale}/admin/dashboard/onboarding`;
       }
     } catch (error) {

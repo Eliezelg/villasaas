@@ -377,18 +377,20 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
     });
 
     // Définir les cookies
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     reply.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax', // 'lax' en dev pour permettre cross-port
       path: '/',
       maxAge: 15 * 60 * 1000,
     });
 
     reply.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax', // 'lax' en dev pour permettre cross-port
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });

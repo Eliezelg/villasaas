@@ -524,17 +524,6 @@ export async function subscriptionsRoutes(fastify: FastifyInstance) {
     config: {
       rawBody: true,
     },
-    preValidation: async (request) => {
-      // Capturer le raw body pour la validation de signature
-      const chunks: Buffer[] = [];
-      request.raw.on('data', (chunk) => chunks.push(chunk));
-      await new Promise((resolve) => {
-        request.raw.on('end', () => {
-          (request as any).rawBody = Buffer.concat(chunks).toString('utf8');
-          resolve(true);
-        });
-      });
-    },
     schema: {
       description: 'Webhook Stripe pour les événements d\'abonnement',
       tags: ['subscriptions', 'webhooks'],
@@ -552,7 +541,7 @@ export async function subscriptionsRoutes(fastify: FastifyInstance) {
 
     try {
       event = fastify.stripe.webhooks.constructEvent(
-        (request as any).rawBody as string,
+        request.rawBody,
         sig,
         webhookSecret
       );

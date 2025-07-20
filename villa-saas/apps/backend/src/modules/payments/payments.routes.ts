@@ -607,17 +607,6 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       // Désactiver le parsing JSON car Stripe envoie du raw body
       rawBody: true,
     },
-    preValidation: async (request) => {
-      // Capturer le raw body pour la validation de signature
-      const chunks: Buffer[] = [];
-      request.raw.on('data', (chunk) => chunks.push(chunk));
-      await new Promise((resolve) => {
-        request.raw.on('end', () => {
-          (request as any).rawBody = Buffer.concat(chunks).toString('utf8');
-          resolve(true);
-        });
-      });
-    },
     schema: {
       description: 'Webhook Stripe pour les événements de paiement',
       tags: ['public', 'payments'],
@@ -641,7 +630,7 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
     try {
       // Vérifier la signature du webhook avec le raw body capturé
       event = fastify.stripe.webhooks.constructEvent(
-        (request as any).rawBody as string,
+        request.rawBody,
         sig,
         webhookSecret
       );

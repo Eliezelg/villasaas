@@ -26,9 +26,8 @@ export function useAuthRefresh() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          // No Content-Type header needed since we're not sending a body
+          // The refresh token is sent via cookies
         });
 
         if (!response.ok) {
@@ -40,14 +39,19 @@ export function useAuthRefresh() {
       }
     };
 
-    // Initial refresh after mount
-    refreshToken();
+    // Don't refresh immediately after mount - wait a bit to avoid conflicts with initial auth
+    const initialTimeout = setTimeout(() => {
+      refreshToken();
+    }, 5000); // 5 second delay
 
     // Set up interval for automatic refresh
     intervalRef.current = setInterval(refreshToken, REFRESH_INTERVAL);
 
     // Cleanup on unmount
     return () => {
+      if (initialTimeout) {
+        clearTimeout(initialTimeout);
+      }
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
