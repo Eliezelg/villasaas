@@ -125,15 +125,9 @@ class AuthService {
             }
             if (attempts > 5) {
                 // Log de sécurité
-                await this.fastify.prisma.auditLog.create({
-                    data: {
-                        action: 'auth.login.blocked',
-                        entity: 'user',
-                        details: { email, ip: ipAddress, attempts },
-                        ip: ipAddress,
-                        tenantId: 'system', // Log système
-                    }
-                });
+                // Pour les logs système sans tenant associé, on omet le tenantId
+                // Note: Il faudrait idéalement modifier le schéma pour rendre tenantId optionnel
+                this.fastify.log.warn('Login blocked - too many attempts', { email, ip: ipAddress, attempts });
                 throw new Error('Too many failed attempts. Please try again later.');
             }
         }
@@ -145,15 +139,8 @@ class AuthService {
         if (!user) {
             // Log d'échec de connexion
             if (ipAddress) {
-                await this.fastify.prisma.auditLog.create({
-                    data: {
-                        action: 'auth.login.failed',
-                        entity: 'user',
-                        details: { email, reason: 'user_not_found' },
-                        ip: ipAddress,
-                        tenantId: 'system',
-                    }
-                });
+                // Log d'échec sans tenant car l'utilisateur n'existe pas
+                this.fastify.log.warn('Login failed - user not found', { email, ip: ipAddress });
             }
             throw new Error('Invalid credentials');
         }
@@ -243,13 +230,9 @@ class AuthService {
         });
         if (!storedToken || storedToken.expiresAt < new Date()) {
             // Log de sécurité pour token invalide
-            await this.fastify.prisma.auditLog.create({
-                data: {
-                    action: 'auth.refresh.failed',
-                    entity: 'refresh_token',
-                    details: { reason: !storedToken ? 'token_not_found' : 'token_expired' },
-                    tenantId: 'system',
-                }
+            // Log de sécurité pour token invalide
+            this.fastify.log.warn('Refresh token failed', {
+                reason: !storedToken ? 'token_not_found' : 'token_expired'
             });
             throw new Error('Invalid refresh token');
         }
