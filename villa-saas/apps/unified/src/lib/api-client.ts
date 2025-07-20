@@ -25,6 +25,7 @@ class ApiClient {
 
     // Only set Content-Type for JSON requests
     // Don't set it for FormData - the browser will set it with the boundary
+    // Don't set it for requests without body (like refresh token)
     if (options.body && !headers['Content-Type'] && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
     }

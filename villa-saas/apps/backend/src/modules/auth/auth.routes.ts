@@ -237,6 +237,12 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
+    preHandler: async (request, reply) => {
+      // Si pas de body et Content-Type JSON, on force un body vide
+      if (!request.body && request.headers['content-type']?.includes('application/json')) {
+        request.body = {};
+      }
+    },
   }, async (request, reply) => {
     try {
       // Récupérer le refresh token depuis le cookie, le body ou les headers
