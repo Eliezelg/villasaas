@@ -628,6 +628,12 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
     let event: Stripe.Event;
 
     try {
+      // Vérifier que le rawBody existe
+      if (!request.rawBody) {
+        fastify.log.error('Missing raw body in request');
+        return reply.code(400).send({ error: 'Missing request body' });
+      }
+
       // Vérifier la signature du webhook avec le raw body capturé
       event = fastify.stripe.webhooks.constructEvent(
         request.rawBody,

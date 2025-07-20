@@ -540,6 +540,12 @@ export async function subscriptionsRoutes(fastify: FastifyInstance) {
     let event: Stripe.Event;
 
     try {
+      // Vérifier que le rawBody existe
+      if (!request.rawBody) {
+        fastify.log.error('Missing raw body in request');
+        return reply.code(400).send({ error: 'Missing request body' });
+      }
+
       event = fastify.stripe.webhooks.constructEvent(
         request.rawBody,
         sig,
