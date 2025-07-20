@@ -29,12 +29,7 @@ const updatePlanSchema = z.object({
 
 const completeSignupSchema = z.object({
   sessionToken: z.string(),
-  propertyName: z.string().min(1),
-  domainType: z.enum(['subdomain', 'custom']),
-  subdomain: z.string().optional(),
-  customDomain: z.string().optional(),
-  propertyType: z.enum(['APARTMENT', 'HOUSE', 'VILLA', 'STUDIO', 'LOFT', 'CHALET', 'BUNGALOW', 'MOBILE_HOME', 'BOAT', 'OTHER']),
-  description: z.record(z.string()), // Multilingue
+  // Plus besoin des champs de propriété - elle sera créée pendant l'onboarding
 });
 
 export async function signupSessionRoutes(fastify: FastifyInstance) {
@@ -228,7 +223,7 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ error: validation.error });
     }
 
-    const { sessionToken, propertyName, domainType, subdomain, customDomain, propertyType, description } = validation.data;
+    const { sessionToken } = validation.data;
 
     // Récupérer la session complète
     const session = await fastify.prisma.signupSession.findUnique({
@@ -298,13 +293,13 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
     // Commencer une transaction pour créer tout en une fois
     const result = await fastify.prisma.$transaction(async (prisma) => {
       // 1. Créer le tenant
-      const tenantSubdomain = domainType === 'subdomain' ? subdomain : `tenant-${Date.now()}`;
+      const tenantSubdomain = `tenant-${Date.now()}`; // Subdomain temporaire, sera changé pendant l'onboarding
       const tenant = await prisma.tenant.create({
         data: {
-          name: session.companyName || propertyName,
+          name: session.companyName || `${session.firstName} ${session.lastName}`.trim() || 'Ma société',
           email: session.email,
-          subdomain: tenantSubdomain!,
-          customDomain: domainType === 'custom' ? customDomain : null,
+          subdomain: tenantSubdomain,
+          customDomain: null,
           isActive: true,
           settings: {},
           address: session.address,
@@ -333,33 +328,12 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
         },
       });
 
-      // 3. Créer la première propriété
-      const property = await prisma.property.create({
-        data: {
-          tenantId: tenant.id,
-          name: propertyName,
-          slug: propertyName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-          propertyType,
-          status: 'DRAFT',
-          description,
-          address: session.address || '',
-          city: session.city || '',
-          postalCode: session.postalCode || '',
-          country: session.country || 'FR',
-          bedrooms: 1,
-          bathrooms: 1,
-          maxGuests: 2,
-          basePrice: 100,
-          minNights: 1,
-        },
-      });
-
-      // 4. Supprimer la session temporaire
+      // 3. Supprimer la session temporaire
       await prisma.signupSession.delete({
         where: { id: session.id },
       });
 
-      // 5. Log d'audit
+      // 4. Log d'audit
       await prisma.auditLog.create({
         data: {
           tenantId: tenant.id,
@@ -370,14 +344,13 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
           details: {
             email: user.email,
             plan: session.selectedPlan,
-            propertyId: property.id,
           },
           ip: request.ip,
           userAgent: request.headers['user-agent'],
         },
       });
 
-      return { user, tenant, property };
+      return { user, tenant };
     });
 
     // Créer les tokens d'authentification (en dehors de la transaction)
@@ -436,11 +409,6 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
         name: result.tenant.name,
         subdomain: result.tenant.subdomain,
         customDomain: result.tenant.customDomain,
-      },
-      property: {
-        id: result.property.id,
-        name: result.property.name,
-        slug: result.property.slug,
       },
     });
   });
