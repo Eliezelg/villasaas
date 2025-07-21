@@ -245,6 +245,10 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
   }, async (request, reply) => {
     try {
+      // Log pour debug
+      console.log('Refresh endpoint - Cookies:', request.cookies);
+      console.log('Refresh endpoint - Headers:', request.headers);
+      
       // Récupérer le refresh token depuis le cookie, le body ou les headers
       let refreshToken = request.cookies?.refresh_token;
       
