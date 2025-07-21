@@ -237,7 +237,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         },
       },
     },
-    preHandler: async (request, reply) => {
+    preHandler: async (request, _reply) => {
       // Si pas de body et Content-Type JSON, on force un body vide
       if (!request.body && request.headers['content-type']?.includes('application/json')) {
         request.body = {};
