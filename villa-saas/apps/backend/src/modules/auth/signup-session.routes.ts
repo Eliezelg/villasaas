@@ -382,7 +382,7 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
     reply.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax', // 'lax' en dev pour permettre cross-port
+      sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
       path: '/',
       maxAge: 15 * 60 * 1000,
     });
@@ -390,7 +390,7 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
     reply.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax', // 'lax' en dev pour permettre cross-port
+      sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });

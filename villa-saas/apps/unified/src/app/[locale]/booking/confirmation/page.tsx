@@ -40,6 +40,7 @@ function BookingConfirmationPageContent() {
   const [status, setStatus] = useState<PaymentStatus>('processing')
   const [booking, setBooking] = useState<BookingData | null>(null)
   const [loadingBooking, setLoadingBooking] = useState(false)
+  const [pollingAttempts, setPollingAttempts] = useState(0)
 
   useEffect(() => {
     // Récupérer les paramètres de retour Stripe
@@ -66,12 +67,40 @@ function BookingConfirmationPageContent() {
 
     // Récupérer les informations de la réservation si le paiement a réussi
     if (paymentIntent && (redirectStatus === 'succeeded' || redirectStatus === 'processing')) {
-      fetchBookingByPaymentIntent(paymentIntent)
+      // Attendre un peu avant la première tentative pour laisser le temps au webhook de traiter
+      setTimeout(() => {
+        fetchBookingByPaymentIntent(paymentIntent)
+      }, 1500) // Attendre 1.5 secondes
+      
+      // Si le statut est "processing" ou "succeeded", on fait du polling pour attendre la confirmation
+      const pollInterval = setInterval(async () => {
+        setPollingAttempts(prev => {
+          const newCount = prev + 1
+          // Arrêter le polling après 20 tentatives (60 secondes)
+          if (newCount >= 20) {
+            clearInterval(pollInterval)
+          }
+          return newCount
+        })
+        
+        const found = await fetchBookingByPaymentIntent(paymentIntent, true)
+        
+        // Arrêter le polling si on trouve la réservation confirmée
+        if (found && booking?.status === 'CONFIRMED') {
+          clearInterval(pollInterval)
+        }
+      }, 3000) // Vérifier toutes les 3 secondes
+      
+      // Nettoyer l'intervalle quand le composant est démonté
+      return () => clearInterval(pollInterval)
     }
   }, [searchParams])
 
-  const fetchBookingByPaymentIntent = async (paymentIntentId: string) => {
-    setLoadingBooking(true)
+  const fetchBookingByPaymentIntent = async (paymentIntentId: string, isPolling = false) => {
+    if (!isPolling) {
+      setLoadingBooking(true)
+    }
+    
     try {
       const { data, error } = await apiClient.get<BookingData>(
         `/api/public/bookings/by-payment-intent/${paymentIntentId}`
@@ -79,13 +108,22 @@ function BookingConfirmationPageContent() {
       
       if (data) {
         setBooking(data)
+        // Si on trouve la réservation et qu'elle est confirmée, on arrête le polling
+        if (data.status === 'CONFIRMED' && data.paymentStatus === 'PAID') {
+          setStatus('succeeded')
+        }
+        return true // Booking trouvé
       } else if (error) {
         console.error('Failed to fetch booking:', error)
+        return false
       }
     } catch (error) {
       console.error('Error fetching booking:', error)
+      return false
     } finally {
-      setLoadingBooking(false)
+      if (!isPolling) {
+        setLoadingBooking(false)
+      }
     }
   }
 
@@ -150,7 +188,7 @@ function BookingConfirmationPageContent() {
             <CardContent className="text-center">
               <p className="mb-8 text-muted-foreground">{config.message}</p>
 
-              {status === 'succeeded' && booking && (
+              {(status === 'succeeded' || status === 'processing') && booking && (
                 <>
                   {/* Code de réservation */}
                   <div className="mb-6 rounded-lg bg-primary/10 p-6">
@@ -215,14 +253,23 @@ function BookingConfirmationPageContent() {
                 </>
               )}
 
-              {status === 'succeeded' && !booking && !loadingBooking && (
-                <div className="mb-8 rounded-lg bg-muted p-4">
-                  <h3 className="mb-2 font-medium">Prochaines étapes :</h3>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>• Vérifiez votre boîte email pour la confirmation</li>
-                    <li>• Vous recevrez les détails d'accès 48h avant votre arrivée</li>
-                    <li>• N'hésitez pas à nous contacter si vous avez des questions</li>
-                  </ul>
+              {(status === 'succeeded' || status === 'processing') && !booking && !loadingBooking && (
+                <div className="mb-8">
+                  {pollingAttempts > 0 && pollingAttempts < 20 && (
+                    <div className="mb-4 rounded-lg bg-blue-50 p-4 text-blue-800">
+                      <p className="text-sm">
+                        Nous récupérons les détails de votre réservation... Cela peut prendre quelques instants.
+                      </p>
+                    </div>
+                  )}
+                  <div className="rounded-lg bg-muted p-4">
+                    <h3 className="mb-2 font-medium">Prochaines étapes :</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>• Vérifiez votre boîte email pour la confirmation</li>
+                      <li>• Vous recevrez les détails d'accès 48h avant votre arrivée</li>
+                      <li>• N'hésitez pas à nous contacter si vous avez des questions</li>
+                    </ul>
+                  </div>
                 </div>
               )}
 
@@ -232,7 +279,7 @@ function BookingConfirmationPageContent() {
                     Retour à l'accueil
                   </Button>
                 </Link>
-                {status === 'succeeded' && booking && (
+                {(status === 'succeeded' || status === 'processing') && booking && (
                   <Link href={`/my-booking/${booking.reference}`}>
                     <Button variant="outline">
                       Accéder à ma réservation

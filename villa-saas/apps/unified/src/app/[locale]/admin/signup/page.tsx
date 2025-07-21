@@ -19,7 +19,8 @@ import {
   CreditCard,
   CheckCircle2,
   Star,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -139,6 +140,7 @@ function SignupPageContent() {
     country: 'FR',
   });
   const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Récupérer le token de session et le step depuis l'URL
   useEffect(() => {
@@ -436,6 +438,7 @@ function SignupPageContent() {
     
     if (sessionId && token) {
       // Finaliser la création du compte après le paiement
+      setIsProcessingPayment(true);
       handlePaymentComplete();
     }
   }, [searchParams]);
@@ -471,9 +474,8 @@ function SignupPageContent() {
           description: "Votre compte a été créé avec succès",
         });
 
-        // Forcer un rechargement complet de la page pour s'assurer que les cookies sont bien pris en compte
-        // Cela permettra au middleware de détecter correctement l'authentification
-        window.location.href = `/${locale}/admin/dashboard/onboarding`;
+        // Rediriger vers la page de confirmation
+        router.push(`/${locale}/admin/signup/confirmation`);
       }
     } catch (error) {
       console.error('Payment completion error:', error);
@@ -486,6 +488,25 @@ function SignupPageContent() {
       setIsLoading(false);
     }
   };
+
+  // Afficher un écran de chargement pendant le traitement du paiement
+  if (isProcessingPayment) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+        <Card className="max-w-md w-full shadow-xl mx-4">
+          <CardContent className="text-center py-12">
+            <Loader2 className="h-12 w-12 text-purple-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Finalisation de votre inscription...</h2>
+            <p className="text-gray-600">
+              Nous vérifions votre paiement et créons votre compte.
+              <br />
+              Cela ne prendra que quelques instants.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">

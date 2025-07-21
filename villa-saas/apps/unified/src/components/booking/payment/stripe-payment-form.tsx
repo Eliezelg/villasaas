@@ -34,10 +34,19 @@ export function StripePaymentForm({ amount, currency, onSuccess, onError }: Stri
     setError(null)
 
     // Confirmer le paiement
+    // Construire l'URL de retour avec les paramètres nécessaires
+    const returnUrl = new URL(`${window.location.origin}/booking/confirmation`)
+    
+    // Préserver les paramètres importants de l'URL actuelle
+    const currentUrl = new URL(window.location.href)
+    if (currentUrl.searchParams.has('tenant')) {
+      returnUrl.searchParams.set('tenant', currentUrl.searchParams.get('tenant')!)
+    }
+    
     const { error: confirmError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/booking/confirmation`,
+        return_url: returnUrl.toString(),
         // On peut aussi gérer la confirmation sans redirection
         // redirect: 'if_required',
       },

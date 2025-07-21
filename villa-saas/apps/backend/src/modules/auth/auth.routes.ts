@@ -110,7 +110,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
         path: '/',
         maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
@@ -118,7 +118,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
@@ -193,7 +193,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
+        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production // 'lax' pour dev pour permettre cross-port
         path: '/',
         maxAge: 2 * 60 * 60 * 1000, // 2 hours en millisecondes
       });
@@ -201,7 +201,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
+        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production // 'lax' pour dev pour permettre cross-port
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours en millisecondes
       });
@@ -274,7 +274,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('access_token', result.accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
         path: '/',
         maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
@@ -282,7 +282,7 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       reply.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
+        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
@@ -298,14 +298,27 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
   });
 
   // Logout
-  fastify.post('/logout', {
-    preHandler: [fastify.authenticate],
-  }, async (request, reply) => {
-    await authService.logout(request.user!.userId);
+  fastify.post('/logout', async (request, reply) => {
+    // Si l'utilisateur est authentifié, on le déconnecte côté serveur
+    if (request.user?.userId) {
+      await authService.logout(request.user.userId);
+    }
     
-    // Supprimer les cookies
-    reply.clearCookie('access_token', { path: '/' });
-    reply.clearCookie('refresh_token', { path: '/' });
+    // Dans tous les cas, on supprime les cookies
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    reply.clearCookie('access_token', { 
+      path: '/',
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax'
+    });
+    reply.clearCookie('refresh_token', { 
+      path: '/',
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax'
+    });
     
     reply.send({ message: 'Logged out successfully' });
   });
