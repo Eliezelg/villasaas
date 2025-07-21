@@ -181,6 +181,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // Routes
   await app.register(healthRoutes, { prefix: '/health' });
   await app.register(authRoutes, { prefix: '/api/auth' });
+  await app.register(import('./modules/auth/debug.routes'), { prefix: '/api/auth' });
   await app.register(authSignupRoutes, { prefix: '/api' });
   await app.register(signupSessionRoutes, { prefix: '/api' });
   await app.register(tenantRoutes, { prefix: '/api/tenants' });

@@ -190,9 +190,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       const validatedData = loginSchema.parse(request.body);
       const result = await authService.login(validatedData, request.ip);
       
-      console.log('Login - Setting cookies, NODE_ENV:', process.env.NODE_ENV);
-      console.log('Login - Origin:', request.headers.origin);
-      
       // Définir les cookies sécurisés pour les tokens
       const isProduction = process.env.NODE_ENV === 'production';
       
@@ -214,9 +211,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
         ...cookieOptions,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
-      
-      console.log('Login - Cookie options:', cookieOptions);
-      console.log('Login - Response headers:', reply.getHeaders());
       
       // Ne pas envoyer les tokens dans la réponse JSON
       const { accessToken, refreshToken, ...responseData } = result;
@@ -257,10 +251,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
   }, async (request, reply) => {
     try {
-      console.log('Refresh - Cookies received:', request.cookies);
-      console.log('Refresh - Origin:', request.headers.origin);
-      console.log('Refresh - Cookie header:', request.headers.cookie);
-      
       // Récupérer le refresh token depuis le cookie, le body ou les headers
       let refreshToken = request.cookies?.refresh_token;
       
