@@ -65,7 +65,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       // Configuration pour la production
       const prodOrigins = process.env.NODE_ENV === 'production' ? [
         process.env.FRONTEND_URL,
-        ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || [])
+        ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || []),
+        // Ajouter explicitement les domaines Vercel
+        'https://villasaas-eight.vercel.app',
+        'https://villasaas-a4wtdk312-villa-saas.vercel.app',
+        /^https:\/\/villasaas.*\.vercel\.app$/
       ].filter(Boolean) : [];
       
       const allowedOrigins = [...devOrigins, ...prodOrigins];

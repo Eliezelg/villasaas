@@ -107,19 +107,22 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       // Définir les cookies sécurisés pour les tokens
       const isProduction = process.env.NODE_ENV === 'production';
       
-      reply.cookie('access_token', result.accessToken, {
+      // Configuration des cookies pour cross-domain
+      const cookieOptions = {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
+        secure: isProduction, // HTTPS requis en production
+        sameSite: isProduction ? 'none' as const : 'lax' as const, // 'none' permet cross-domain avec secure=true
         path: '/',
+        // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+      };
+      
+      reply.cookie('access_token', result.accessToken, {
+        ...cookieOptions,
         maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
       
       reply.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
-        path: '/',
+        ...cookieOptions,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
       
@@ -190,20 +193,23 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       // Définir les cookies sécurisés pour les tokens
       const isProduction = process.env.NODE_ENV === 'production';
       
-      reply.cookie('access_token', result.accessToken, {
+      // Configuration des cookies pour cross-domain
+      const cookieOptions = {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production // 'lax' pour dev pour permettre cross-port
+        secure: isProduction, // HTTPS requis en production
+        sameSite: isProduction ? 'none' as const : 'lax' as const, // 'none' permet cross-domain avec secure=true
         path: '/',
-        maxAge: 2 * 60 * 60 * 1000, // 2 hours en millisecondes
+        // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+      };
+      
+      reply.cookie('access_token', result.accessToken, {
+        ...cookieOptions,
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
       
       reply.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production // 'lax' pour dev pour permettre cross-port
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours en millisecondes
+        ...cookieOptions,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
       
       // Ne pas envoyer les tokens dans la réponse JSON
@@ -245,10 +251,6 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     },
   }, async (request, reply) => {
     try {
-      // Log pour debug
-      console.log('Refresh endpoint - Cookies:', request.cookies);
-      console.log('Refresh endpoint - Headers:', request.headers);
-      
       // Récupérer le refresh token depuis le cookie, le body ou les headers
       let refreshToken = request.cookies?.refresh_token;
       
@@ -275,19 +277,22 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
       // Définir les nouveaux cookies
       const isProduction = process.env.NODE_ENV === 'production';
       
-      reply.cookie('access_token', result.accessToken, {
+      // Configuration des cookies pour cross-domain
+      const cookieOptions = {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
+        secure: isProduction, // HTTPS requis en production
+        sameSite: isProduction ? 'none' as const : 'lax' as const, // 'none' permet cross-domain avec secure=true
         path: '/',
+        // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+      };
+      
+      reply.cookie('access_token', result.accessToken, {
+        ...cookieOptions,
         maxAge: 2 * 60 * 60 * 1000, // 2 hours
       });
       
       reply.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
-        path: '/',
+        ...cookieOptions,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
       });
       
@@ -311,18 +316,16 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     // Dans tous les cas, on supprime les cookies
     const isProduction = process.env.NODE_ENV === 'production';
     
-    reply.clearCookie('access_token', { 
+    // Configuration des options pour supprimer les cookies (doit correspondre à la création)
+    const clearCookieOptions = {
       path: '/',
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax'
-    });
-    reply.clearCookie('refresh_token', { 
-      path: '/',
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax'
-    });
+      sameSite: isProduction ? 'none' as const : 'lax' as const
+    };
+    
+    reply.clearCookie('access_token', clearCookieOptions);
+    reply.clearCookie('refresh_token', clearCookieOptions);
     
     reply.send({ message: 'Logged out successfully' });
   });

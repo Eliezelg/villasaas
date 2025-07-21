@@ -379,19 +379,22 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
     // Définir les cookies
     const isProduction = process.env.NODE_ENV === 'production';
     
-    reply.cookie('access_token', accessToken, {
+    // Configuration des cookies pour cross-domain
+    const cookieOptions = {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
+      secure: isProduction, // HTTPS requis en production
+      sameSite: isProduction ? 'none' as const : 'lax' as const, // 'none' permet cross-domain avec secure=true
       path: '/',
+      // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+    };
+    
+    reply.cookie('access_token', accessToken, {
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000,
     });
 
     reply.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax', // 'none' pour permettre cross-domain en production
-      path: '/',
+      ...cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
