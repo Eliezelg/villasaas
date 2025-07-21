@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// Si NEXT_PUBLIC_API_URL n'est pas défini, on utilise le proxy local
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export interface ApiError {
   error: string;

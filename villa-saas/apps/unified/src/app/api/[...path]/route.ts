@@ -47,6 +47,8 @@ async function proxyRequest(
   const path = pathSegments.join('/');
   const url = `${API_URL}/api/${path}`;
   
+  console.log(`Proxying ${method} request to: ${url}`);
+  
   // Récupérer les cookies de la requête
   const cookieStore = cookies();
   const accessToken = cookieStore.get('access_token');
@@ -113,14 +115,8 @@ async function proxyRequest(
         const [name, value] = nameValue.split('=');
         
         if (name && value) {
-          cookieStore.set({
-            name: name.trim(),
-            value: value.trim(),
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/',
-          });
+          // Les cookies sont gérés automatiquement par Next.js via les headers Set-Cookie
+          responseHeaders.append('Set-Cookie', cookie);
         }
       });
     }
