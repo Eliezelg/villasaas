@@ -11,6 +11,9 @@ COPY packages/types/package*.json ./packages/types/
 COPY packages/utils/package*.json ./packages/utils/
 COPY packages/i18n/package*.json ./packages/i18n/
 
+# Copy Prisma schema before install (needed for postinstall)
+COPY packages/database/prisma ./packages/database/prisma
+
 # Install dependencies
 RUN npm ci
 
