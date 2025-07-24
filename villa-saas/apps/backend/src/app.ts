@@ -74,7 +74,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         'https://webpro200.com',
         'https://www.webpro200.com',
         /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
-        // Force deployment: 2025-07-24T23:59:00Z - Fixed Dockerfile
+        // Force deployment: 2025-07-25T00:23:00Z - Using Dockerfile
       ].filter(Boolean) : [];
       
       const allowedOrigins = [...devOrigins, ...prodOrigins];
