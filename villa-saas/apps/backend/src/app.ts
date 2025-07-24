@@ -69,7 +69,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         // Ajouter explicitement les domaines Vercel
         'https://villasaas-eight.vercel.app',
         'https://villasaas-a4wtdk312-villa-saas.vercel.app',
-        /^https:\/\/villasaas.*\.vercel\.app$/
+        /^https:\/\/villasaas.*\.vercel\.app$/,
+        // Ajouter le domaine webpro200.com et ses sous-domaines
+        'https://webpro200.com',
+        'https://www.webpro200.com',
+        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/
       ].filter(Boolean) : [];
       
       const allowedOrigins = [...devOrigins, ...prodOrigins];
