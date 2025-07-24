@@ -408,4 +408,4 @@ npm run test:coverage
 
 ## 📝 License
 
-Ce projet est privé et propriétaire.
+Ce projet est privé et propriétaire.# Force Railway rebuild ven. 25 juil. 2025 00:22:45 IDT
