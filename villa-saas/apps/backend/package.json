@@ -41,6 +41,8 @@
     "@villa-saas/database": "file:../../packages/database",
     "@villa-saas/types": "file:../../packages/types",
     "@villa-saas/utils": "file:../../packages/utils",
+    "axios": "^1.7.3",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.6.1",
     "fastify": "^5.2.1",
     "fastify-plugin": "^5.0.1",
