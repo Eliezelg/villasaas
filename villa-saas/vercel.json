@@ -1,6 +1,0 @@
-{
-  "buildCommand": "npm run build --workspace=@villa-saas/unified",
-  "outputDirectory": "apps/unified/.next",
-  "installCommand": "npm install",
-  "framework": null
-}
