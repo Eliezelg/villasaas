@@ -26,11 +26,32 @@ export async function getTenantMetadata(): Promise<TenantMetadata | null> {
     const host = headersList.get('host')
     const tenant = headersList.get('x-tenant')
     
-    if (!host) {
+    // Pour les domaines Vercel, forcer l'utilisation du subdomain
+    const isVercelDomain = host?.includes('.vercel.app')
+    const forcedSubdomain = process.env.NEXT_PUBLIC_TENANT_SUBDOMAIN
+    
+    if (!host && !forcedSubdomain) {
       return null
     }
 
-    // Essayer de récupérer par domaine d'abord
+    // Si on a un subdomain forcé ou un domaine Vercel, chercher par subdomain
+    if (forcedSubdomain || isVercelDomain) {
+      const subdomain = forcedSubdomain || 'testcompany'
+      const subdomainResponse = await fetch(`${API_URL}/api/public/tenant/${subdomain}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store'
+      })
+
+      if (subdomainResponse.ok) {
+        const data = await subdomainResponse.json()
+        return data
+      }
+    }
+
+    // Essayer de récupérer par domaine pour les domaines custom
     const response = await fetch(`${API_URL}/api/public/tenant-by-domain/${host}`, {
       method: 'GET',
       headers: {
