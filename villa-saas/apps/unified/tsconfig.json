@@ -19,6 +19,7 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@villa-saas/database": ["../../packages/database/src/index.ts"],

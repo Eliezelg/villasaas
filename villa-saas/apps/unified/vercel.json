@@ -1,3 +1,4 @@
 {
-  "installCommand": "npm install --prefix ../.."
+  "installCommand": "cd ../.. && npm install && cd apps/unified",
+  "buildCommand": "pwd && ls -la && npm run build"
 }
