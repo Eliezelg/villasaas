@@ -1,3 +1,6 @@
 {
-  "installCommand": "cd ../.. && npm install && cd apps/unified && npm install"
+  "buildCommand": "cd ../../packages/database && npx prisma generate && cd ../../apps/unified && npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && npm install && cd apps/unified && npm install",
+  "framework": "nextjs"
 }
