@@ -34,3 +34,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# uploads
+/public/uploads
+
+# test files
+cookies.txt
+cookies_login.txt
+frontend_cookies.txt
+frontend_cookies_test.txt
+login_data.json
+register_data.json
+signup_data.json
