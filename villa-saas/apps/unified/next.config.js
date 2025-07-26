@@ -77,8 +77,12 @@ const nextConfig = {
   
   // Optimisations de build
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: false, // Gardons les logs pour débugger
   },
+  
+  // Configuration pour Vercel
+  output: 'standalone',
+  poweredByHeader: false,
   
   // Désactiver ESLint pendant le build pour éviter les erreurs de quotes
   eslint: {

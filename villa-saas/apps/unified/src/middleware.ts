@@ -34,18 +34,27 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const hostname = request.headers.get('host') || ''
   
-  // Redirections pour les anciennes URLs
+  // Redirections pour les anciennes URLs et gestion des locales
+  const pathSegments = pathname.split('/')
+  const hasLocale = locales.includes(pathSegments[1] as any)
+  const locale = hasLocale ? pathSegments[1] : 'fr'
+  
   if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {
-    const newPath = pathname.replace('/dashboard', '/admin/dashboard')
+    const newPath = pathname.replace('/dashboard', `/${locale}/admin/dashboard`)
     return NextResponse.redirect(new URL(newPath, request.url))
   }
   
   if (pathname === '/login') {
-    return NextResponse.redirect(new URL('/admin/login', request.url))
+    return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
   }
   
   if (pathname === '/register' || pathname === '/signup') {
-    return NextResponse.redirect(new URL('/admin/signup', request.url))
+    return NextResponse.redirect(new URL(`/${locale}/admin/signup`, request.url))
+  }
+  
+  // Redirection de la racine vers /admin/login
+  if (pathname === '/' || pathname === `/${locale}`) {
+    return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
   }
   
   // 1. Déterminer le mode de l'application
