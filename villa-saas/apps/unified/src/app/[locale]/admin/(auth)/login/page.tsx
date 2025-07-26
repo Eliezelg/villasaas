@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -30,6 +30,8 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const params = useParams()
+  const locale = params.locale as string
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const login = useAuthStore((state) => state.login)
@@ -49,7 +51,7 @@ export default function LoginPage() {
     const result = await login(data)
 
     if (result.success) {
-      router.push('/admin/dashboard')
+      router.push(`/${locale}/admin/dashboard`)
     } else {
       setError(result.error || 'Une erreur est survenue')
       setIsLoading(false)
@@ -58,7 +60,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <Link href="/admin" className="absolute top-4 left-4">
+      <Link href={`/${locale}/admin`} className="absolute top-4 left-4">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Retour à l'accueil
@@ -132,7 +134,7 @@ export default function LoginPage() {
           <p className="text-sm text-muted-foreground">
             Pas encore de compte ?{' '}
             <Link
-              href="/admin/signup"
+              href={`/${locale}/admin/signup`}
               className="font-medium text-primary hover:underline"
             >
               Créer un compte
