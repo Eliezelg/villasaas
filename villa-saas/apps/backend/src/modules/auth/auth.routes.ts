@@ -163,6 +163,71 @@ export async function authRoutes(fastify: FastifyInstance): Promise<void> {
     }
   });
 
+  // Find tenant by email (pour portail de connexion centralisé)
+  fastify.post('/find-tenant', {
+    schema: {
+      tags: [swaggerTags.auth],
+      summary: 'Trouver le tenant d\'un utilisateur par email',
+      description: 'Permet de trouver le tenant associé à un email pour un portail de connexion centralisé',
+      body: {
+        type: 'object',
+        required: ['email'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+        },
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            tenant: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                subdomain: { type: 'string' },
+                customDomain: { type: 'string' },
+              },
+            },
+          },
+        },
+        404: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const { email } = request.body as { email: string };
+    
+    try {
+      const user = await fastify.prisma.user.findUnique({
+        where: { email: email.toLowerCase() },
+        select: {
+          tenant: {
+            select: {
+              id: true,
+              name: true,
+              subdomain: true,
+              customDomain: true,
+            },
+          },
+        },
+      });
+
+      if (!user || !user.tenant) {
+        return reply.code(404).send({ error: 'No account found with this email' });
+      }
+
+      return { tenant: user.tenant };
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.code(500).send({ error: 'Failed to find tenant' });
+    }
+  });
+
   // Login
   fastify.post('/login', {
     schema: {
