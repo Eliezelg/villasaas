@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const API_URL = process.env.API_URL || 'https://villasaas-production.up.railway.app';
+const API_URL = process.env.API_URL || 'https://api.webpro200.com';
 
 // Proxy toutes les requêtes API vers le backend
 export async function GET(

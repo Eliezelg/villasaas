@@ -1,0 +1,9 @@
+{
+  "email": "test@webpro200.com",
+  "password": "TestPassword123!",
+  "firstName": "Test",
+  "lastName": "User",
+  "companyName": "Test Company",
+  "phone": "+33123456789",
+  "subdomain": "testcompany"
+}
