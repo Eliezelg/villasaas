@@ -1,0 +1,3 @@
+{
+  "buildCommand": "echo 'Current directory:' && pwd && echo 'Parent directory:' && ls -la ../.. && echo 'Components directory:' && ls -la src/components && echo 'UI directory:' && ls -la src/components/ui && npm run build"
+}
