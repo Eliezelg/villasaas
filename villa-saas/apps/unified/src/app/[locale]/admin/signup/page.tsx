@@ -373,7 +373,8 @@ function SignupPageContent() {
 
       // Pour les plans payants, créer une session Stripe Checkout
       const selectedPlan = PLANS.find(p => p.id === data.plan);
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      // Utiliser l'URL actuelle du navigateur pour les redirections
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
       const response = await apiClient.post('/api/subscriptions/signup-checkout', {
         plan: data.plan,
         email: formData.email || '',
