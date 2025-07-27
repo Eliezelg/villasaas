@@ -443,15 +443,18 @@ export default function OnboardingPage() {
   const handleNext = async () => {
     switch (currentStep) {
       case 0:
-        await basicForm.handleSubmit(handleBasicInfo)()
+        await creationForm.handleSubmit(handlePropertyCreation)()
         break
       case 1:
-        await detailsForm.handleSubmit(handleDetails)()
+        await basicForm.handleSubmit(handleBasicInfo)()
         break
       case 2:
-        await pricingForm.handleSubmit(handlePricing)()
+        await detailsForm.handleSubmit(handleDetails)()
         break
       case 3:
+        await pricingForm.handleSubmit(handlePricing)()
+        break
+      case 4:
         await handleComplete()
         break
     }
