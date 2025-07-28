@@ -19,6 +19,12 @@ const updatePersonalInfoSchema = z.object({
   city: z.string(),
   postalCode: z.string(),
   country: z.string().default('FR'),
+  subdomain: z.string()
+    .min(3, 'Le sous-domaine doit contenir au moins 3 caractères')
+    .max(30, 'Le sous-domaine doit contenir au maximum 30 caractères')
+    .regex(/^[a-z0-9-]+$/, 'Le sous-domaine ne peut contenir que des lettres minuscules, des chiffres et des tirets')
+    .regex(/^[a-z0-9]/, 'Le sous-domaine doit commencer par une lettre ou un chiffre')
+    .regex(/[a-z0-9]$/, 'Le sous-domaine doit se terminer par une lettre ou un chiffre'),
 });
 
 const updatePlanSchema = z.object({
@@ -128,7 +134,7 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ error: validation.error });
     }
 
-    const { sessionToken, ...personalInfo } = validation.data;
+    const { sessionToken, subdomain, ...personalInfo } = validation.data;
 
     // Récupérer la session
     const session = await fastify.prisma.signupSession.findUnique({
@@ -142,11 +148,55 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
       });
     }
 
+    // Vérifier la disponibilité du subdomain
+    if (subdomain) {
+      // Liste des sous-domaines réservés
+      const reservedSubdomains = [
+        'www', 'app', 'api', 'admin', 'dashboard', 'blog', 'shop', 'store',
+        'help', 'support', 'docs', 'documentation', 'status', 'mail', 'email',
+        'ftp', 'ssh', 'vpn', 'test', 'dev', 'staging', 'prod', 'production',
+        'demo', 'example', 'sample', 'preview', 'beta', 'alpha', 'auth',
+        'login', 'signup', 'register', 'account', 'user', 'users', 'profile',
+        'settings', 'config', 'configuration', 'public', 'private', 'secure',
+        'villa', 'villasaas', 'villa-saas', 'tenant', 'client', 'customer'
+      ];
+
+      if (reservedSubdomains.includes(subdomain.toLowerCase())) {
+        return reply.code(400).send({ 
+          error: 'Subdomain reserved',
+          message: 'Ce sous-domaine est réservé' 
+        });
+      }
+
+      // Vérifier dans la table Tenant
+      const existingTenant = await fastify.prisma.tenant.findFirst({
+        where: {
+          subdomain: subdomain.toLowerCase(),
+          id: { not: session.id }, // Exclure la session actuelle
+        },
+      });
+
+      // Vérifier dans la table PublicSite
+      const existingPublicSite = await fastify.prisma.publicSite.findFirst({
+        where: {
+          subdomain: subdomain.toLowerCase(),
+        },
+      });
+
+      if (existingTenant || existingPublicSite) {
+        return reply.code(400).send({ 
+          error: 'Subdomain not available',
+          message: 'Ce sous-domaine n\'est pas disponible' 
+        });
+      }
+    }
+
     // Mettre à jour la session
     const updatedSession = await fastify.prisma.signupSession.update({
       where: { id: session.id },
       data: {
         ...personalInfo,
+        subdomain: subdomain?.toLowerCase(),
         currentStep: 2,
         completedSteps: JSON.stringify(
           Array.isArray(session.completedSteps) 
@@ -292,8 +342,8 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
 
     // Commencer une transaction pour créer tout en une fois
     const result = await fastify.prisma.$transaction(async (prisma) => {
-      // 1. Créer le tenant
-      const tenantSubdomain = `tenant-${Date.now()}`; // Subdomain temporaire, sera changé pendant l'onboarding
+      // 1. Créer le tenant avec le subdomain choisi
+      const tenantSubdomain = session.subdomain || `tenant-${Date.now()}`; // Utiliser le subdomain choisi ou un temporaire
       const tenant = await prisma.tenant.create({
         data: {
           name: session.companyName || `${session.firstName} ${session.lastName}`.trim() || 'Ma société',
@@ -328,12 +378,45 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
         },
       });
 
-      // 3. Supprimer la session temporaire
+      // 3. Créer automatiquement le PublicSite avec le subdomain du tenant
+      const publicSite = await prisma.publicSite.create({
+        data: {
+          tenantId: tenant.id,
+          subdomain: tenantSubdomain,
+          domain: null, // Sera configuré plus tard si l'utilisateur veut un domaine personnalisé
+          theme: {
+            primaryColor: '#6B46C1',
+            secondaryColor: '#9333EA',
+            fontFamily: 'Inter',
+            showPrices: true,
+            allowBooking: true,
+            showAvailability: true,
+          },
+          isActive: true,
+          logo: null,
+          favicon: null,
+          metadata: {
+            seo: {
+              title: `${tenant.name} - Locations de vacances`,
+              description: `Découvrez nos propriétés disponibles à la location`,
+              keywords: ['location', 'vacances', 'villa', 'appartement'],
+            },
+            socialLinks: {},
+            analytics: {},
+          },
+          defaultLocale: 'fr',
+          locales: ['fr'],
+          googleAnalyticsId: null,
+          facebookPixelId: null,
+        },
+      });
+
+      // 4. Supprimer la session temporaire
       await prisma.signupSession.delete({
         where: { id: session.id },
       });
 
-      // 4. Log d'audit
+      // 5. Log d'audit
       await prisma.auditLog.create({
         data: {
           tenantId: tenant.id,
@@ -344,13 +427,15 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
           details: {
             email: user.email,
             plan: session.selectedPlan,
+            publicSiteCreated: true,
+            subdomain: tenantSubdomain,
           },
           ip: request.ip,
           userAgent: request.headers['user-agent'],
         },
       });
 
-      return { user, tenant };
+      return { user, tenant, publicSite };
     });
 
     // Créer les tokens d'authentification (en dehors de la transaction)

@@ -559,17 +559,6 @@ async function paymentsRoutes(fastify) {
             // Désactiver le parsing JSON car Stripe envoie du raw body
             rawBody: true,
         },
-        preValidation: async (request) => {
-            // Capturer le raw body pour la validation de signature
-            const chunks = [];
-            request.raw.on('data', (chunk) => chunks.push(chunk));
-            await new Promise((resolve) => {
-                request.raw.on('end', () => {
-                    request.rawBody = Buffer.concat(chunks).toString('utf8');
-                    resolve(true);
-                });
-            });
-        },
         schema: {
             description: 'Webhook Stripe pour les événements de paiement',
             tags: ['public', 'payments'],
@@ -587,6 +576,11 @@ async function paymentsRoutes(fastify) {
         }
         let event;
         try {
+            // Vérifier que le rawBody existe
+            if (!request.rawBody) {
+                fastify.log.error('Missing raw body in request');
+                return reply.code(400).send({ error: 'Missing request body' });
+            }
             // Vérifier la signature du webhook avec le raw body capturé
             event = fastify.stripe.webhooks.constructEvent(request.rawBody, sig, webhookSecret);
         }
@@ -635,30 +629,34 @@ async function paymentsRoutes(fastify) {
                                     paymentStatus: 'PAID',
                                 }
                             });
-                            // Envoyer l'email de confirmation
-                            try {
-                                const emailService = (0, email_service_1.createEmailService)(fastify);
-                                await emailService.sendBookingConfirmation({
-                                    to: booking.guestEmail,
-                                    bookingReference: booking.reference,
-                                    guestName: `${booking.guestFirstName} ${booking.guestLastName}`,
-                                    propertyName: booking.property.name,
-                                    checkIn: booking.checkIn.toLocaleDateString('fr-FR'),
-                                    checkOut: booking.checkOut.toLocaleDateString('fr-FR'),
-                                    guests: booking.adults + booking.children,
-                                    totalAmount: booking.total,
-                                    currency: booking.currency,
-                                    propertyImage: booking.property.images?.[0]?.urls?.large || booking.property.images?.[0]?.url,
-                                    tenantName: booking.tenant.name,
-                                    tenantLogo: booking.tenant.publicSite?.logo ?? undefined,
-                                    tenantSubdomain: booking.tenant.subdomain ?? undefined,
-                                    locale: booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'
-                                });
-                                fastify.log.info(`Confirmation email sent for booking: ${booking.reference}`);
-                            }
-                            catch (emailError) {
-                                fastify.log.error({ emailError }, 'Failed to send confirmation email from webhook');
-                            }
+                            // Envoyer l'email de confirmation de manière asynchrone
+                            // On n'attend pas la fin de l'envoi pour répondre à Stripe
+                            setImmediate(async () => {
+                                try {
+                                    const emailService = (0, email_service_1.createEmailService)(fastify);
+                                    await emailService.sendBookingConfirmation({
+                                        to: booking.guestEmail,
+                                        bookingReference: booking.reference,
+                                        guestName: `${booking.guestFirstName} ${booking.guestLastName}`,
+                                        propertyName: booking.property.name,
+                                        checkIn: booking.checkIn.toLocaleDateString('fr-FR'),
+                                        checkOut: booking.checkOut.toLocaleDateString('fr-FR'),
+                                        guests: booking.adults + booking.children,
+                                        totalAmount: booking.total,
+                                        currency: booking.currency,
+                                        propertyImage: booking.property.images?.[0]?.urls?.large || booking.property.images?.[0]?.url,
+                                        tenantName: booking.tenant.name,
+                                        tenantLogo: booking.tenant.publicSite?.logo ?? undefined,
+                                        tenantSubdomain: booking.tenant.subdomain ?? undefined,
+                                        locale: booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'
+                                    });
+                                    fastify.log.info(`Confirmation email sent for booking: ${booking.reference}`);
+                                }
+                                catch (emailError) {
+                                    // Log l'erreur mais ne pas faire échouer le webhook
+                                    fastify.log.error({ emailError }, 'Failed to send confirmation email from webhook');
+                                }
+                            });
                             fastify.log.info(`Booking confirmed for payment intent: ${paymentIntent.id}`);
                         }
                     }
@@ -698,74 +696,82 @@ async function paymentsRoutes(fastify) {
                         }
                     });
                     if (booking) {
-                        // Envoyer l'email de notification d'échec
-                        try {
-                            const emailService = (0, email_service_1.createEmailService)(fastify);
-                            const retryUrl = `${process.env.NEXT_PUBLIC_BOOKING_URL}/${booking.tenant.subdomain}/booking/retry/${booking.id}`;
-                            await emailService.sendPaymentFailedNotification({
-                                to: booking.guestEmail,
-                                bookingReference: booking.reference,
-                                guestName: `${booking.guestFirstName} ${booking.guestLastName}`,
-                                propertyName: booking.property.name,
-                                checkIn: booking.checkIn.toLocaleDateString('fr-FR'),
-                                checkOut: booking.checkOut.toLocaleDateString('fr-FR'),
-                                totalAmount: booking.total,
-                                currency: booking.currency,
-                                tenantName: booking.tenant.name,
-                                tenantLogo: booking.tenant.publicSite?.logo || undefined,
-                                retryUrl,
-                                locale: booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'
-                            });
-                            // Marquer la réservation comme ayant un paiement échoué
-                            await fastify.prisma.booking.update({
-                                where: { id: booking.id },
-                                data: {
-                                    paymentStatus: 'FAILED',
-                                    internalNotes: JSON.stringify({
-                                        paymentFailedAt: new Date().toISOString(),
-                                        paymentFailureReason: paymentIntent.last_payment_error?.message,
-                                        originalNotes: booking.internalNotes
-                                    })
-                                }
-                            });
-                            // Planifier l'annulation automatique dans 24h
-                            // Note: Ceci pourrait être fait avec un job queue comme BullMQ
-                            setTimeout(async () => {
-                                // Vérifier si le paiement n'a toujours pas été effectué
-                                const currentBooking = await fastify.prisma.booking.findUnique({
-                                    where: { id: booking.id }
+                        // Envoyer l'email de notification d'échec de manière asynchrone
+                        setImmediate(async () => {
+                            try {
+                                const emailService = (0, email_service_1.createEmailService)(fastify);
+                                const retryUrl = `${process.env.NEXT_PUBLIC_BOOKING_URL}/${booking.tenant.subdomain}/booking/retry/${booking.id}`;
+                                await emailService.sendPaymentFailedNotification({
+                                    to: booking.guestEmail,
+                                    bookingReference: booking.reference,
+                                    guestName: `${booking.guestFirstName} ${booking.guestLastName}`,
+                                    propertyName: booking.property.name,
+                                    checkIn: booking.checkIn.toLocaleDateString('fr-FR'),
+                                    checkOut: booking.checkOut.toLocaleDateString('fr-FR'),
+                                    totalAmount: booking.total,
+                                    currency: booking.currency,
+                                    tenantName: booking.tenant.name,
+                                    tenantLogo: booking.tenant.publicSite?.logo || undefined,
+                                    retryUrl,
+                                    locale: booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'
                                 });
-                                if (currentBooking && currentBooking.paymentStatus === 'FAILED' && currentBooking.status === 'PENDING') {
-                                    // Annuler la réservation
-                                    await fastify.prisma.booking.update({
-                                        where: { id: booking.id },
-                                        data: {
-                                            status: 'CANCELLED',
-                                            internalNotes: JSON.stringify({
-                                                cancelledAt: new Date().toISOString(),
-                                                cancellationReason: 'Payment not completed within 24 hours',
-                                                originalNotes: currentBooking.internalNotes
-                                            })
+                                // Marquer la réservation comme ayant un paiement échoué
+                                await fastify.prisma.booking.update({
+                                    where: { id: booking.id },
+                                    data: {
+                                        paymentStatus: 'FAILED',
+                                        internalNotes: JSON.stringify({
+                                            paymentFailedAt: new Date().toISOString(),
+                                            paymentFailureReason: paymentIntent.last_payment_error?.message,
+                                            originalNotes: booking.internalNotes
+                                        })
+                                    }
+                                });
+                                // Planifier l'annulation automatique dans 24h
+                                // Note: Ceci devrait être fait avec un job queue comme BullMQ en production
+                                setTimeout(async () => {
+                                    try {
+                                        // Vérifier si le paiement n'a toujours pas été effectué
+                                        const currentBooking = await fastify.prisma.booking.findUnique({
+                                            where: { id: booking.id }
+                                        });
+                                        if (currentBooking && currentBooking.paymentStatus === 'FAILED' && currentBooking.status === 'PENDING') {
+                                            // Annuler la réservation
+                                            await fastify.prisma.booking.update({
+                                                where: { id: booking.id },
+                                                data: {
+                                                    status: 'CANCELLED',
+                                                    internalNotes: JSON.stringify({
+                                                        cancelledAt: new Date().toISOString(),
+                                                        cancellationReason: 'Payment not completed within 24 hours',
+                                                        originalNotes: currentBooking.internalNotes
+                                                    })
+                                                }
+                                            });
+                                            // Envoyer l'email d'annulation
+                                            const emailServiceForCancellation = (0, email_service_1.createEmailService)(fastify);
+                                            await emailServiceForCancellation.sendBookingCancellation({
+                                                to: booking.guestEmail,
+                                                bookingReference: booking.reference,
+                                                guestName: `${booking.guestFirstName} ${booking.guestLastName}`,
+                                                propertyName: booking.property.name,
+                                                checkIn: booking.checkIn.toLocaleDateString('fr-FR'),
+                                                checkOut: booking.checkOut.toLocaleDateString('fr-FR'),
+                                                tenantName: booking.tenant.name,
+                                                tenantLogo: booking.tenant.publicSite?.logo ?? undefined,
+                                                locale: booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'
+                                            });
                                         }
-                                    });
-                                    // Envoyer l'email d'annulation
-                                    await emailService.sendBookingCancellation({
-                                        to: booking.guestEmail,
-                                        bookingReference: booking.reference,
-                                        guestName: `${booking.guestFirstName} ${booking.guestLastName}`,
-                                        propertyName: booking.property.name,
-                                        checkIn: booking.checkIn.toLocaleDateString('fr-FR'),
-                                        checkOut: booking.checkOut.toLocaleDateString('fr-FR'),
-                                        tenantName: booking.tenant.name,
-                                        tenantLogo: booking.tenant.publicSite?.logo ?? undefined,
-                                        locale: booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'
-                                    });
-                                }
-                            }, 24 * 60 * 60 * 1000); // 24 heures
-                        }
-                        catch (emailError) {
-                            fastify.log.error({ emailError }, 'Failed to send payment failed notification');
-                        }
+                                    }
+                                    catch (error) {
+                                        fastify.log.error({ error }, 'Failed to process delayed booking cancellation');
+                                    }
+                                }, 24 * 60 * 60 * 1000); // 24 heures
+                            }
+                            catch (emailError) {
+                                fastify.log.error({ emailError }, 'Failed to send payment failed notification');
+                            }
+                        });
                     }
                     break;
                 }
@@ -778,11 +784,13 @@ async function paymentsRoutes(fastify) {
                 default:
                     fastify.log.info(`Unhandled event type: ${event.type}`);
             }
-            return { received: true };
+            // Toujours retourner une réponse de succès à Stripe
+            return reply.code(200).send({ received: true });
         }
         catch (error) {
             fastify.log.error('Error processing webhook:', error);
-            return reply.code(500).send({ error: 'Webhook processing failed' });
+            // Même en cas d'erreur, on répond avec succès à Stripe pour éviter les retries
+            return reply.code(200).send({ received: true, error: 'Internal processing error' });
         }
     });
     // Route pour créer une intention de paiement (version authentifiée)

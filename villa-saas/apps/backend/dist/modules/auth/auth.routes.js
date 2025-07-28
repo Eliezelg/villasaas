@@ -6,6 +6,22 @@ const auth_dto_1 = require("./auth.dto");
 const swagger_schemas_1 = require("../../utils/swagger-schemas");
 async function authRoutes(fastify) {
     const authService = new auth_service_1.AuthService(fastify);
+    // Route de debug pour vérifier les cookies
+    fastify.get('/debug/cookies', async (request, reply) => {
+        const response = {
+            cookies: request.cookies,
+            headers: {
+                cookie: request.headers.cookie,
+                origin: request.headers.origin,
+                referer: request.headers.referer,
+            },
+            env: {
+                NODE_ENV: process.env.NODE_ENV,
+                isProduction: process.env.NODE_ENV === 'production',
+            },
+        };
+        reply.send(response);
+    });
     // Check subdomain availability
     fastify.get('/check-subdomain/:subdomain', {
         schema: {
@@ -100,18 +116,20 @@ async function authRoutes(fastify) {
             const result = await authService.register(validatedData);
             // Définir les cookies sécurisés pour les tokens
             const isProduction = process.env.NODE_ENV === 'production';
-            reply.cookie('access_token', result.accessToken, {
+            // Configuration des cookies pour cross-domain
+            const cookieOptions = {
                 httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax',
+                secure: isProduction, // HTTPS requis en production
+                sameSite: isProduction ? 'none' : 'lax', // 'none' permet cross-domain avec secure=true
                 path: '/',
+                // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+            };
+            reply.cookie('access_token', result.accessToken, {
+                ...cookieOptions,
                 maxAge: 2 * 60 * 60 * 1000, // 2 hours
             });
             reply.cookie('refresh_token', result.refreshToken, {
-                httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax',
-                path: '/',
+                ...cookieOptions,
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
             });
             // Ne pas envoyer les tokens dans la réponse JSON
@@ -134,6 +152,68 @@ async function authRoutes(fastify) {
             else {
                 throw error;
             }
+        }
+    });
+    // Find tenant by email (pour portail de connexion centralisé)
+    fastify.post('/find-tenant', {
+        schema: {
+            tags: [swagger_schemas_1.swaggerTags.auth],
+            summary: 'Trouver le tenant d\'un utilisateur par email',
+            description: 'Permet de trouver le tenant associé à un email pour un portail de connexion centralisé',
+            body: {
+                type: 'object',
+                required: ['email'],
+                properties: {
+                    email: { type: 'string', format: 'email' },
+                },
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        tenant: {
+                            type: 'object',
+                            properties: {
+                                id: { type: 'string' },
+                                name: { type: 'string' },
+                                subdomain: { type: 'string' },
+                                customDomain: { type: 'string' },
+                            },
+                        },
+                    },
+                },
+                404: {
+                    type: 'object',
+                    properties: {
+                        error: { type: 'string' },
+                    },
+                },
+            },
+        },
+    }, async (request, reply) => {
+        const { email } = request.body;
+        try {
+            const user = await fastify.prisma.user.findUnique({
+                where: { email: email.toLowerCase() },
+                select: {
+                    tenant: {
+                        select: {
+                            id: true,
+                            name: true,
+                            subdomain: true,
+                            customDomain: true,
+                        },
+                    },
+                },
+            });
+            if (!user || !user.tenant) {
+                return reply.code(404).send({ error: 'No account found with this email' });
+            }
+            return { tenant: user.tenant };
+        }
+        catch (error) {
+            fastify.log.error(error);
+            return reply.code(500).send({ error: 'Failed to find tenant' });
         }
     });
     // Login
@@ -182,19 +262,21 @@ async function authRoutes(fastify) {
             const result = await authService.login(validatedData, request.ip);
             // Définir les cookies sécurisés pour les tokens
             const isProduction = process.env.NODE_ENV === 'production';
-            reply.cookie('access_token', result.accessToken, {
+            // Configuration des cookies pour cross-domain
+            const cookieOptions = {
                 httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
+                secure: isProduction, // HTTPS requis en production
+                sameSite: isProduction ? 'none' : 'lax', // 'none' permet cross-domain avec secure=true
                 path: '/',
-                maxAge: 2 * 60 * 60 * 1000, // 2 hours en millisecondes
+                // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+            };
+            reply.cookie('access_token', result.accessToken, {
+                ...cookieOptions,
+                maxAge: 2 * 60 * 60 * 1000, // 2 hours
             });
             reply.cookie('refresh_token', result.refreshToken, {
-                httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax', // 'lax' pour dev pour permettre cross-port
-                path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours en millisecondes
+                ...cookieOptions,
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
             });
             // Ne pas envoyer les tokens dans la réponse JSON
             const { accessToken, refreshToken, ...responseData } = result;
@@ -229,6 +311,12 @@ async function authRoutes(fastify) {
                 },
             },
         },
+        preHandler: async (request, _reply) => {
+            // Si pas de body et Content-Type JSON, on force un body vide
+            if (!request.body && request.headers['content-type']?.includes('application/json')) {
+                request.body = {};
+            }
+        },
     }, async (request, reply) => {
         try {
             // Récupérer le refresh token depuis le cookie, le body ou les headers
@@ -251,18 +339,20 @@ async function authRoutes(fastify) {
             const result = await authService.refreshToken(refreshToken);
             // Définir les nouveaux cookies
             const isProduction = process.env.NODE_ENV === 'production';
-            reply.cookie('access_token', result.accessToken, {
+            // Configuration des cookies pour cross-domain
+            const cookieOptions = {
                 httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax',
+                secure: isProduction, // HTTPS requis en production
+                sameSite: isProduction ? 'none' : 'lax', // 'none' permet cross-domain avec secure=true
                 path: '/',
+                // Ne pas définir de domain pour permettre au navigateur de gérer automatiquement
+            };
+            reply.cookie('access_token', result.accessToken, {
+                ...cookieOptions,
                 maxAge: 2 * 60 * 60 * 1000, // 2 hours
             });
             reply.cookie('refresh_token', result.refreshToken, {
-                httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'strict' : 'lax',
-                path: '/',
+                ...cookieOptions,
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
             });
             // Ne pas envoyer les tokens dans la réponse JSON
@@ -276,13 +366,22 @@ async function authRoutes(fastify) {
         }
     });
     // Logout
-    fastify.post('/logout', {
-        preHandler: [fastify.authenticate],
-    }, async (request, reply) => {
-        await authService.logout(request.user.userId);
-        // Supprimer les cookies
-        reply.clearCookie('access_token', { path: '/' });
-        reply.clearCookie('refresh_token', { path: '/' });
+    fastify.post('/logout', async (request, reply) => {
+        // Si l'utilisateur est authentifié, on le déconnecte côté serveur
+        if (request.user?.userId) {
+            await authService.logout(request.user.userId);
+        }
+        // Dans tous les cas, on supprime les cookies
+        const isProduction = process.env.NODE_ENV === 'production';
+        // Configuration des options pour supprimer les cookies (doit correspondre à la création)
+        const clearCookieOptions = {
+            path: '/',
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax'
+        };
+        reply.clearCookie('access_token', clearCookieOptions);
+        reply.clearCookie('refresh_token', clearCookieOptions);
         reply.send({ message: 'Logged out successfully' });
     });
     // Get current user

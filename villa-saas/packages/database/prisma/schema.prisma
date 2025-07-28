@@ -186,6 +186,7 @@ model SignupSession {
   city             String?
   postalCode       String?
   country          String?
+  subdomain        String?  // Sous-domaine choisi par l'utilisateur
   selectedPlan     String?
   stripeSessionId  String?
   currentStep      Int      @default(0)

@@ -9,10 +9,21 @@ const websocketPlugin = async (fastify) => {
     const io = new socket_io_1.Server(fastify.server, {
         cors: {
             origin: (origin, callback) => {
-                const allowedOrigins = [
+                const devOrigins = [
                     'http://localhost:3000',
                     /^http:\/\/[a-zA-Z0-9-]+\.localhost:3000$/,
                 ];
+                const prodOrigins = process.env.NODE_ENV === 'production' ? [
+                    process.env.FRONTEND_URL,
+                    ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || []),
+                    'https://villasaas-eight.vercel.app',
+                    'https://villasaas-a4wtdk312-villa-saas.vercel.app',
+                    /^https:\/\/villasaas.*\.vercel\.app$/,
+                    'https://webpro200.com',
+                    'https://www.webpro200.com',
+                    /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
+                ].filter(Boolean) : [];
+                const allowedOrigins = [...devOrigins, ...prodOrigins];
                 if (!origin) {
                     callback(null, true);
                     return;

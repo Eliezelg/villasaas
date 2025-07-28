@@ -6,7 +6,29 @@ export async function domainLookupRoutes(fastify: FastifyInstance) {
     const { domain } = request.params as { domain: string }
     
     try {
-      // Chercher d'abord dans les domaines personnalisés des propriétés
+      // Chercher d'abord dans PublicSite pour les domaines personnalisés
+      const publicSite = await fastify.prisma.publicSite.findFirst({
+        where: {
+          domain: domain,
+          isActive: true
+        },
+        include: {
+          tenant: true
+        }
+      })
+      
+      if (publicSite) {
+        return reply.send({
+          found: true,
+          type: 'tenant',
+          tenant: {
+            id: publicSite.tenant.id,
+            subdomain: publicSite.tenant.subdomain || publicSite.subdomain
+          }
+        })
+      }
+      
+      // Chercher dans les domaines personnalisés des propriétés
       const property = await fastify.prisma.property.findFirst({
         where: {
           OR: [

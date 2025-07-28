@@ -22,6 +22,7 @@ const stripe_1 = __importDefault(require("./plugins/stripe"));
 const s3_1 = __importDefault(require("./plugins/s3"));
 const resend_1 = __importDefault(require("./plugins/resend"));
 const websocket_1 = __importDefault(require("./plugins/websocket"));
+const vercel_1 = __importDefault(require("./plugins/vercel"));
 const health_routes_1 = require("./modules/health/health.routes");
 const auth_routes_1 = require("./modules/auth/auth.routes");
 const auth_signup_routes_1 = require("./modules/auth/auth-signup.routes");
@@ -47,6 +48,7 @@ const auto_response_routes_1 = require("./modules/messaging/auto-response.routes
 const booking_options_routes_1 = require("./modules/booking-options/booking-options.routes");
 const domains_routes_1 = require("./modules/domains/domains.routes");
 const domain_lookup_routes_1 = require("./modules/public/domain-lookup.routes");
+const public_site_routes_1 = require("./modules/public-site/public-site.routes");
 async function buildApp(opts = {}) {
     const app = (0, fastify_1.default)(opts);
     // Global error handler
@@ -65,7 +67,16 @@ async function buildApp(opts = {}) {
             // Configuration pour la production
             const prodOrigins = process.env.NODE_ENV === 'production' ? [
                 process.env.FRONTEND_URL,
-                ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || [])
+                ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || []),
+                // Ajouter explicitement les domaines Vercel
+                'https://villasaas-eight.vercel.app',
+                'https://villasaas-a4wtdk312-villa-saas.vercel.app',
+                /^https:\/\/villasaas.*\.vercel\.app$/,
+                // Ajouter le domaine webpro200.com et ses sous-domaines
+                'https://webpro200.com',
+                'https://www.webpro200.com',
+                /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
+                // Force deployment: 2025-07-25T00:26:00Z - Railway Dockerfile path
             ].filter(Boolean) : [];
             const allowedOrigins = [...devOrigins, ...prodOrigins];
             // Si pas d'origine (ex: Postman), permettre
@@ -162,6 +173,7 @@ async function buildApp(opts = {}) {
     await app.register(auth_1.default);
     await app.register(static_1.default);
     await app.register(websocket_1.default);
+    await app.register(vercel_1.default);
     // Routes
     await app.register(health_routes_1.healthRoutes, { prefix: '/health' });
     await app.register(auth_routes_1.authRoutes, { prefix: '/api/auth' });
@@ -184,6 +196,7 @@ async function buildApp(opts = {}) {
     await app.register(messaging_routes_1.messagingRoutes, { prefix: '/api/messaging' });
     await app.register(auto_response_routes_1.autoResponseRoutes, { prefix: '/api/messaging' });
     await app.register(booking_options_routes_1.bookingOptionsRoutes, { prefix: '/api' });
+    await app.register(public_site_routes_1.publicSiteRoutes, { prefix: '/api' });
     await app.register(domains_routes_1.domainsRoutes);
     // Public routes (no auth required)
     await app.register(public_routes_1.publicRoutes, { prefix: '/api' });

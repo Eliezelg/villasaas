@@ -13,6 +13,8 @@ export declare function createTenant(prisma: PrismaClient): Promise<{
     updatedAt: Date;
     email: string;
     phone: string | null;
+    isActive: boolean;
+    subdomain: string | null;
     companyName: string | null;
     siret: string | null;
     vatNumber: string | null;
@@ -20,9 +22,7 @@ export declare function createTenant(prisma: PrismaClient): Promise<{
     city: string | null;
     postalCode: string | null;
     country: string;
-    subdomain: string | null;
     customDomain: string | null;
-    isActive: boolean;
     settings: import("@prisma/client/runtime/library").JsonValue;
     stripeAccountId: string | null;
     stripeAccountStatus: string | null;
@@ -36,20 +36,20 @@ export declare function createTenant(prisma: PrismaClient): Promise<{
     subscriptionEndDate: Date | null;
 }>;
 export declare function createUser(prisma: PrismaClient, tenantId: string): Promise<{
+    metadata: import("@prisma/client/runtime/library").JsonValue | null;
     id: string;
     createdAt: Date;
+    role: import(".prisma/client").$Enums.UserRole;
     updatedAt: Date;
     email: string;
-    phone: string | null;
-    isActive: boolean;
     passwordHash: string;
     firstName: string;
     lastName: string;
+    phone: string | null;
+    isActive: boolean;
     emailVerified: boolean;
     tenantId: string;
-    role: import(".prisma/client").$Enums.UserRole;
     permissions: import("@prisma/client/runtime/library").JsonValue;
-    metadata: import("@prisma/client/runtime/library").JsonValue | null;
 }>;
 export declare function generateToken(app: FastifyInstance, payload: {
     id: string;

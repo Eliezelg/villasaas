@@ -17,6 +17,7 @@ import stripePlugin from './plugins/stripe';
 import s3Plugin from './plugins/s3';
 import resendPlugin from './plugins/resend';
 import websocketPlugin from './plugins/websocket';
+import vercelPlugin from './plugins/vercel';
 
 import { healthRoutes } from './modules/health/health.routes';
 import { authRoutes } from './modules/auth/auth.routes';
@@ -43,6 +44,7 @@ import { autoResponseRoutes } from './modules/messaging/auto-response.routes';
 import { bookingOptionsRoutes } from './modules/booking-options/booking-options.routes';
 import { domainsRoutes } from './modules/domains/domains.routes';
 import { domainLookupRoutes } from './modules/public/domain-lookup.routes';
+import { publicSiteRoutes } from './modules/public-site/public-site.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -182,6 +184,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(authPlugin);
   await app.register(staticPlugin);
   await app.register(websocketPlugin);
+  await app.register(vercelPlugin);
 
   // Routes
   await app.register(healthRoutes, { prefix: '/health' });
@@ -205,12 +208,17 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(messagingRoutes, { prefix: '/api/messaging' });
   await app.register(autoResponseRoutes, { prefix: '/api/messaging' });
   await app.register(bookingOptionsRoutes, { prefix: '/api' });
+  await app.register(publicSiteRoutes, { prefix: '/api' });
   await app.register(domainsRoutes);
   
   // Public routes (no auth required)
   await app.register(publicRoutes, { prefix: '/api' });
   await app.register(publicPromoCodesRoutes, { prefix: '/api' });
   await app.register(domainLookupRoutes);
+  
+  // Import and register subdomain check routes
+  const { subdomainCheckRoutes } = await import('./modules/public/subdomain-check.routes');
+  await app.register(subdomainCheckRoutes, { prefix: '/api' });
 
   return app;
 }

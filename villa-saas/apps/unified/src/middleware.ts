@@ -122,7 +122,7 @@ export async function middleware(request: NextRequest) {
   } else {
     // Pour la production avec domaines personnalisés
     // Si ce n'est pas le domaine principal, c'est un domaine personnalisé
-    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'location.com'
+    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.com'
     
     // Ignorer les domaines Vercel preview
     const isVercelPreview = hostname.endsWith('.vercel.app') && hostname !== mainDomain
@@ -159,7 +159,7 @@ export async function middleware(request: NextRequest) {
               
               // Si c'est une propriété avec un domaine personnalisé et qu'on accède via le sous-domaine
               // on pourrait rediriger vers le domaine personnalisé
-              if (data.type === 'property' && data.property.customDomain && hostname.includes('.villasaas.com')) {
+              if (data.type === 'property' && data.property.customDomain && hostname.includes(`.${mainDomain}`)) {
                 return NextResponse.redirect(`https://${data.property.customDomain}${pathname}`)
               }
             }

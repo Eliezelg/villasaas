@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { debounce } from 'lodash';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -20,7 +21,8 @@ import {
   CheckCircle2,
   Star,
   Zap,
-  Loader2
+  Loader2,
+  X
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -62,6 +64,12 @@ const step2Schema = z.object({
   city: z.string().min(1, 'La ville est requise'),
   postalCode: z.string().min(1, 'Le code postal est requis'),
   country: z.string().default('FR'),
+  subdomain: z.string()
+    .min(3, 'Le sous-domaine doit contenir au moins 3 caractères')
+    .max(30, 'Le sous-domaine doit contenir au maximum 30 caractères')
+    .regex(/^[a-z0-9-]+$/, 'Lettres minuscules, chiffres et tirets uniquement')
+    .regex(/^[a-z0-9]/, 'Doit commencer par une lettre ou un chiffre')
+    .regex(/[a-z0-9]$/, 'Doit se terminer par une lettre ou un chiffre'),
 });
 
 const step3Schema = z.object({
@@ -138,9 +146,19 @@ function SignupPageContent() {
     plan: 'starter',
     domainType: 'subdomain',
     country: 'FR',
+    subdomain: '',
   });
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [subdomainStatus, setSubdomainStatus] = useState<{
+    checking: boolean;
+    available: boolean | null;
+    suggestions: string[];
+  }>({
+    checking: false,
+    available: null,
+    suggestions: [],
+  });
 
   // Récupérer le token de session et le step depuis l'URL
   useEffect(() => {
@@ -217,6 +235,36 @@ function SignupPageContent() {
     }
   }, [searchParams]);
 
+  // Fonction pour vérifier la disponibilité du sous-domaine
+  const checkSubdomainAvailability = useCallback(
+    debounce(async (subdomain: string) => {
+      if (!subdomain || subdomain.length < 3) {
+        setSubdomainStatus({ checking: false, available: null, suggestions: [] });
+        return;
+      }
+
+      setSubdomainStatus(prev => ({ ...prev, checking: true }));
+
+      try {
+        const response = await apiClient.post('/api/public/subdomain/check', {
+          subdomain,
+        });
+
+        if (response.data) {
+          setSubdomainStatus({
+            checking: false,
+            available: response.data.available,
+            suggestions: response.data.suggestions || [],
+          });
+        }
+      } catch (error) {
+        console.error('Subdomain check error:', error);
+        setSubdomainStatus({ checking: false, available: null, suggestions: [] });
+      }
+    }, 500),
+    []
+  );
+
   // Formulaires pour chaque étape
   const step1Form = useForm<z.infer<typeof step1Schema>>({
     resolver: zodResolver(step1Schema),
@@ -237,6 +285,7 @@ function SignupPageContent() {
       city: formData.city || '',
       postalCode: formData.postalCode || '',
       country: formData.country || 'FR',
+      subdomain: formData.subdomain || '',
     },
   });
 
@@ -316,6 +365,7 @@ function SignupPageContent() {
         city: data.city,
         postalCode: data.postalCode,
         country: data.country,
+        subdomain: data.subdomain,
       });
 
       if (response.error) {
@@ -772,6 +822,82 @@ function SignupPageContent() {
                         )}
                       />
                     </div>
+
+                    <FormField
+                      control={step2Form.control}
+                      name="subdomain"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sous-domaine de votre site</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center gap-2">
+                              <div className="relative flex-1">
+                                <Input 
+                                  {...field} 
+                                  disabled={isLoading}
+                                  placeholder="monsite"
+                                  className={`pr-10 ${
+                                    subdomainStatus.available === false ? 'border-red-500' : 
+                                    subdomainStatus.available === true ? 'border-green-500' : ''
+                                  }`}
+                                  onChange={(e) => {
+                                    // Forcer en minuscules et nettoyer
+                                    const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                                    field.onChange(value);
+                                    // Vérifier la disponibilité
+                                    checkSubdomainAvailability(value);
+                                  }}
+                                />
+                                {subdomainStatus.checking && (
+                                  <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />
+                                )}
+                                {!subdomainStatus.checking && subdomainStatus.available === true && field.value && (
+                                  <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
+                                )}
+                                {!subdomainStatus.checking && subdomainStatus.available === false && (
+                                  <X className="absolute right-3 top-3 h-4 w-4 text-red-500" />
+                                )}
+                              </div>
+                              <span className="text-gray-500">.webpro200.com</span>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            {subdomainStatus.available === false ? (
+                              <span className="text-red-500">
+                                Ce sous-domaine n'est pas disponible
+                              </span>
+                            ) : subdomainStatus.available === true ? (
+                              <span className="text-green-500">
+                                Ce sous-domaine est disponible !
+                              </span>
+                            ) : (
+                              'Choisissez l\'adresse de votre site de réservation'
+                            )}
+                          </FormDescription>
+                          {subdomainStatus.suggestions.length > 0 && (
+                            <div className="mt-2">
+                              <p className="text-sm text-gray-600 mb-1">Suggestions disponibles :</p>
+                              <div className="flex flex-wrap gap-2">
+                                {subdomainStatus.suggestions.map((suggestion) => (
+                                  <button
+                                    key={suggestion}
+                                    type="button"
+                                    onClick={() => {
+                                      field.onChange(suggestion);
+                                      checkSubdomainAvailability(suggestion);
+                                    }}
+                                    className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                                  >
+                                    {suggestion}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </form>
                 </Form>
               )}
@@ -875,7 +1001,7 @@ function SignupPageContent() {
                 
                 <Button
                   onClick={handleNext}
-                  disabled={isLoading}
+                  disabled={isLoading || (currentStep === 1 && subdomainStatus.available === false)}
                   className={currentStep === 0 ? 'ml-auto' : ''}
                 >
                   {isLoading ? (
