@@ -233,14 +233,27 @@ export default function OnboardingPage() {
   const handlePropertyCreation = async (data: z.infer<typeof propertyCreationSchema>) => {
     setIsLoading(true)
     try {
-      // Créer la propriété
+      // Créer la propriété avec les champs obligatoires
       const propertyData = {
         name: data.propertyName,
-        companyName: data.companyName,
-        status: 'DRAFT',
-        subdomain: data.domainType === 'subdomain' ? data.subdomain : undefined,
-        customDomain: data.domainType === 'custom' ? data.customDomain : data.domainType === 'purchase' ? data.purchaseDomain : undefined,
+        propertyType: 'VILLA' as const, // Type par défaut
+        status: 'DRAFT' as const,
+        address: 'À définir', // Sera mise à jour dans l'étape suivante
+        city: 'À définir',
+        postalCode: '00000',
+        country: 'FR',
+        bedrooms: 1,
+        bathrooms: 1,
+        maxGuests: 2,
+        basePrice: 100,
+        description: {
+          fr: 'Description à venir',
+          en: 'Description coming soon'
+        }
       }
+      
+      // TODO: Mettre à jour le tenant avec les informations de domaine et d'entreprise
+      // Pour l'instant, on crée juste la propriété
       
       const response = await apiClient.post('/api/properties', propertyData)
       

@@ -83,6 +83,22 @@ type SignupFormData = z.infer<typeof step1Schema> &
   z.infer<typeof step2Schema> & 
   z.infer<typeof step3Schema>;
 
+// Types pour les réponses API
+interface SessionResponse {
+  sessionToken: string;
+  currentStep: number;
+  email: string;
+}
+
+interface SubscriptionResponse {
+  url: string;
+}
+
+interface CompleteResponse {
+  user: any;
+  tenant: any;
+}
+
 const STEPS = [
   { id: 'account', title: 'Compte', icon: Mail },
   { id: 'personal', title: 'Informations', icon: User },
@@ -303,17 +319,33 @@ function SignupPageContent() {
     setIsLoading(true);
     try {
       // Créer une session temporaire
-      const response = await apiClient.post('/api/auth/signup/session', {
+      const response = await apiClient.post<SessionResponse>('/api/auth/signup/session', {
         email: data.email,
         password: data.password,
       });
 
       if (response.error) {
-        toast({
-          title: "Erreur",
-          description: response.error.message || "Impossible de créer la session",
-          variant: "destructive",
-        });
+        // Gérer spécifiquement l'erreur d'email déjà utilisé
+        if (response.error.error === 'Email already exists' || response.error.message === 'Cet email est déjà utilisé') {
+          toast({
+            title: "Email déjà utilisé",
+            description: "Cet email est déjà associé à un compte. Veuillez vous connecter ou utiliser un autre email.",
+            variant: "destructive",
+            action: (
+              <Link href={`/${locale}/admin/login`}>
+                <Button variant="outline" size="sm">
+                  Se connecter
+                </Button>
+              </Link>
+            ),
+          });
+        } else {
+          toast({
+            title: "Erreur",
+            description: response.error.message || "Impossible de créer la session",
+            variant: "destructive",
+          });
+        }
         return;
       }
 
@@ -425,7 +457,7 @@ function SignupPageContent() {
       const selectedPlan = PLANS.find(p => p.id === data.plan);
       // Utiliser l'URL actuelle du navigateur pour les redirections
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
-      const response = await apiClient.post('/api/subscriptions/signup-checkout', {
+      const response = await apiClient.post<SubscriptionResponse>('/api/subscriptions/signup-checkout', {
         plan: data.plan,
         email: formData.email || '',
         successUrl: `${baseUrl}/${locale}/admin/signup?session_id={CHECKOUT_SESSION_ID}&token=${sessionToken}`,
@@ -445,7 +477,7 @@ function SignupPageContent() {
       setFormData({ ...formData, ...data });
       
       // Rediriger vers Stripe Checkout
-      if (response.data?.url) {
+      if (response.data) {
         window.location.href = response.data.url;
       }
     } catch (error) {
@@ -502,7 +534,7 @@ function SignupPageContent() {
       if (!token) return;
 
       // Créer le compte après vérification du paiement
-      const response = await apiClient.post('/api/auth/signup/complete', {
+      const response = await apiClient.post<CompleteResponse>('/api/auth/signup/complete', {
         sessionToken: token,
       });
 

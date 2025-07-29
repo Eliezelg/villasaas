@@ -34,10 +34,12 @@ export async function getTenantMetadata(): Promise<TenantMetadata | null> {
       return null
     }
 
-    // Si on a un subdomain forcé ou un domaine Vercel, chercher par subdomain
+    // Stratégie optimisée : Un seul appel basé sur le contexte
+    
+    // 1. Si on a un subdomain forcé ou un domaine Vercel
     if (forcedSubdomain || isVercelDomain) {
       const subdomain = forcedSubdomain || 'testcompany'
-      const subdomainResponse = await fetch(`${API_URL}/api/public/tenant/${subdomain}`, {
+      const response = await fetch(`${API_URL}/api/public/tenant/${subdomain}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -45,56 +47,67 @@ export async function getTenantMetadata(): Promise<TenantMetadata | null> {
         cache: 'no-store'
       })
 
-      if (subdomainResponse.ok) {
-        const data = await subdomainResponse.json()
+      if (response.ok) {
+        const data = await response.json()
         return data
       }
+      return null // Stop ici si échec
     }
 
-    // Essayer de récupérer par domaine pour les domaines custom
+    // 2. Si on a un header x-tenant (priorité)
+    if (tenant) {
+      const response = await fetch(`${API_URL}/api/public/tenant/${tenant}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store'
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return data
+      }
+      return null // Stop ici si échec
+    }
+
+    // 3. Pour les domaines personnalisés ou webpro200.com
+    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.com'
+    const isMainDomain = host?.includes(mainDomain)
+    
+    if (isMainDomain) {
+      // Extraire le subdomain pour les sites clients
+      const parts = host.split('.')
+      if (parts.length >= 3 && parts[0] !== 'www') {
+        const subdomain = parts[0]
+        const response = await fetch(`${API_URL}/api/public/tenant/${subdomain}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store'
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          return data
+        }
+      }
+      return null // C'est www.webpro200.com ou pas un sous-domaine
+    }
+
+    // 4. Pour les domaines personnalisés uniquement
     const response = await fetch(`${API_URL}/api/public/tenant-by-domain/${host}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      // Important: désactiver le cache pour avoir toujours les données à jour
       cache: 'no-store'
     })
 
     if (response.ok) {
       const data = await response.json()
       return data.tenant
-    }
-
-    // Si pas trouvé par domaine et qu'on a un tenant header, essayer par subdomain
-    if (tenant) {
-      const subdomainResponse = await fetch(`${API_URL}/api/public/tenant/${tenant}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-store'
-      })
-
-      if (subdomainResponse.ok) {
-        const data = await subdomainResponse.json()
-        return data
-      }
-    }
-
-    // Fallback: extraire le subdomain du host
-    const subdomain = host.split('.')[0]
-    const fallbackResponse = await fetch(`${API_URL}/api/public/tenant/${subdomain}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store'
-    })
-
-    if (fallbackResponse.ok) {
-      const data = await fallbackResponse.json()
-      return data
     }
 
     return null
