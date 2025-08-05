@@ -411,12 +411,23 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
         },
       });
 
-      // 4. Supprimer la session temporaire
+      // 4. Créer l'enregistrement DNS dans Cloudflare (si configuré)
+      if (fastify.cloudflare) {
+        try {
+          await fastify.cloudflare.createSubdomainRecord(tenantSubdomain);
+          fastify.log.info(`DNS record created for subdomain: ${tenantSubdomain}`);
+        } catch (error) {
+          fastify.log.error('Failed to create DNS record:', error);
+          // Ne pas faire échouer la création du compte si Cloudflare échoue
+        }
+      }
+
+      // 5. Supprimer la session temporaire
       await prisma.signupSession.delete({
         where: { id: session.id },
       });
 
-      // 5. Log d'audit
+      // 6. Log d'audit
       await prisma.auditLog.create({
         data: {
           tenantId: tenant.id,

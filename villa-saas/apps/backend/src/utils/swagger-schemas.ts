@@ -8,6 +8,7 @@ export const swaggerTags = {
   pricing: 'Pricing',
   health: 'Health',
   public: 'Public',
+  domains: 'Domains',
 };
 
 export const swaggerSchemas = {

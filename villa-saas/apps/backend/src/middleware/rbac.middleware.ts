@@ -16,7 +16,10 @@ export type Permission =
   | 'payments.read'
   | 'payments.write'
   | 'settings.read'
-  | 'settings.write';
+  | 'settings.write'
+  | 'domain.create'
+  | 'domain.update'
+  | 'domain.delete';
 
 // Définir les permissions par rôle
 const rolePermissions: Record<string, Permission[]> = {
@@ -28,7 +31,8 @@ const rolePermissions: Record<string, Permission[]> = {
     'tenant.read', 'tenant.write',
     'analytics.read',
     'payments.read', 'payments.write',
-    'settings.read', 'settings.write'
+    'settings.read', 'settings.write',
+    'domain.create', 'domain.update', 'domain.delete'
   ],
   ADMIN: [
     // Les admins peuvent tout faire sauf gérer le tenant et les paiements
@@ -38,7 +42,8 @@ const rolePermissions: Record<string, Permission[]> = {
     'tenant.read',
     'analytics.read',
     'payments.read',
-    'settings.read', 'settings.write'
+    'settings.read', 'settings.write',
+    'domain.create', 'domain.update', 'domain.delete'
   ],
   USER: [
     // Les utilisateurs standards ont des permissions limitées

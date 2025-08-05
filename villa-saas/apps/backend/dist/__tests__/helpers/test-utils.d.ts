@@ -7,13 +7,13 @@ export declare function createAuthHeader(token: string): {
     authorization: string;
 };
 export declare function createTenant(prisma: PrismaClient): Promise<{
+    id: string;
+    name: string;
     subdomain: string | null;
     email: string;
     settings: import("@prisma/client/runtime/library").JsonValue;
-    id: string;
     createdAt: Date;
     updatedAt: Date;
-    name: string;
     phone: string | null;
     companyName: string | null;
     siret: string | null;
@@ -36,8 +36,8 @@ export declare function createTenant(prisma: PrismaClient): Promise<{
     subscriptionEndDate: Date | null;
 }>;
 export declare function createUser(prisma: PrismaClient, tenantId: string): Promise<{
-    email: string;
     id: string;
+    email: string;
     createdAt: Date;
     updatedAt: Date;
     phone: string | null;

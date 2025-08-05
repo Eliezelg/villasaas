@@ -11,6 +11,7 @@ exports.swaggerTags = {
     pricing: 'Pricing',
     health: 'Health',
     public: 'Public',
+    domains: 'Domains',
 };
 exports.swaggerSchemas = {
     // Common error response

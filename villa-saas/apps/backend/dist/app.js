@@ -23,6 +23,7 @@ const s3_1 = __importDefault(require("./plugins/s3"));
 const resend_1 = __importDefault(require("./plugins/resend"));
 const websocket_1 = __importDefault(require("./plugins/websocket"));
 const vercel_1 = __importDefault(require("./plugins/vercel"));
+const cloudflare_1 = __importDefault(require("./plugins/cloudflare"));
 const health_routes_1 = require("./modules/health/health.routes");
 const auth_routes_1 = require("./modules/auth/auth.routes");
 const auth_signup_routes_1 = require("./modules/auth/auth-signup.routes");
@@ -47,6 +48,7 @@ const messaging_routes_1 = require("./modules/messaging/messaging.routes");
 const auto_response_routes_1 = require("./modules/messaging/auto-response.routes");
 const booking_options_routes_1 = require("./modules/booking-options/booking-options.routes");
 const domains_routes_1 = require("./modules/domains/domains.routes");
+const dns_management_routes_1 = require("./modules/domains/dns-management.routes");
 const domain_lookup_routes_1 = require("./modules/public/domain-lookup.routes");
 const public_site_routes_1 = require("./modules/public-site/public-site.routes");
 const subdomain_check_routes_1 = require("./modules/public/subdomain-check.routes");
@@ -175,6 +177,7 @@ async function buildApp(opts = {}) {
     await app.register(static_1.default);
     await app.register(websocket_1.default);
     await app.register(vercel_1.default);
+    await app.register(cloudflare_1.default);
     // Routes
     await app.register(health_routes_1.healthRoutes, { prefix: '/health' });
     await app.register(auth_routes_1.authRoutes, { prefix: '/api/auth' });
@@ -199,6 +202,7 @@ async function buildApp(opts = {}) {
     await app.register(booking_options_routes_1.bookingOptionsRoutes, { prefix: '/api' });
     await app.register(public_site_routes_1.publicSiteRoutes, { prefix: '/api' });
     await app.register(domains_routes_1.domainsRoutes);
+    await app.register(dns_management_routes_1.dnsManagementRoutes, { prefix: '/api' });
     // Public routes (no auth required)
     await app.register(public_routes_1.publicRoutes, { prefix: '/api' });
     await app.register(promocodes_public_routes_1.publicPromoCodesRoutes, { prefix: '/api' });

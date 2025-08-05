@@ -18,6 +18,7 @@ import s3Plugin from './plugins/s3';
 import resendPlugin from './plugins/resend';
 import websocketPlugin from './plugins/websocket';
 import vercelPlugin from './plugins/vercel';
+import cloudflarePlugin from './plugins/cloudflare';
 
 import { healthRoutes } from './modules/health/health.routes';
 import { authRoutes } from './modules/auth/auth.routes';
@@ -43,6 +44,7 @@ import { messagingRoutes } from './modules/messaging/messaging.routes';
 import { autoResponseRoutes } from './modules/messaging/auto-response.routes';
 import { bookingOptionsRoutes } from './modules/booking-options/booking-options.routes';
 import { domainsRoutes } from './modules/domains/domains.routes';
+import { dnsManagementRoutes } from './modules/domains/dns-management.routes';
 import { domainLookupRoutes } from './modules/public/domain-lookup.routes';
 import { publicSiteRoutes } from './modules/public-site/public-site.routes';
 import { subdomainCheckRoutes } from './modules/public/subdomain-check.routes';
@@ -186,6 +188,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(staticPlugin);
   await app.register(websocketPlugin);
   await app.register(vercelPlugin);
+  await app.register(cloudflarePlugin);
 
   // Routes
   await app.register(healthRoutes, { prefix: '/health' });
@@ -211,6 +214,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(bookingOptionsRoutes, { prefix: '/api' });
   await app.register(publicSiteRoutes, { prefix: '/api' });
   await app.register(domainsRoutes);
+  await app.register(dnsManagementRoutes, { prefix: '/api' });
   
   // Public routes (no auth required)
   await app.register(publicRoutes, { prefix: '/api' });

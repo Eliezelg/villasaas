@@ -8,6 +8,7 @@ export declare const swaggerTags: {
     pricing: string;
     health: string;
     public: string;
+    domains: string;
 };
 export declare const swaggerSchemas: {
     errorResponse: {
