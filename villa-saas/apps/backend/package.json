@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "npm run migrate:deploy && node dist/server.js",
-    "migrate:deploy": "cd ../../packages/database && npx prisma migrate deploy",
+    "start": "node dist/server.js",
     "start:production": "bash start-production.sh",
     "test": "jest",
     "test:watch": "jest --watch",
