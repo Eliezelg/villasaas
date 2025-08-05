@@ -45,6 +45,7 @@ import { bookingOptionsRoutes } from './modules/booking-options/booking-options.
 import { domainsRoutes } from './modules/domains/domains.routes';
 import { domainLookupRoutes } from './modules/public/domain-lookup.routes';
 import { publicSiteRoutes } from './modules/public-site/public-site.routes';
+import { subdomainCheckRoutes } from './modules/public/subdomain-check.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -215,9 +216,6 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(publicRoutes, { prefix: '/api' });
   await app.register(publicPromoCodesRoutes, { prefix: '/api' });
   await app.register(domainLookupRoutes);
-  
-  // Import and register subdomain check routes
-  const { subdomainCheckRoutes } = await import('./modules/public/subdomain-check.routes');
   await app.register(subdomainCheckRoutes, { prefix: '/api' });
 
   return app;
