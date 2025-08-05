@@ -426,7 +426,7 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
       if (fastify.vercel && process.env.VERCEL_PROJECT_ID) {
         try {
           const domain = `${tenantSubdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.com'}`;
-          await fastify.vercel.addDomain(process.env.VERCEL_PROJECT_ID, domain);
+          await fastify.vercel.addDomain(domain);
           fastify.log.info(`Domain added to Vercel: ${domain}`);
         } catch (error) {
           fastify.log.error('Failed to add domain to Vercel:', error);
