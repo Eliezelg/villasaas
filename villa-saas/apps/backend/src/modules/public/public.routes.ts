@@ -69,7 +69,7 @@ const publicBookingSchema = z.object({
 
 export async function publicRoutes(fastify: FastifyInstance) {
   // Gérer les requêtes OPTIONS pour CORS preflight
-  fastify.options('/*', async (request, reply) => {
+  fastify.options('/*', async (_request, reply) => {
     return reply.code(204).send();
   });
   const pricingService = new PricingService(fastify.prisma);
