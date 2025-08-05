@@ -10,6 +10,7 @@ exports.swaggerTags = {
     periods: 'Periods',
     pricing: 'Pricing',
     health: 'Health',
+    public: 'Public',
 };
 exports.swaggerSchemas = {
     // Common error response

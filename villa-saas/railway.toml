@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "cd apps/backend && npm run build"
 
 [deploy]
-startCommand = "cd apps/backend && npm start"
+startCommand = "cd apps/backend && npm run start:production"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"

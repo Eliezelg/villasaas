@@ -11,7 +11,7 @@ if [ ! -d "dist" ]; then
 fi
 
 # Check critical files
-if [ ! -f "dist/modules/auth/auth-signup.routes.js" ]; then
+if [ ! -f "dist/modules/auth/auth-signup.routes.js" ] || [ ! -f "dist/modules/public/subdomain-check.routes.js" ]; then
     echo "❌ Critical files missing! Rebuilding..."
     rm -rf dist tsconfig.tsbuildinfo
     npx tsc
