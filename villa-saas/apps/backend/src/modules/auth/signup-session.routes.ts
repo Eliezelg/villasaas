@@ -422,6 +422,18 @@ export async function signupSessionRoutes(fastify: FastifyInstance) {
         }
       }
 
+      // 4b. Ajouter le domaine dans Vercel (si configuré)
+      if (fastify.vercel && process.env.VERCEL_PROJECT_ID) {
+        try {
+          const domain = `${tenantSubdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.com'}`;
+          await fastify.vercel.addDomain(process.env.VERCEL_PROJECT_ID, domain);
+          fastify.log.info(`Domain added to Vercel: ${domain}`);
+        } catch (error) {
+          fastify.log.error('Failed to add domain to Vercel:', error);
+          // Ne pas faire échouer la création du compte si Vercel échoue
+        }
+      }
+
       // 5. Supprimer la session temporaire
       await prisma.signupSession.delete({
         where: { id: session.id },

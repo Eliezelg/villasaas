@@ -78,8 +78,9 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         // Ajouter le domaine webpro200.com et ses sous-domaines
         'https://webpro200.com',
         'https://www.webpro200.com',
-        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
-        // Force deployment: 2025-07-25T00:26:00Z - Railway Dockerfile path
+        'https://aviv.webpro200.com', // Ajouter explicitement aviv pour le test
+        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/, // Pattern pour tous les sous-domaines
+        // Force deployment: 2025-08-05T22:30:00Z - CORS fix for subdomains
       ].filter(Boolean) : [];
       
       const allowedOrigins = [...devOrigins, ...prodOrigins];

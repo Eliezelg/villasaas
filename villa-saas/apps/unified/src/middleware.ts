@@ -52,14 +52,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/admin/signup`, request.url))
   }
   
-  // Redirection de la racine vers /admin/login
-  if (pathname === '/' || pathname === `/${locale}`) {
-    return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
-  }
-  
-  // 1. Déterminer le mode de l'application
+  // 1. Déterminer le mode de l'application AVANT les redirections
   let mode: 'hub' | 'admin' | 'booking' = 'hub'
   let tenant = null
+  
+  // Vérifier d'abord si c'est un sous-domaine (pour éviter la redirection vers admin)
+  const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.com'
+  const isSubdomain = hostname.endsWith(`.${mainDomain}`) && !hostname.startsWith('www.')
+  
+  if (isSubdomain) {
+    const subdomain = hostname.split('.')[0]
+    if (subdomain && subdomain !== 'www' && subdomain !== 'api') {
+      tenant = subdomain
+      mode = 'booking'
+    }
+  }
+  
+  // Redirection de la racine vers /admin/login SEULEMENT si ce n'est pas un site booking
+  if (mode !== 'booking' && (pathname === '/' || pathname === `/${locale}`)) {
+    return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
+  }
   
   // Si c'est une route admin
   if (pathname.startsWith('/admin')) {
