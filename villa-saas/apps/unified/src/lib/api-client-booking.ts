@@ -29,6 +29,7 @@ class ApiClient {
     try {
       const response = await fetch(`${this.baseURL}${endpoint}`, {
         ...options,
+        credentials: 'include', // Important pour les cookies
         headers: {
           ...defaultHeaders,
           ...options.headers,

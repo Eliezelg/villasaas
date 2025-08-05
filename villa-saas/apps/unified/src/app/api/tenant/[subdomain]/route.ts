@@ -10,7 +10,7 @@ export async function GET(
     const { subdomain } = params;
 
     // Faire un proxy vers le backend
-    const response = await fetch(`${API_URL}/api/tenants/info/${subdomain}`, {
+    const response = await fetch(`${API_URL}/api/public/tenant/${subdomain}`, {
       headers: {
         'Content-Type': 'application/json',
       },

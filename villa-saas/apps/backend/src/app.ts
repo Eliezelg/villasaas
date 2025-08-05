@@ -55,6 +55,19 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   // Global error handler
   app.setErrorHandler(errorHandler);
 
+  // Handle OPTIONS requests early to avoid CORS preflight issues
+  app.addHook('onRequest', async (request, reply) => {
+    if (request.method === 'OPTIONS') {
+      reply
+        .code(204)
+        .header('Access-Control-Allow-Origin', request.headers.origin || '*')
+        .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant')
+        .header('Access-Control-Allow-Credentials', 'true')
+        .send();
+    }
+  });
+
   // Core plugins
   await app.register(cors, {
     origin: (origin, cb) => {
@@ -80,7 +93,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         'https://www.webpro200.com',
         'https://aviv.webpro200.com', // Ajouter explicitement aviv pour le test
         /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/, // Pattern pour tous les sous-domaines
-        // Force deployment: 2025-08-05T22:30:00Z - CORS fix for subdomains
+        // Force deployment: 2025-08-05T22:45:00Z - CORS fix for preflight
       ].filter(Boolean) : [];
       
       const allowedOrigins = [...devOrigins, ...prodOrigins];
@@ -107,6 +120,9 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant'],
+    exposedHeaders: ['X-Total-Count'],
   });
 
   await app.register(helmet, {
