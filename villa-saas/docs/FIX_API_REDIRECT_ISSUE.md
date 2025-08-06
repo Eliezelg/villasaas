@@ -2,7 +2,7 @@
 
 ## Problème identifié
 
-L'API sur api.webpro200.com renvoie des redirections 301 qui causent l'erreur CORS "Redirect is not allowed for preflight request". 
+L'API sur api.webpro200.fr renvoie des redirections 301 qui causent l'erreur CORS "Redirect is not allowed for preflight request". 
 
 Cause : Conflit entre Railway et Cloudflare sur la gestion SSL/TLS.
 
@@ -10,7 +10,7 @@ Cause : Conflit entre Railway et Cloudflare sur la gestion SSL/TLS.
 
 ### 1. Dans Cloudflare Dashboard
 
-1. Allez dans votre zone **webpro200.com**
+1. Allez dans votre zone **webpro200.fr**
 2. Allez dans **SSL/TLS** → **Overview**
 3. Changez le mode de chiffrement de "Full (strict)" ou "Flexible" vers **"Full"**
    - ⚠️ IMPORTANT : Utilisez "Full" et non "Full (strict)"
@@ -32,7 +32,7 @@ Si le domaine personnalisé n'est pas encore ajouté :
 
 1. Dashboard Railway → Projet "tranquil-hope"
 2. Service "villasaas" → Settings → Domains
-3. Add Custom Domain : `api.webpro200.com`
+3. Add Custom Domain : `api.webpro200.fr`
 4. Railway confirmera que le domaine est configuré
 
 ## Vérification
@@ -41,11 +41,11 @@ Après les changements (attendez 2-3 minutes) :
 
 ```bash
 # Test direct de l'API
-curl -I https://api.webpro200.com/health
+curl -I https://api.webpro200.fr/health
 
 # Test CORS
-curl -X OPTIONS https://api.webpro200.com/api/properties \
-  -H "Origin: https://aviv.webpro200.com" \
+curl -X OPTIONS https://api.webpro200.fr/api/properties \
+  -H "Origin: https://aviv.webpro200.fr" \
   -H "Access-Control-Request-Method: GET" \
   -H "Access-Control-Request-Headers: Content-Type, X-Tenant" \
   -v

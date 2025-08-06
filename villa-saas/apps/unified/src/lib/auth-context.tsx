@@ -40,14 +40,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string, tenantSubdomain?: string) => {
     try {
-      // Pour webpro200.com, on doit d'abord identifier le tenant de l'utilisateur
+      // Pour webpro200.fr, on doit d'abord identifier le tenant de l'utilisateur
       let subdomain = tenantSubdomain
       
       if (!subdomain && typeof window !== 'undefined') {
         const host = window.location.hostname
         
-        // Si on est sur webpro200.com, on devra chercher le tenant via l'email
-        if (host === 'www.webpro200.com' || host === 'webpro200.com') {
+        // Si on est sur webpro200.fr, on devra chercher le tenant via l'email
+        if (host === 'www.webpro200.fr' || host === 'webpro200.fr') {
           // TODO: Implémenter une route pour trouver le tenant par email
           // Pour l'instant, on utilise testcompany par défaut
           subdomain = 'testcompany'
@@ -66,12 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Rediriger vers le dashboard approprié
         if (data.user.tenant?.subdomain) {
-          // Si on est sur webpro200.com, rediriger vers le subdomain du tenant
-          if (window.location.hostname.includes('webpro200.com')) {
+          // Si on est sur webpro200.fr, rediriger vers le subdomain du tenant
+          if (window.location.hostname.includes('webpro200.fr')) {
             // Option 1: Rediriger vers le subdomain
-            // window.location.href = `https://${data.user.tenant.subdomain}.webpro200.com/admin`
+            // window.location.href = `https://${data.user.tenant.subdomain}.webpro200.fr/admin`
             
-            // Option 2: Rester sur webpro200.com mais avec le contexte du tenant
+            // Option 2: Rester sur webpro200.fr mais avec le contexte du tenant
             router.push('/admin')
           } else {
             router.push('/admin')

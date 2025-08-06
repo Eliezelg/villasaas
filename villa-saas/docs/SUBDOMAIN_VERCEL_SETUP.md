@@ -2,7 +2,7 @@
 
 ## Problème
 
-Vercel ne supporte pas nativement les domaines wildcard (*.webpro200.com). Chaque sous-domaine doit être configuré individuellement.
+Vercel ne supporte pas nativement les domaines wildcard (*.webpro200.fr). Chaque sous-domaine doit être configuré individuellement.
 
 ## Solutions
 
@@ -14,7 +14,7 @@ Vercel ne supporte pas nativement les domaines wildcard (*.webpro200.com). Chaqu
 2. Sélectionnez votre projet
 3. Settings → Domains
 4. Cliquez sur "Add"
-5. Entrez le sous-domaine complet : `aviv.webpro200.com`
+5. Entrez le sous-domaine complet : `aviv.webpro200.fr`
 6. Vercel affichera : "Invalid Configuration: A valid CNAME record was not found"
 
 #### Étape 2 : Configurer DNS dans Cloudflare
@@ -45,7 +45,7 @@ Cela ajoutera automatiquement les domaines dans Vercel lors de l'inscription.
 
 Pour éviter cette limitation, considérez :
 
-1. **Un seul domaine avec paths** : `webpro200.com/aviv` au lieu de `aviv.webpro200.com`
+1. **Un seul domaine avec paths** : `webpro200.fr/aviv` au lieu de `aviv.webpro200.fr`
 2. **Proxy inverse** : Nginx/Caddy sur un VPS qui route vers Vercel
 3. **Edge Functions** : Utiliser Cloudflare Workers pour router les requêtes
 
@@ -90,7 +90,7 @@ Pour Villa SaaS avec plusieurs clients :
 
 ## Exemple de Configuration Correcte
 
-Pour `aviv.webpro200.com` :
+Pour `aviv.webpro200.fr` :
 
 **Cloudflare DNS :**
 ```
@@ -102,6 +102,6 @@ TTL: Auto
 ```
 
 **Vercel :**
-- Domain: aviv.webpro200.com
+- Domain: aviv.webpro200.fr
 - Status: Valid Configuration ✓
 - SSL: Automatic

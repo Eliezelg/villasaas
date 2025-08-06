@@ -17,7 +17,7 @@ async function fixTenantPublicSite() {
       const publicSite = await prisma.publicSite.create({
         data: {
           tenantId: tenant.id,
-          domain: `${tenant.subdomain}.webpro200.com`,
+          domain: `${tenant.subdomain}.webpro200.fr`,
           subdomain: tenant.subdomain,
           isActive: true,
           defaultLocale: 'fr',
@@ -33,10 +33,10 @@ async function fixTenantPublicSite() {
       console.log(`Created PublicSite for tenant ${tenant.name} (${tenant.subdomain})`);
     }
 
-    // Vérifier aussi si webpro200.com est configuré
+    // Vérifier aussi si webpro200.fr est configuré
     const mainSite = await prisma.publicSite.findFirst({
       where: {
-        domain: 'www.webpro200.com'
+        domain: 'www.webpro200.fr'
       }
     });
 
@@ -52,7 +52,7 @@ async function fixTenantPublicSite() {
         await prisma.publicSite.create({
           data: {
             tenantId: testTenant.id,
-            domain: 'www.webpro200.com',
+            domain: 'www.webpro200.fr',
             subdomain: 'testcompany',
             isActive: true,
             defaultLocale: 'fr',
@@ -64,7 +64,7 @@ async function fixTenantPublicSite() {
             }
           }
         });
-        console.log('Created PublicSite for www.webpro200.com');
+        console.log('Created PublicSite for www.webpro200.fr');
       }
     }
 

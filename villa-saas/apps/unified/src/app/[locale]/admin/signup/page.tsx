@@ -890,7 +890,7 @@ function SignupPageContent() {
                                   <X className="absolute right-3 top-3 h-4 w-4 text-red-500" />
                                 )}
                               </div>
-                              <span className="text-gray-500">.webpro200.com</span>
+                              <span className="text-gray-500">.webpro200.fr</span>
                             </div>
                           </FormControl>
                           <FormDescription>

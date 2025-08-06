@@ -62,7 +62,7 @@ export class CloudflareService {
     try {
       const response = await this.client.dns.records.list({
         zone_id: this.zoneId,
-        search: `${subdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.com'}`,
+        search: `${subdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.fr'}`,
       } as any);
 
       return response.result?.[0];
@@ -146,7 +146,7 @@ export class CloudflareService {
     try {
       await this.client.cache.purge({
         zone_id: this.zoneId,
-        hosts: [`${subdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.com'}`],
+        hosts: [`${subdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.fr'}`],
       });
 
       console.log(`Cache purged for ${subdomain}`);

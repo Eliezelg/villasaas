@@ -29,9 +29,9 @@ async function main() {
         
         // URLs d'accès
         console.log(`\n   📍 URLs d'accès:`);
-        console.log(`      - Admin: https://www.webpro200.com/admin/login`);
+        console.log(`      - Admin: https://www.webpro200.fr/admin/login`);
         if (tenant.publicSite.subdomain) {
-          console.log(`      - Site public: https://${tenant.publicSite.subdomain}.webpro200.com`);
+          console.log(`      - Site public: https://${tenant.publicSite.subdomain}.webpro200.fr`);
         }
         if (tenant.publicSite.domain) {
           console.log(`      - Domaine personnalisé: https://${tenant.publicSite.domain}`);
@@ -58,7 +58,7 @@ async function main() {
     // 3. Résumé de l'architecture
     console.log('\n\n📐 Architecture actuelle :');
     console.log('================================');
-    console.log('🏛️  Domaine principal (Admin) : www.webpro200.com');
+    console.log('🏛️  Domaine principal (Admin) : www.webpro200.fr');
     console.log('   → Tous les propriétaires se connectent ici');
     console.log('   → Gestion centralisée des propriétés et réservations');
     console.log('');
@@ -71,7 +71,7 @@ async function main() {
 
     for (const site of activeSites) {
       if (site.subdomain) {
-        console.log(`   → ${site.subdomain}.webpro200.com (${site.tenant?.name})`);
+        console.log(`   → ${site.subdomain}.webpro200.fr (${site.tenant?.name})`);
       }
       if (site.domain) {
         console.log(`   → ${site.domain} (domaine personnalisé)`);
@@ -81,8 +81,8 @@ async function main() {
     // 4. Instructions pour tester
     console.log('\n\n🧪 Pour tester l\'architecture :');
     console.log('================================');
-    console.log('1. Connexion admin : https://www.webpro200.com/admin/login');
-    console.log('2. Site public : https://[subdomain].webpro200.com');
+    console.log('1. Connexion admin : https://www.webpro200.fr/admin/login');
+    console.log('2. Site public : https://[subdomain].webpro200.fr');
     console.log('3. Domaine personnalisé : Configurer le DNS (CNAME vers cname.vercel-dns.com)');
 
   } catch (error) {
