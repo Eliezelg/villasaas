@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "pwd && ls -la && ls -la src/components/ui/ | head -10 && next build",
+    "build": "ls -la src/components/ && ls -la src/components/chat/ && next build",
     "start": "next start -p 3000",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
