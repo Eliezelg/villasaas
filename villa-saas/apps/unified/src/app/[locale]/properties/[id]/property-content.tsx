@@ -267,13 +267,45 @@ export default function PropertyContent() {
                 />
               </div>
               
+              {/* Message d'instruction si aucune date sélectionnée */}
+              {(!selectedDates.checkIn || !selectedDates.checkOut) && (
+                <div className="mb-4 p-3 bg-muted/50 rounded-md text-sm text-center">
+                  <p className="font-medium">Sélectionnez vos dates pour réserver</p>
+                  <p className="text-muted-foreground mt-1">
+                    Choisissez une date d'arrivée puis une date de départ
+                  </p>
+                </div>
+              )}
+              
+              {/* Résumé de la réservation si dates sélectionnées */}
+              {selectedDates.checkIn && selectedDates.checkOut && (
+                <div className="mb-4 p-3 bg-primary/5 border border-primary/20 rounded-md">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Arrivée:</span>
+                    <span className="font-medium">{format(selectedDates.checkIn, 'dd MMM yyyy')}</span>
+                  </div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span>Départ:</span>
+                    <span className="font-medium">{format(selectedDates.checkOut, 'dd MMM yyyy')}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-medium pt-2 border-t">
+                    <span>Nombre de nuits:</span>
+                    <span>{Math.floor((selectedDates.checkOut.getTime() - selectedDates.checkIn.getTime()) / (1000 * 60 * 60 * 24))}</span>
+                  </div>
+                </div>
+              )}
+              
               <Button
                 onClick={handleBooking}
                 disabled={!selectedDates.checkIn || !selectedDates.checkOut}
                 className="w-full"
                 size="lg"
+                variant={selectedDates.checkIn && selectedDates.checkOut ? "default" : "outline"}
               >
-                {t('common.actions.book')}
+                {selectedDates.checkIn && selectedDates.checkOut 
+                  ? t('common.actions.book')
+                  : 'Sélectionnez vos dates'
+                }
               </Button>
 
               {property.cleaningFee > 0 && (
