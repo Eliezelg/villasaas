@@ -81,7 +81,7 @@ const nextConfig = {
   },
   
   // Configuration pour Vercel
-  output: 'standalone',
+  // output: 'standalone', // Commenté car peut causer des problèmes de résolution de modules
   poweredByHeader: false,
   
   // Désactiver ESLint pendant le build pour éviter les erreurs de quotes
