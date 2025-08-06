@@ -3,14 +3,14 @@
 ## 🌐 Structure des Domaines
 
 ### 1. **Domaine Principal - Administration**
-- **URL** : `www.webpro200.com`
+- **URL** : `www.webpro200.fr`
 - **Utilisation** : Portail d'administration où TOUS les propriétaires se connectent
 - **Accès** : `/admin/login`
 
 ### 2. **Sous-domaines - Sites Publics**
-- **URL** : `[subdomain].webpro200.com`
+- **URL** : `[subdomain].webpro200.fr`
 - **Utilisation** : Sites de réservation publics pour chaque client
-- **Exemple** : `villa-martin.webpro200.com`
+- **Exemple** : `villa-martin.webpro200.fr`
 
 ### 3. **Domaines Personnalisés (Optionnel)**
 - **URL** : `www.client-domain.com`
@@ -18,17 +18,17 @@
 
 ## 🚀 Flux d'Inscription
 
-1. Le client s'inscrit sur `www.webpro200.com/admin/signup`
+1. Le client s'inscrit sur `www.webpro200.fr/admin/signup`
 2. Il choisit son sous-domaine (ex: `villa-martin`)
-3. Son site public est créé automatiquement : `villa-martin.webpro200.com`
-4. Il se connecte toujours sur `www.webpro200.com` pour administrer
+3. Son site public est créé automatiquement : `villa-martin.webpro200.fr`
+4. Il se connecte toujours sur `www.webpro200.fr` pour administrer
 
 ## 🛠️ Configuration Technique
 
 ### Variables d'environnement (.env)
 ```bash
 # Frontend
-NEXT_PUBLIC_MAIN_DOMAIN=webpro200.com
+NEXT_PUBLIC_MAIN_DOMAIN=webpro200.fr
 NEXT_PUBLIC_API_URL=http://localhost:3001
 
 # Backend (pour Vercel API)
@@ -39,21 +39,21 @@ VERCEL_TEAM_ID=xxx
 
 ### Vercel Project Settings
 1. Ajouter les domaines :
-   - `www.webpro200.com` (domaine principal)
-   - `*.webpro200.com` (wildcard pour les sous-domaines)
+   - `www.webpro200.fr` (domaine principal)
+   - `*.webpro200.fr` (wildcard pour les sous-domaines)
 
 ## 📝 Exemples Concrets
 
 ### Client "Villa Martin Cannes"
 - **Inscription** : Choisit le sous-domaine `villa-martin`
-- **Administration** : Se connecte sur `www.webpro200.com`
-- **Site public** : `villa-martin.webpro200.com`
+- **Administration** : Se connecte sur `www.webpro200.fr`
+- **Site public** : `villa-martin.webpro200.fr`
 - **Domaine perso** : Peut ajouter `www.villa-martin-cannes.com` plus tard
 
 ### Client "Résidence Azur Nice"
 - **Inscription** : Choisit le sous-domaine `residence-azur`
-- **Administration** : Se connecte sur `www.webpro200.com`
-- **Site public** : `residence-azur.webpro200.com`
+- **Administration** : Se connecte sur `www.webpro200.fr`
+- **Site public** : `residence-azur.webpro200.fr`
 - **Domaine perso** : Peut ajouter `www.residence-azur.fr` plus tard
 
 ## 🧪 Test Local
@@ -101,7 +101,7 @@ node scripts/fix-missing-public-sites.js
 
 ## ⚠️ Points Importants
 
-1. **Ne jamais** utiliser `www.webpro200.com` comme domaine personnalisé d'un client
+1. **Ne jamais** utiliser `www.webpro200.fr` comme domaine personnalisé d'un client
 2. **Toujours** créer un PublicSite lors de l'inscription
-3. **Les sous-domaines** sont en `.webpro200.com`, pas `.villa-saas.com`
-4. **L'admin** est toujours sur `www.webpro200.com` pour tous les clients
+3. **Les sous-domaines** sont en `.webpro200.fr`, pas `.villa-saas.com`
+4. **L'admin** est toujours sur `www.webpro200.fr` pour tous les clients

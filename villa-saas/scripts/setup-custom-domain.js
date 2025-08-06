@@ -22,7 +22,7 @@ async function setupCustomDomain() {
       const publicSite = await prisma.publicSite.create({
         data: {
           tenantId: tenant.id,
-          domain: 'www.webpro200.com',
+          domain: 'www.webpro200.fr',
           subdomain: tenant.subdomain || 'demo',
           isActive: true,
           defaultLocale: 'fr',
@@ -40,15 +40,15 @@ async function setupCustomDomain() {
       const updated = await prisma.publicSite.update({
         where: { id: tenant.publicSite.id },
         data: { 
-          domain: 'www.webpro200.com',
+          domain: 'www.webpro200.fr',
           isActive: true
         }
       });
-      console.log('✅ PublicSite mis à jour avec le domaine www.webpro200.com');
+      console.log('✅ PublicSite mis à jour avec le domaine www.webpro200.fr');
     }
 
     console.log('\n📝 Configuration terminée !');
-    console.log('Le site devrait maintenant être accessible sur www.webpro200.com');
+    console.log('Le site devrait maintenant être accessible sur www.webpro200.fr');
     
   } catch (error) {
     console.error('❌ Erreur:', error);

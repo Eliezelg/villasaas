@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
   let tenant = null
   
   // Vérifier d'abord si c'est un sous-domaine (pour éviter la redirection vers admin)
-  const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.com'
+  const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.fr'
   const isSubdomain = hostname.endsWith(`.${mainDomain}`) && !hostname.startsWith('www.')
   
   if (isSubdomain) {
@@ -134,7 +134,7 @@ export async function middleware(request: NextRequest) {
   } else {
     // Pour la production avec domaines personnalisés
     // Si ce n'est pas le domaine principal, c'est un domaine personnalisé
-    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.com'
+    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.fr'
     
     // Ignorer les domaines Vercel preview
     const isVercelPreview = hostname.endsWith('.vercel.app') && hostname !== mainDomain

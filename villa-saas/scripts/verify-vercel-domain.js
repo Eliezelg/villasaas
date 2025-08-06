@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 // Configuration
 const VERCEL_TOKEN = process.env.VERCEL_API_TOKEN || 'XeS9vedL6cGqbncEYrKTtPCm';
 const PROJECT_ID = process.env.VERCEL_PROJECT_ID || 'prj_WDVwHE1tbLl7DsTI4U1i7SZMa62s';
-const DOMAIN = 'www.webpro200.com';
+const DOMAIN = 'www.webpro200.fr';
 
 async function checkDomain() {
   try {

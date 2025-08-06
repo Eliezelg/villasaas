@@ -71,8 +71,8 @@ export async function getTenantMetadata(): Promise<TenantMetadata | null> {
       return null // Stop ici si échec
     }
 
-    // 3. Pour les domaines personnalisés ou webpro200.com
-    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.com'
+    // 3. Pour les domaines personnalisés ou webpro200.fr
+    const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.fr'
     const isMainDomain = host?.includes(mainDomain)
     
     if (isMainDomain) {
@@ -93,7 +93,7 @@ export async function getTenantMetadata(): Promise<TenantMetadata | null> {
           return data
         }
       }
-      return null // C'est www.webpro200.com ou pas un sous-domaine
+      return null // C'est www.webpro200.fr ou pas un sous-domaine
     }
 
     // 4. Pour les domaines personnalisés uniquement

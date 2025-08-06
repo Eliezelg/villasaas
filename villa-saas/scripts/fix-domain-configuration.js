@@ -7,10 +7,10 @@ async function main() {
   console.log('🔧 Correction de la configuration des domaines...\n');
   
   try {
-    // Trouver le PublicSite qui utilise incorrectement www.webpro200.com
+    // Trouver le PublicSite qui utilise incorrectement www.webpro200.fr
     const incorrectSite = await prisma.publicSite.findFirst({
       where: {
-        domain: 'www.webpro200.com'
+        domain: 'www.webpro200.fr'
       },
       include: {
         tenant: true
@@ -18,7 +18,7 @@ async function main() {
     });
 
     if (incorrectSite) {
-      console.log(`❌ Trouvé un PublicSite utilisant incorrectement www.webpro200.com`);
+      console.log(`❌ Trouvé un PublicSite utilisant incorrectement www.webpro200.fr`);
       console.log(`   Tenant: ${incorrectSite.tenant.name}`);
       console.log(`   ID: ${incorrectSite.id}`);
       
@@ -29,7 +29,7 @@ async function main() {
       });
       
       console.log(`✅ Domaine personnalisé retiré`);
-      console.log(`   Le site est maintenant accessible sur: ${updated.subdomain}.webpro200.com`);
+      console.log(`   Le site est maintenant accessible sur: ${updated.subdomain}.webpro200.fr`);
     } else {
       console.log('✅ Aucune configuration incorrecte trouvée');
     }
@@ -37,8 +37,8 @@ async function main() {
     // Afficher la configuration correcte
     console.log('\n📐 Configuration correcte :');
     console.log('================================');
-    console.log('🏛️  www.webpro200.com → Administration centralisée (tous les propriétaires)');
-    console.log('🌐 [subdomain].webpro200.com → Sites publics de réservation');
+    console.log('🏛️  www.webpro200.fr → Administration centralisée (tous les propriétaires)');
+    console.log('🌐 [subdomain].webpro200.fr → Sites publics de réservation');
     console.log('🔗 [custom-domain].com → Domaines personnalisés (optionnel)');
     
     // Lister tous les sites correctement configurés
@@ -50,8 +50,8 @@ async function main() {
 
     for (const site of sites) {
       console.log(`\n🏢 ${site.tenant.name}`);
-      console.log(`   - Admin: www.webpro200.com`);
-      console.log(`   - Site public: ${site.subdomain}.webpro200.com`);
+      console.log(`   - Admin: www.webpro200.fr`);
+      console.log(`   - Site public: ${site.subdomain}.webpro200.fr`);
       if (site.domain) {
         console.log(`   - Domaine personnalisé: ${site.domain}`);
       }
