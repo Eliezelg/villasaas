@@ -115,7 +115,7 @@ export async function dnsManagementRoutes(fastify: FastifyInstance) {
     try {
       const record = await fastify.cloudflare.getSubdomainRecord(subdomain);
       const sslStatus = await fastify.cloudflare.checkSSLStatus(
-        `${subdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.com'}`
+        `${subdomain}.${process.env.CLOUDFLARE_DOMAIN || 'webpro200.fr'}`
       );
       
       reply.send({

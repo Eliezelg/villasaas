@@ -88,11 +88,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         'https://villasaas-eight.vercel.app',
         'https://villasaas-a4wtdk312-villa-saas.vercel.app',
         /^https:\/\/villasaas.*\.vercel\.app$/,
-        // Ajouter le domaine webpro200.com et ses sous-domaines
-        'https://webpro200.com',
-        'https://www.webpro200.com',
-        'https://aviv.webpro200.com', // Ajouter explicitement aviv pour le test
-        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/, // Pattern pour tous les sous-domaines
+        // Ajouter le domaine webpro200.fr et ses sous-domaines
+        'https://webpro200.fr',
+        'https://www.webpro200.fr',
+        'https://aviv.webpro200.fr', // Ajouter explicitement aviv pour le test
+        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/, // Pattern pour tous les sous-domaines
         // Force deployment: 2025-08-05T22:45:00Z - CORS fix for preflight
       ].filter(Boolean) : [];
       
