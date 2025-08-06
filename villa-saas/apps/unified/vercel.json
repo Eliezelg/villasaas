@@ -3,6 +3,11 @@
   "outputDirectory": ".next",
   "installCommand": "cd ../.. && npm install && cd apps/unified && npm install",
   "framework": "nextjs",
+  "build": {
+    "env": {
+      "FORCE_BUILDER_TAG": "canary"
+    }
+  },
   "rewrites": [
     {
       "source": "/:path*",
