@@ -4,12 +4,12 @@
 
 Les domaines suivants doivent être enregistrés dans Stripe pour activer Apple Pay et Google Pay :
 
-- `webpro200.fr` - Domaine principal
-- `www.webpro200.fr` - Sous-domaine www
-- `api.webpro200.fr` - API backend
+- `webpro200.com` - Domaine principal
+- `www.webpro200.com` - Sous-domaine www
+- `api.webpro200.com` - API backend
 - `villasaas-eight.vercel.app` - Domaine Vercel actuel
 
-**Note importante** : Les wildcards (*.webpro200.fr) ne sont pas supportés par Stripe. Chaque sous-domaine client devra être enregistré individuellement lorsqu'il sera créé.
+**Note importante** : Les wildcards (*.webpro200.com) ne sont pas supportés par Stripe. Chaque sous-domaine client devra être enregistré individuellement lorsqu'il sera créé.
 
 ## Méthode 1 : Dashboard Stripe (Recommandé)
 
@@ -37,7 +37,7 @@ Pour enregistrer manuellement via l'API :
 # Exemple pour un domaine
 curl https://api.stripe.com/v1/apple_pay/domains \
   -u "sk_live_...:" \
-  -d domain_name="webpro200.fr"
+  -d domain_name="webpro200.com"
 ```
 
 ## Vérification
@@ -65,5 +65,5 @@ Les webhooks Stripe sont déjà configurés dans le code pour accepter les requ�
 - `/api/public/stripe/subscription-webhook` - Webhooks d'abonnement
 
 Assurez-vous que les URLs de webhook dans Stripe pointent vers :
-- Production : `https://api.webpro200.fr/api/public/stripe/webhook`
-- Abonnements : `https://api.webpro200.fr/api/public/stripe/subscription-webhook`
+- Production : `https://api.webpro200.com/api/public/stripe/webhook`
+- Abonnements : `https://api.webpro200.com/api/public/stripe/subscription-webhook`

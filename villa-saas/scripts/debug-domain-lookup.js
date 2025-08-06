@@ -29,10 +29,10 @@ async function debugDomainLookup() {
       console.log(`   Actif: ${site.isActive ? 'Oui' : 'Non'}`);
     });
 
-    // 2. Rechercher spécifiquement www.webpro200.fr
-    console.log('\n🔎 Recherche de www.webpro200.fr...');
+    // 2. Rechercher spécifiquement www.webpro200.com
+    console.log('\n🔎 Recherche de www.webpro200.com...');
     const siteWithDomain = await prisma.publicSite.findFirst({
-      where: { domain: 'www.webpro200.fr' },
+      where: { domain: 'www.webpro200.com' },
       include: { tenant: true }
     });
 
@@ -47,7 +47,7 @@ async function debugDomainLookup() {
     // 3. Vérifier aussi la table Tenant directement
     console.log('\n🔎 Recherche dans la table Tenant...');
     const tenantWithDomain = await prisma.tenant.findFirst({
-      where: { customDomain: 'www.webpro200.fr' }
+      where: { customDomain: 'www.webpro200.com' }
     });
 
     if (tenantWithDomain) {

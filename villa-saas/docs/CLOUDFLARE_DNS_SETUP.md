@@ -4,8 +4,8 @@ Ce guide explique comment configurer Cloudflare pour la gestion automatique des 
 
 ## Prérequis
 
-1. Un compte Cloudflare avec votre domaine principal configuré (ex: webpro200.fr)
-2. Un certificat SSL qui couvre les sous-domaines (wildcard: *.webpro200.fr)
+1. Un compte Cloudflare avec votre domaine principal configuré (ex: webpro200.com)
+2. Un certificat SSL qui couvre les sous-domaines (wildcard: *.webpro200.com)
 
 ## Étapes de configuration
 
@@ -17,7 +17,7 @@ Ce guide explique comment configurer Cloudflare pour la gestion automatique des 
 4. Utilisez le template "Edit zone DNS" ou créez un token personnalisé avec ces permissions :
    - Zone → DNS → Edit
    - Zone → Zone → Read
-5. Sélectionnez votre zone (webpro200.fr)
+5. Sélectionnez votre zone (webpro200.com)
 6. Copiez le token généré
 
 ### 2. Obtenir le Zone ID
@@ -34,7 +34,7 @@ Ajoutez ces variables dans votre fichier `.env` du backend :
 # Cloudflare API (for automatic DNS management)
 CLOUDFLARE_API_TOKEN="votre-api-token"
 CLOUDFLARE_ZONE_ID="votre-zone-id"
-CLOUDFLARE_DOMAIN="webpro200.fr"
+CLOUDFLARE_DOMAIN="webpro200.com"
 ```
 
 ### 4. Vérifier le certificat SSL
@@ -42,7 +42,7 @@ CLOUDFLARE_DOMAIN="webpro200.fr"
 Pour que les sous-domaines fonctionnent automatiquement avec HTTPS :
 
 1. Dans Cloudflare → SSL/TLS → Edge Certificates
-2. Vérifiez que vous avez un certificat qui couvre `*.webpro200.fr`
+2. Vérifiez que vous avez un certificat qui couvre `*.webpro200.com`
 3. Si non, activez "Universal SSL" qui inclut automatiquement les wildcards
 
 ### 5. Configuration SSL/TLS
@@ -66,7 +66,7 @@ Pour créer manuellement un sous-domaine pour un client existant :
 
 ```bash
 # Créer un enregistrement DNS
-curl -X POST https://api.webpro200.fr/api/dns/records \
+curl -X POST https://api.webpro200.com/api/dns/records \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -75,7 +75,7 @@ curl -X POST https://api.webpro200.fr/api/dns/records \
   }'
 
 # Vérifier un enregistrement
-curl https://api.webpro200.fr/api/dns/records/test \
+curl https://api.webpro200.com/api/dns/records/test \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

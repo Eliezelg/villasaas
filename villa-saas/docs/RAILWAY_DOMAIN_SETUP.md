@@ -1,10 +1,10 @@
-# Configuration du domaine Railway pour api.webpro200.fr
+# Configuration du domaine Railway pour api.webpro200.com
 
 ## État actuel
 
-- **DNS** : api.webpro200.fr pointe vers des IPs Cloudflare (188.114.97.7, 188.114.96.7)
+- **DNS** : api.webpro200.com pointe vers des IPs Cloudflare (188.114.97.7, 188.114.96.7)
 - **Railway** : Le domaine personnalisé n'est pas encore configuré
-- **Variables** : BACKEND_URL mise à jour vers https://api.webpro200.fr
+- **Variables** : BACKEND_URL mise à jour vers https://api.webpro200.com
 - **Déploiement** : En cours (BUILDING)
 
 ## Actions requises
@@ -16,13 +16,13 @@
 3. Cliquez sur le service **"villasaas"**
 4. Allez dans **Settings** → **Domains**
 5. Cliquez sur **"Add Custom Domain"**
-6. Entrez : `api.webpro200.fr`
+6. Entrez : `api.webpro200.com`
 7. Railway vous fournira un domaine cible (ex: `villasaas-production.up.railway.app`)
 
 ### 2. Sur Cloudflare Dashboard
 
 1. Allez dans votre compte Cloudflare
-2. Sélectionnez le domaine **webpro200.fr**
+2. Sélectionnez le domaine **webpro200.com**
 3. Allez dans **DNS**
 4. Trouvez l'enregistrement pour `api` (actuellement type A)
 5. **Modifiez-le** en CNAME :
@@ -38,21 +38,21 @@ Après la configuration, vérifiez avec :
 
 ```bash
 # Vérifier le CNAME
-dig api.webpro200.fr CNAME
+dig api.webpro200.com CNAME
 
 # Tester l'API
-curl -I https://api.webpro200.fr/health
+curl -I https://api.webpro200.com/health
 
 # Tester CORS
-curl -I https://api.webpro200.fr/api/auth/me \
-  -H "Origin: https://www.webpro200.fr"
+curl -I https://api.webpro200.com/api/auth/me \
+  -H "Origin: https://www.webpro200.com"
 ```
 
 ## Variables d'environnement mises à jour
 
-- `BACKEND_URL`: https://api.webpro200.fr
-- `FRONTEND_URL`: https://webpro200.fr
-- `ALLOWED_BOOKING_DOMAINS`: villasaas-eight.vercel.app,webpro200.fr,www.webpro200.fr
+- `BACKEND_URL`: https://api.webpro200.com
+- `FRONTEND_URL`: https://webpro200.com
+- `ALLOWED_BOOKING_DOMAINS`: villasaas-eight.vercel.app,webpro200.com,www.webpro200.com
 
 ## Domaines Railway actuels
 

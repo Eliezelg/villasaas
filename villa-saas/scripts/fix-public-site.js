@@ -32,7 +32,7 @@ async function main() {
           id: existingPublicSite.id
         },
         data: {
-          domain: 'www.webpro200.fr',
+          domain: 'www.webpro200.com',
           isActive: true
         }
       });
@@ -42,7 +42,7 @@ async function main() {
       const created = await prisma.publicSite.create({
         data: {
           tenantId: tenant.id,
-          domain: 'www.webpro200.fr',
+          domain: 'www.webpro200.com',
           subdomain: 'testcompany',
           isActive: true,
           defaultLocale: 'fr',

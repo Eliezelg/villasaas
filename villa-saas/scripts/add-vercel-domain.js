@@ -30,7 +30,7 @@ async function updatePublicSiteForVercel() {
         isActive: existingSite.isActive
       });
 
-      // Pour le moment, on garde www.webpro200.fr comme domaine principal
+      // Pour le moment, on garde www.webpro200.com comme domaine principal
       // Le domaine Vercel sera géré via le subdomain
       console.log('\n🔍 Configuration actuelle:');
       console.log('- Domaine principal:', existingSite.domain);
@@ -45,7 +45,7 @@ async function updatePublicSiteForVercel() {
       const newSite = await prisma.publicSite.create({
         data: {
           tenantId: tenant.id,
-          domain: 'www.webpro200.fr',
+          domain: 'www.webpro200.com',
           subdomain: 'testcompany',
           isActive: true,
           defaultLocale: 'fr',

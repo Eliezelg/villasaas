@@ -9,10 +9,10 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const domains = [
-  'webpro200.fr',
-  'www.webpro200.fr',
+  'webpro200.com',
+  'www.webpro200.com',
   'villasaas-eight.vercel.app',
-  'api.webpro200.fr'
+  'api.webpro200.com'
   // Note: Les wildcards ne sont pas supportés par Stripe
   // Chaque sous-domaine client doit être enregistré individuellement
 ];

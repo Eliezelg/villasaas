@@ -7,7 +7,7 @@ Villa SaaS utilise une architecture multi-domaines pour séparer l'administratio
 ## Structure des domaines
 
 ### 1. Domaine Principal - Administration
-- **URL** : `www.webpro200.fr`
+- **URL** : `www.webpro200.com`
 - **Fonction** : Portail d'administration centralisé
 - **Utilisateurs** : Tous les propriétaires/admins se connectent ici
 - **Contenu** : 
@@ -18,7 +18,7 @@ Villa SaaS utilise une architecture multi-domaines pour séparer l'administratio
   - Paramètres du compte
 
 ### 2. Sous-domaines - Sites Publics
-- **URL** : `[subdomain].webpro200.fr`
+- **URL** : `[subdomain].webpro200.com`
 - **Fonction** : Sites publics de réservation pour chaque client
 - **Utilisateurs** : Visiteurs/voyageurs qui veulent réserver
 - **Contenu** :
@@ -35,18 +35,18 @@ Villa SaaS utilise une architecture multi-domaines pour séparer l'administratio
 
 ## Flux d'inscription
 
-1. **Inscription sur www.webpro200.fr**
+1. **Inscription sur www.webpro200.com**
    - Le client s'inscrit sur le domaine principal
    - Il choisit son sous-domaine (ex: `villa-martin`)
-   - Son site public est créé automatiquement : `villa-martin.webpro200.fr`
+   - Son site public est créé automatiquement : `villa-martin.webpro200.com`
 
 2. **Accès après inscription**
-   - **Admin** : Se connecte sur `www.webpro200.fr/admin/login`
-   - **Site public** : Accessible sur `villa-martin.webpro200.fr`
+   - **Admin** : Se connecte sur `www.webpro200.com/admin/login`
+   - **Site public** : Accessible sur `villa-martin.webpro200.com`
 
 3. **Domaine personnalisé (plus tard)**
    - Le client peut configurer un domaine personnalisé
-   - Ex: `www.villa-martin-cannes.com` → `villa-martin.webpro200.fr`
+   - Ex: `www.villa-martin-cannes.com` → `villa-martin.webpro200.com`
 
 ## Configuration technique
 
@@ -58,7 +58,7 @@ model PublicSite {
   subdomain     String?  @unique  // Sous-domaine (ex: villa-martin)
   
   // Le site est accessible via:
-  // 1. subdomain.webpro200.fr
+  // 1. subdomain.webpro200.com
   // 2. domain (si configuré)
 }
 ```
@@ -73,12 +73,12 @@ model Tenant {
 
 ## Résolution des domaines
 
-### 1. Requête sur www.webpro200.fr
+### 1. Requête sur www.webpro200.com
 - Redirection vers `/admin/login` ou `/admin/dashboard`
 - Authentification requise
 - Accès multi-tenant (un compte peut gérer plusieurs tenants)
 
-### 2. Requête sur [subdomain].webpro200.fr
+### 2. Requête sur [subdomain].webpro200.com
 - Lookup dans PublicSite par subdomain
 - Affichage du site public du tenant
 - Pas d'authentification requise
@@ -91,13 +91,13 @@ model Tenant {
 ## Exemples concrets
 
 ### Client "Villa Martin"
-- **Admin** : Se connecte sur `www.webpro200.fr`
-- **Site public** : `villa-martin.webpro200.fr`
+- **Admin** : Se connecte sur `www.webpro200.com`
+- **Site public** : `villa-martin.webpro200.com`
 - **Domaine perso** : `www.villa-martin-cannes.com` (optionnel)
 
 ### Client "Résidence Azur"
-- **Admin** : Se connecte sur `www.webpro200.fr`
-- **Site public** : `residence-azur.webpro200.fr`
+- **Admin** : Se connecte sur `www.webpro200.com`
+- **Site public** : `residence-azur.webpro200.com`
 - **Domaine perso** : `www.residence-azur.fr` (optionnel)
 
 ## Avantages de cette architecture
@@ -111,6 +111,6 @@ model Tenant {
 ## Configuration Vercel
 
 Le projet doit être configuré sur Vercel pour accepter :
-- `www.webpro200.fr` (domaine principal)
-- `*.webpro200.fr` (wildcard pour les sous-domaines)
+- `www.webpro200.com` (domaine principal)
+- `*.webpro200.com` (wildcard pour les sous-domaines)
 - Tous les domaines personnalisés ajoutés dynamiquement via l'API Vercel

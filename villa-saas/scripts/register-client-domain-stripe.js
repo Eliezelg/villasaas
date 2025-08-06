@@ -4,7 +4,7 @@
  * Script pour enregistrer un sous-domaine client dans Stripe
  * À appeler lors de la création d'un nouveau domaine client
  * 
- * Usage: node register-client-domain-stripe.js client-name.webpro200.fr
+ * Usage: node register-client-domain-stripe.js client-name.webpro200.com
  */
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -12,7 +12,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 async function registerClientDomain(domain) {
   if (!domain) {
     console.error('❌ Erreur: Veuillez fournir un domaine en argument');
-    console.log('Usage: node register-client-domain-stripe.js client-name.webpro200.fr');
+    console.log('Usage: node register-client-domain-stripe.js client-name.webpro200.com');
     process.exit(1);
   }
 
