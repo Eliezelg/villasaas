@@ -57,27 +57,51 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
 
   // Handle OPTIONS requests early to avoid CORS preflight issues
   app.addHook('onRequest', async (request, reply) => {
-    // Log pour débugger les requêtes OPTIONS
     if (request.method === 'OPTIONS') {
-      console.log('OPTIONS request from origin:', request.headers.origin);
-      
       const origin = request.headers.origin;
-      // Liste des origines autorisées
-      const allowedOrigins = [
-        'https://webpro200.fr',
-        'https://www.webpro200.fr',
-        'https://aviv.webpro200.fr'
-      ];
       
-      // Si l'origine est dans la liste ou si elle correspond au pattern
-      const isAllowed = origin && (
-        allowedOrigins.includes(origin) || 
-        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/.test(origin)
-      );
+      // Utiliser la même logique que le plugin CORS principal
+      let allowedOrigin = '*';
+      
+      if (origin) {
+        // Liste des origines autorisées
+        const allowedOrigins = [
+          process.env.FRONTEND_URL,
+          'https://webpro200.fr',
+          'https://www.webpro200.fr',
+        ];
+        
+        // Ajouter les domaines de booking depuis les variables d'environnement
+        const bookingDomains = process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || [];
+        bookingDomains.forEach(domain => {
+          if (domain) {
+            allowedOrigins.push(`https://${domain.trim()}`);
+            allowedOrigins.push(`https://www.${domain.trim()}`);
+          }
+        });
+        
+        // Vérifier si l'origine est autorisée
+        let isAllowed = false;
+        
+        if (allowedOrigins.includes(origin)) {
+          isAllowed = true;
+        } else if (/^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/.test(origin)) {
+          isAllowed = true;
+        } else if (process.env.NODE_ENV !== 'production' && 
+                   (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+          isAllowed = true;
+        } else if (process.env.NODE_ENV !== 'production' && origin.includes('.vercel.app')) {
+          isAllowed = true;
+        }
+        
+        if (isAllowed) {
+          allowedOrigin = origin;
+        }
+      }
       
       reply
         .code(204)
-        .header('Access-Control-Allow-Origin', isAllowed ? origin : 'https://webpro200.fr')
+        .header('Access-Control-Allow-Origin', allowedOrigin)
         .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
         .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant, Cookie')
         .header('Access-Control-Allow-Credentials', 'true')
@@ -85,35 +109,60 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         .send();
     }
   });
-
-  // Log toutes les requêtes pour débugger
-  app.addHook('onRequest', async (request) => {
-    console.log(`${request.method} ${request.url} from origin: ${request.headers.origin || 'no-origin'}`);
-  });
   
-  // Core plugins - CORS configuration simplifiée pour webpro200.fr
+  // Core plugins - CORS configuration sécurisée
   await app.register(cors, {
     origin: (origin, cb) => {
-      console.log('CORS check for origin:', origin);
-      
-      // TEMPORAIRE: Autoriser webpro200.fr et tous ses sous-domaines
-      // TODO: Revoir la configuration CORS plus proprement
+      // Autoriser les requêtes sans origin (ex: Postman, serveur à serveur)
       if (!origin) {
         cb(null, true);
         return;
       }
       
-      // Autoriser webpro200.fr et tous ses sous-domaines
-      if (origin.includes('webpro200.fr') || 
-          origin.includes('localhost') || 
-          origin.includes('vercel.app')) {
-        console.log('CORS allowed for:', origin);
-        cb(null, true);
-        return;
+      // Liste des origines autorisées
+      const allowedOrigins = [
+        // Domaine principal et sous-domaines
+        process.env.FRONTEND_URL,
+        'https://webpro200.fr',
+        'https://www.webpro200.fr',
+      ];
+      
+      // Ajouter les domaines de booking depuis les variables d'environnement
+      const bookingDomains = process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || [];
+      bookingDomains.forEach(domain => {
+        if (domain) {
+          allowedOrigins.push(`https://${domain.trim()}`);
+          allowedOrigins.push(`https://www.${domain.trim()}`);
+        }
+      });
+      
+      // Vérifier si l'origine est autorisée
+      let isAllowed = false;
+      
+      // Vérification exacte
+      if (allowedOrigins.includes(origin)) {
+        isAllowed = true;
+      }
+      // Vérification des sous-domaines de webpro200.fr
+      else if (/^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/.test(origin)) {
+        isAllowed = true;
+      }
+      // En développement, autoriser localhost
+      else if (process.env.NODE_ENV !== 'production' && 
+               (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+        isAllowed = true;
+      }
+      // Autoriser les preview Vercel en dev
+      else if (process.env.NODE_ENV !== 'production' && origin.includes('.vercel.app')) {
+        isAllowed = true;
       }
       
-      console.log('CORS blocked:', origin);
-      cb(new Error('Not allowed by CORS'), false);
+      if (isAllowed) {
+        cb(null, true);
+      } else {
+        console.warn(`CORS blocked origin: ${origin}`);
+        cb(new Error('Not allowed by CORS'), false);
+      }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
