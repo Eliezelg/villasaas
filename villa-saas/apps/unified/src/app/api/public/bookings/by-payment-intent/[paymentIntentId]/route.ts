@@ -8,11 +8,50 @@ export async function GET(
   try {
     const { paymentIntentId } = params
     const cookieStore = cookies()
-    const tenant = cookieStore.get('tenant')?.value
+    
+    // Essayer de récupérer le tenant depuis plusieurs sources
+    let tenant = cookieStore.get('tenant')?.value
+    
+    // Si pas dans les cookies, essayer depuis le header x-tenant
+    if (!tenant) {
+      tenant = request.headers.get('x-tenant') || null
+    }
+    
+    // Si toujours pas de tenant, essayer de l'extraire du referer ou du host
+    if (!tenant) {
+      const referer = request.headers.get('referer') || ''
+      const host = request.headers.get('host') || ''
+      
+      // Extraire le sous-domaine du referer ou du host
+      const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'webpro200.fr'
+      
+      // Vérifier le referer d'abord
+      if (referer.includes(`.${mainDomain}`)) {
+        const url = new URL(referer)
+        const hostParts = url.hostname.split('.')
+        if (hostParts.length > 2 && hostParts[0] !== 'www' && hostParts[0] !== 'api') {
+          tenant = hostParts[0]
+        }
+      }
+      
+      // Sinon vérifier le host
+      if (!tenant && host.includes(`.${mainDomain}`)) {
+        const hostParts = host.split('.')
+        if (hostParts.length > 2 && hostParts[0] !== 'www' && hostParts[0] !== 'api') {
+          tenant = hostParts[0]
+        }
+      }
+    }
     
     if (!tenant) {
+      console.error('Tenant not found in cookies, headers, referer or host:', { 
+        cookie: cookieStore.get('tenant')?.value,
+        xTenant: request.headers.get('x-tenant'),
+        referer: request.headers.get('referer'),
+        host: request.headers.get('host')
+      })
       return NextResponse.json(
-        { error: 'Tenant not found' },
+        { error: 'Tenant not specified' },
         { status: 400 }
       )
     }
