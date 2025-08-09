@@ -19,8 +19,8 @@ const websocketPlugin = async (fastify) => {
                     'https://villasaas-eight.vercel.app',
                     'https://villasaas-a4wtdk312-villa-saas.vercel.app',
                     /^https:\/\/villasaas.*\.vercel\.app$/,
-                    'https://webpro200.com',
-                    'https://www.webpro200.com',
+                    'https://webpro200.fr',
+                    'https://www.webpro200.fr',
                     /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
                 ].filter(Boolean) : [];
                 const allowedOrigins = [...devOrigins, ...prodOrigins];

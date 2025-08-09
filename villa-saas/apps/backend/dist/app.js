@@ -56,53 +56,60 @@ async function buildApp(opts = {}) {
     const app = (0, fastify_1.default)(opts);
     // Global error handler
     app.setErrorHandler(error_handler_1.errorHandler);
-    // Core plugins
+    // Handle OPTIONS requests early to avoid CORS preflight issues
+    app.addHook('onRequest', async (request, reply) => {
+        // Log pour débugger les requêtes OPTIONS
+        if (request.method === 'OPTIONS') {
+            console.log('OPTIONS request from origin:', request.headers.origin);
+            const origin = request.headers.origin;
+            // Liste des origines autorisées
+            const allowedOrigins = [
+                'https://webpro200.fr',
+                'https://www.webpro200.fr',
+                'https://aviv.webpro200.fr'
+            ];
+            // Si l'origine est dans la liste ou si elle correspond au pattern
+            const isAllowed = origin && (allowedOrigins.includes(origin) ||
+                /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/.test(origin));
+            reply
+                .code(204)
+                .header('Access-Control-Allow-Origin', isAllowed ? origin : 'https://webpro200.fr')
+                .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
+                .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant, Cookie')
+                .header('Access-Control-Allow-Credentials', 'true')
+                .header('Access-Control-Max-Age', '86400')
+                .send();
+        }
+    });
+    // Log toutes les requêtes pour débugger
+    app.addHook('onRequest', async (request) => {
+        console.log(`${request.method} ${request.url} from origin: ${request.headers.origin || 'no-origin'}`);
+    });
+    // Core plugins - CORS configuration simplifiée pour webpro200.fr
     await app.register(cors_1.default, {
         origin: (origin, cb) => {
-            // Configuration pour le développement
-            const devOrigins = [
-                'http://localhost:3000',
-                'http://localhost:3002',
-                /^http:\/\/[a-zA-Z0-9-]+\.localhost:3000$/, // Sous-domaines de localhost:3000 (app unifiée)
-                /^http:\/\/[a-zA-Z0-9-]+\.localhost:3002$/, // Sous-domaines de localhost:3002
-                /^http:\/\/localhost:\d+$/, // N'importe quel port localhost
-            ];
-            // Configuration pour la production
-            const prodOrigins = process.env.NODE_ENV === 'production' ? [
-                process.env.FRONTEND_URL,
-                ...(process.env.ALLOWED_BOOKING_DOMAINS?.split(',') || []),
-                // Ajouter explicitement les domaines Vercel
-                'https://villasaas-eight.vercel.app',
-                'https://villasaas-a4wtdk312-villa-saas.vercel.app',
-                /^https:\/\/villasaas.*\.vercel\.app$/,
-                // Ajouter le domaine webpro200.com et ses sous-domaines
-                'https://webpro200.com',
-                'https://www.webpro200.com',
-                /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
-                // Force deployment: 2025-07-25T00:26:00Z - Railway Dockerfile path
-            ].filter(Boolean) : [];
-            const allowedOrigins = [...devOrigins, ...prodOrigins];
-            // Si pas d'origine (ex: Postman), permettre
+            console.log('CORS check for origin:', origin);
+            // TEMPORAIRE: Autoriser webpro200.fr et tous ses sous-domaines
+            // TODO: Revoir la configuration CORS plus proprement
             if (!origin) {
                 cb(null, true);
                 return;
             }
-            // Vérifier si l'origine est autorisée
-            const isAllowed = allowedOrigins.some(allowed => {
-                if (allowed instanceof RegExp) {
-                    return allowed.test(origin);
-                }
-                return allowed === origin;
-            });
-            if (isAllowed) {
+            // Autoriser webpro200.fr et tous ses sous-domaines
+            if (origin.includes('webpro200.fr') ||
+                origin.includes('localhost') ||
+                origin.includes('vercel.app')) {
+                console.log('CORS allowed for:', origin);
                 cb(null, true);
+                return;
             }
-            else {
-                app.log.warn(`CORS blocked origin: ${origin}`);
-                cb(new Error('Not allowed by CORS'), false);
-            }
+            console.log('CORS blocked:', origin);
+            cb(new Error('Not allowed by CORS'), false);
         },
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant', 'Cookie'],
+        exposedHeaders: ['X-Total-Count', 'Set-Cookie'],
     });
     await app.register(helmet_1.default, {
         contentSecurityPolicy: {
