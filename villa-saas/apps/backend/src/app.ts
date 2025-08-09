@@ -87,7 +87,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   });
 
   // Log toutes les requêtes pour débugger
-  app.addHook('onRequest', async (request, reply) => {
+  app.addHook('onRequest', async (request) => {
     console.log(`${request.method} ${request.url} from origin: ${request.headers.origin || 'no-origin'}`);
   });
   
