@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
   }
   
   // Si c'est une route admin
-  if (pathname.startsWith('/admin')) {
+  if (pathname.includes('/admin')) {
     mode = 'admin'
     
     // Appliquer le middleware i18n pour le mode admin
@@ -87,24 +87,33 @@ export async function middleware(request: NextRequest) {
       ? '/' + pathSegments.slice(2).join('/')
       : pathname
     
+    console.log('Admin route check:', { pathname, pathWithoutLocale, hasLocale })
+    
     // Vérifier si c'est une route publique
     const isPublicRoute = publicRoutes.some(route => pathWithoutLocale === route)
     if (isPublicRoute) {
+      console.log('Public route, allowing access')
       // Pour les routes publiques, on laisse passer
       return response
     }
     
     // Vérifier si c'est une route protégée
     const isProtectedRoute = protectedRoutes.some(route => pathWithoutLocale.startsWith(route))
+    console.log('Protected route check:', { isProtectedRoute, pathWithoutLocale, protectedRoutes })
+    
     if (isProtectedRoute) {
       const token = request.cookies.get('access_token')
+      console.log('Token check:', { hasToken: !!token, tokenValue: token?.value?.substring(0, 20) })
       
       if (!token) {
+        console.log('No token found, redirecting to login')
         // Rediriger vers la page de connexion avec la locale
         const locale = hasLocale ? pathSegments[1] : 'fr'
         const loginUrl = new URL(`/${locale}/admin/login`, request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl)
+      } else {
+        console.log('Token found, allowing access')
       }
     }
     

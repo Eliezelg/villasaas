@@ -106,18 +106,15 @@ async function proxyRequest(
       }
     });
     
-    // Gérer les cookies de réponse
+    // Gérer les cookies de réponse - IMPORTANT pour l'authentification
     const setCookieHeaders = response.headers.getSetCookie();
-    if (setCookieHeaders) {
+    console.log('Set-Cookie headers from backend:', setCookieHeaders);
+    
+    if (setCookieHeaders && setCookieHeaders.length > 0) {
       setCookieHeaders.forEach(cookie => {
-        // Parser et définir le cookie
-        const [nameValue, ...attributes] = cookie.split(';');
-        const [name, value] = nameValue.split('=');
-        
-        if (name && value) {
-          // Les cookies sont gérés automatiquement par Next.js via les headers Set-Cookie
-          responseHeaders.append('Set-Cookie', cookie);
-        }
+        console.log('Processing cookie:', cookie);
+        // Transmettre directement le header Set-Cookie au client
+        responseHeaders.append('Set-Cookie', cookie);
       });
     }
     
