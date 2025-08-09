@@ -57,20 +57,45 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
 
   // Handle OPTIONS requests early to avoid CORS preflight issues
   app.addHook('onRequest', async (request, reply) => {
+    // Log pour débugger les requêtes OPTIONS
     if (request.method === 'OPTIONS') {
+      console.log('OPTIONS request from origin:', request.headers.origin);
+      
+      const origin = request.headers.origin;
+      // Liste des origines autorisées
+      const allowedOrigins = [
+        'https://webpro200.fr',
+        'https://www.webpro200.fr',
+        'https://aviv.webpro200.fr'
+      ];
+      
+      // Si l'origine est dans la liste ou si elle correspond au pattern
+      const isAllowed = origin && (
+        allowedOrigins.includes(origin) || 
+        /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/.test(origin)
+      );
+      
       reply
         .code(204)
-        .header('Access-Control-Allow-Origin', request.headers.origin || '*')
-        .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant')
+        .header('Access-Control-Allow-Origin', isAllowed ? origin : 'https://webpro200.fr')
+        .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
+        .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant, Cookie')
         .header('Access-Control-Allow-Credentials', 'true')
+        .header('Access-Control-Max-Age', '86400')
         .send();
     }
   });
 
+  // Log toutes les requêtes pour débugger
+  app.addHook('onRequest', async (request, reply) => {
+    console.log(`${request.method} ${request.url} from origin: ${request.headers.origin || 'no-origin'}`);
+  });
+  
   // Core plugins
   await app.register(cors, {
     origin: (origin, cb) => {
+      console.log('CORS check for origin:', origin);
+      
       // Configuration pour le développement
       const devOrigins = [
         'http://localhost:3000',
