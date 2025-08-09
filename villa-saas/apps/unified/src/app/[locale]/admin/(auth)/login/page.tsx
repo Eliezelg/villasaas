@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -31,10 +31,23 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
   const locale = params.locale as string
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const login = useAuthStore((state) => state.login)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  // Récupérer l'URL de redirection depuis les paramètres
+  const redirectTo = searchParams.get('from') || `/${locale}/admin/dashboard`
+
+  // Si déjà connecté, rediriger immédiatement
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('Already authenticated, redirecting to:', redirectTo)
+      router.push(redirectTo)
+    }
+  }, [isAuthenticated, redirectTo, router])
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -51,7 +64,12 @@ export default function LoginPage() {
     const result = await login(data)
 
     if (result.success) {
-      router.push(`/${locale}/admin/dashboard`)
+      console.log('Login successful, redirecting to:', redirectTo)
+      // Petit délai pour s'assurer que les cookies sont bien définis
+      setTimeout(() => {
+        // Utiliser replace pour éviter de garder la page de login dans l'historique
+        router.replace(redirectTo)
+      }, 100)
     } else {
       setError(result.error || 'Une erreur est survenue')
       setIsLoading(false)

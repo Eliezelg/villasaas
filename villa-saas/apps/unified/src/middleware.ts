@@ -77,6 +77,16 @@ export async function middleware(request: NextRequest) {
   if (pathname.includes('/admin')) {
     mode = 'admin'
     
+    // Si pas de locale dans l'URL, rediriger vers la version avec locale
+    if (!hasLocale && pathname.startsWith('/admin')) {
+      const newUrl = new URL(`/${locale}${pathname}`, request.url)
+      // Conserver les paramètres de requête
+      request.nextUrl.searchParams.forEach((value, key) => {
+        newUrl.searchParams.set(key, value)
+      })
+      return NextResponse.redirect(newUrl)
+    }
+    
     // Appliquer le middleware i18n pour le mode admin
     const response = intlMiddleware(request as any)
     
@@ -118,9 +128,16 @@ export async function middleware(request: NextRequest) {
     }
     
     // Si on est sur login/signup et qu'on est déjà connecté
-    if ((pathWithoutLocale === '/admin/login' || pathWithoutLocale === '/admin/signup') && request.cookies.get('access_token')) {
-      const locale = hasLocale ? pathSegments[1] : 'fr'
-      return NextResponse.redirect(new URL(`/${locale}/admin/dashboard`, request.url))
+    if ((pathWithoutLocale === '/admin/login' || pathWithoutLocale === '/admin/signup')) {
+      const token = request.cookies.get('access_token')
+      if (token) {
+        console.log('User already logged in, redirecting from login page')
+        const locale = hasLocale ? pathSegments[1] : 'fr'
+        // Récupérer la redirection depuis le paramètre 'from'
+        const from = request.nextUrl.searchParams.get('from')
+        const redirectUrl = from || `/${locale}/admin/dashboard`
+        return NextResponse.redirect(new URL(redirectUrl, request.url))
+      }
     }
     
     // Pour les autres routes admin, retourner la réponse i18n
