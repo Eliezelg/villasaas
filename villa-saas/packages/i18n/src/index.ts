@@ -214,11 +214,16 @@ export type MessageKeys = keyof Messages[Locale];
 export function getLocaleFromAcceptLanguage(acceptLanguage: string): Locale {
   const languages = acceptLanguage
     .split(',')
-    .map(lang => lang.split(';')[0].trim().toLowerCase());
+    .map(lang => {
+      const parts = lang.split(';');
+      return parts[0] ? parts[0].trim().toLowerCase() : '';
+    })
+    .filter(lang => lang !== '');
   
   for (const lang of languages) {
-    const locale = lang.split('-')[0];
-    if (locales.includes(locale as Locale)) {
+    const localeParts = lang.split('-');
+    const locale = localeParts[0];
+    if (locale && locales.includes(locale as Locale)) {
       return locale as Locale;
     }
   }
