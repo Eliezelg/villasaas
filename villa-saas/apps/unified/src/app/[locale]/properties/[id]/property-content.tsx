@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useTenant } from '@/lib/tenant-context'
 import { PropertyImage } from '@/components/ui/property-image'
 import { apiClient } from '@/lib/api-client-booking'
-import { formatPrice, formatDate } from '@/lib/utils'
+import { formatPrice, formatDate, cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { MapPin, Users, Bed, Bath, Home, Calendar, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -298,9 +298,13 @@ export default function PropertyContent() {
               <Button
                 onClick={handleBooking}
                 disabled={!selectedDates.checkIn || !selectedDates.checkOut}
-                className="w-full"
+                className={cn(
+                  "w-full font-semibold",
+                  !selectedDates.checkIn || !selectedDates.checkOut 
+                    ? "bg-gray-200 text-gray-700 border border-gray-400 hover:bg-gray-300 hover:text-gray-900" 
+                    : "bg-primary text-white hover:bg-primary/90"
+                )}
                 size="lg"
-                variant={selectedDates.checkIn && selectedDates.checkOut ? "default" : "outline"}
               >
                 {selectedDates.checkIn && selectedDates.checkOut 
                   ? t('common.actions.book')
