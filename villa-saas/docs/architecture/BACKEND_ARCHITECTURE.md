@@ -2,7 +2,7 @@
 
 ## Description
 
-Backend API pour la plateforme Villa SaaS - Solution de gestion multi-tenant pour locations de vacances.
+Backend API pour plateforme Villa SaaS - Solution de gestion multi-tenant pour locations de vacances.
 
 ## Technologies
 
