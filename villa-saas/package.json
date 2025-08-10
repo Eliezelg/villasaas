@@ -41,6 +41,8 @@
     "packages/*"
   ],
   "dependencies": {
+    "@fontsource/playfair-display": "^5.2.6",
+    "@fontsource/raleway": "^5.2.6",
     "date-fns": "^4.1.0"
   }
 }
