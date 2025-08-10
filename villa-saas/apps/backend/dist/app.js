@@ -56,6 +56,18 @@ async function buildApp(opts = {}) {
     const app = (0, fastify_1.default)(opts);
     // Global error handler
     app.setErrorHandler(error_handler_1.errorHandler);
+    // Handle OPTIONS requests early to avoid CORS preflight issues
+    app.addHook('onRequest', async (request, reply) => {
+        if (request.method === 'OPTIONS') {
+            reply
+                .code(204)
+                .header('Access-Control-Allow-Origin', request.headers.origin || '*')
+                .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant')
+                .header('Access-Control-Allow-Credentials', 'true')
+                .send();
+        }
+    });
     // Core plugins
     await app.register(cors_1.default, {
         origin: (origin, cb) => {
@@ -75,11 +87,12 @@ async function buildApp(opts = {}) {
                 'https://villasaas-eight.vercel.app',
                 'https://villasaas-a4wtdk312-villa-saas.vercel.app',
                 /^https:\/\/villasaas.*\.vercel\.app$/,
-                // Ajouter le domaine webpro200.com et ses sous-domaines
-                'https://webpro200.com',
-                'https://www.webpro200.com',
-                /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.com$/,
-                // Force deployment: 2025-07-25T00:26:00Z - Railway Dockerfile path
+                // Ajouter le domaine webpro200.fr et ses sous-domaines
+                'https://webpro200.fr',
+                'https://www.webpro200.fr',
+                'https://aviv.webpro200.fr', // Ajouter explicitement aviv pour le test
+                /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/, // Pattern pour tous les sous-domaines
+                // Force deployment: 2025-08-05T22:45:00Z - CORS fix for preflight
             ].filter(Boolean) : [];
             const allowedOrigins = [...devOrigins, ...prodOrigins];
             // Si pas d'origine (ex: Postman), permettre
@@ -103,6 +116,9 @@ async function buildApp(opts = {}) {
             }
         },
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant'],
+        exposedHeaders: ['X-Total-Count'],
     });
     await app.register(helmet_1.default, {
         contentSecurityPolicy: {

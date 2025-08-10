@@ -74,6 +74,10 @@ const publicBookingSchema = zod_1.z.object({
     promoCode: zod_1.z.string().optional(),
 });
 async function publicRoutes(fastify) {
+    // Gérer les requêtes OPTIONS pour CORS preflight
+    fastify.options('/*', async (_request, reply) => {
+        return reply.code(204).send();
+    });
     const pricingService = new pricing_service_1.PricingService(fastify.prisma);
     // Rate limiter pour la vérification des réservations
     const bookingVerifyLimiter = new Map();
