@@ -9,7 +9,6 @@ import { apiClient } from '@/lib/api-client-booking'
 import { formatPrice, formatDate, cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { MapPin, Users, Bed, Bath, Home, Calendar, ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AvailabilityCalendar } from '@/components/booking/availability/availability-calendar'
 import { useTranslations, useLocale } from 'next-intl'
@@ -295,22 +294,23 @@ export default function PropertyContent() {
                 </div>
               )}
               
-              <Button
+              <button
                 onClick={handleBooking}
                 disabled={!selectedDates.checkIn || !selectedDates.checkOut}
                 className={cn(
-                  "w-full font-semibold",
+                  "w-full h-11 rounded-md px-8 font-semibold transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "disabled:pointer-events-none disabled:opacity-50",
                   !selectedDates.checkIn || !selectedDates.checkOut 
                     ? "bg-gray-200 text-gray-700 border border-gray-400 hover:bg-gray-300 hover:text-gray-900" 
-                    : "bg-primary text-white hover:bg-primary/90"
+                    : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
                 )}
-                size="lg"
               >
                 {selectedDates.checkIn && selectedDates.checkOut 
                   ? t('common.actions.book')
                   : 'Sélectionnez vos dates'
                 }
-              </Button>
+              </button>
 
               {property.cleaningFee > 0 && (
                 <p className="text-sm text-muted-foreground mt-4">
