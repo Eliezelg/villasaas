@@ -400,18 +400,31 @@ export async function propertyImageS3Routes(fastify: FastifyInstance): Promise<v
       return reply.code(400).send({ error: 'Invalid image IDs' });
     }
 
-    // Mettre à jour l'ordre des images
-    const updatePromises = images.map(img =>
-      fastify.prisma.propertyImage.update({
-        where: { id: img.id },
-        data: { 
-          order: img.order,
-          isPrimary: img.order === 0,
-        },
-      })
-    );
-
-    await Promise.all(updatePromises);
+    // Mettre à jour l'ordre des images en utilisant une transaction
+    // pour éviter les conflits de contrainte unique
+    await fastify.prisma.$transaction(async (tx) => {
+      // D'abord, définir temporairement tous les ordres à des valeurs négatives
+      // pour éviter les conflits
+      const tempUpdatePromises = images.map((img, index) =>
+        tx.propertyImage.update({
+          where: { id: img.id },
+          data: { order: -(index + 1) }, // Valeurs négatives temporaires
+        })
+      );
+      await Promise.all(tempUpdatePromises);
+      
+      // Ensuite, mettre à jour avec les vraies valeurs
+      const finalUpdatePromises = images.map(img =>
+        tx.propertyImage.update({
+          where: { id: img.id },
+          data: { 
+            order: img.order,
+            isPrimary: img.order === 0,
+          },
+        })
+      );
+      await Promise.all(finalUpdatePromises);
+    });
 
     return reply.send({ success: true });
   });
