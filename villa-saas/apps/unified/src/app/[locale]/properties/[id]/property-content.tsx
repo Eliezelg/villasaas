@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useTenant } from '@/lib/tenant-context'
 import { PropertyImage } from '@/components/ui/property-image'
 import { apiClient } from '@/lib/api-client-booking'
 import { formatPrice, formatDate, cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { MapPin, Users, Bed, Bath, Home, Calendar, ArrowLeft } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MapPin, Users, Bed, Bath, Home, Calendar, Check, ChevronLeft } from 'lucide-react'
 import { AvailabilityCalendar } from '@/components/booking/availability/availability-calendar'
 import { useTranslations, useLocale } from 'next-intl'
 import * as gtag from '@/lib/gtag'
 import * as fbpixel from '@/lib/fbpixel'
+import { BookingHeader } from '@/components/booking/layout/booking-header'
+import { BookingFooter } from '@/components/booking/layout/booking-footer'
+import { PageHeader } from '@/components/booking/page-header'
 
 interface Property {
   id: string
@@ -56,36 +57,22 @@ export default function PropertyContent() {
   const { tenant } = useTenant()
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showBackButton, setShowBackButton] = useState(true)
   const [selectedDates, setSelectedDates] = useState<{
     checkIn: Date | null
     checkOut: Date | null
   }>({ checkIn: null, checkOut: null })
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
   useEffect(() => {
     loadProperty()
-    checkMultipleProperties()
   }, [params.id])
 
   useEffect(() => {
     if (property) {
-      // Track property view
       gtag.trackPropertyView(property.id, property.name)
       fbpixel.fbTrackPropertyView(property.id, property.name, property.basePrice)
     }
   }, [property])
-
-  async function checkMultipleProperties() {
-    try {
-      const response = await apiClient.getProperties({ limit: 2 })
-      if (response.data) {
-        // Si il n'y a qu'une seule propriété, masquer le bouton retour
-        setShowBackButton(response.data.properties.length > 1)
-      }
-    } catch (error) {
-      console.error('Failed to check properties count:', error)
-    }
-  }
 
   async function loadProperty() {
     try {
@@ -109,7 +96,6 @@ export default function PropertyContent() {
       const checkIn = format(selectedDates.checkIn, 'yyyy-MM-dd')
       const checkOut = format(selectedDates.checkOut, 'yyyy-MM-dd')
       
-      // Track booking started
       gtag.trackBookingStarted(property.id, property.name)
       fbpixel.fbTrackBookingStarted(property.basePrice)
       
@@ -119,16 +105,10 @@ export default function PropertyContent() {
 
   if (loading) {
     return (
-      <div className="container py-8">
-        <div className="animate-pulse">
-          <div className="h-96 bg-gray-200 rounded-lg mb-8" />
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2 space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-3/4" />
-              <div className="h-4 bg-gray-200 rounded w-full" />
-              <div className="h-4 bg-gray-200 rounded w-full" />
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
+          <p className="text-gray-600">{t('common.messages.loading')}</p>
         </div>
       </div>
     )
@@ -136,191 +116,235 @@ export default function PropertyContent() {
 
   if (!property) {
     return (
-      <div className="container py-8">
-        <p>{t('common.messages.error')}</p>
+      <div className="min-h-screen bg-gray-50">
+        <BookingHeader siteName={tenant?.name || 'Maison Aviv'} />
+        <div className="container py-20 text-center">
+          <p className="text-gray-600">{t('common.messages.error')}</p>
+        </div>
+        <BookingFooter />
       </div>
     )
   }
 
+  const nights = selectedDates.checkIn && selectedDates.checkOut 
+    ? Math.floor((selectedDates.checkOut.getTime() - selectedDates.checkIn.getTime()) / (1000 * 60 * 60 * 24))
+    : 0
+
   return (
-    <div className="container py-8">
-      {showBackButton && (
-        <Link
-          href={`/${locale}`}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          {t('common.actions.back')}
-        </Link>
-      )}
+    <div className="min-h-screen bg-gray-50">
+      <BookingHeader siteName={property.name} />
+      
+      {/* Hero avec image principale */}
+      <PageHeader 
+        title={property.name}
+        subtitle={`${property.city}, ${property.country}`}
+        backgroundImage={property.images?.[selectedImageIndex]?.urls?.large || property.images?.[selectedImageIndex]?.url}
+      />
 
-      {/* Images Gallery */}
-      <div className="grid grid-cols-4 gap-2 mb-8 h-96">
-        {property.images?.[0] && (
-          <div className="col-span-2 row-span-2">
-            <PropertyImage
-              src={property.images[0].urls?.large || property.images[0].url}
-              alt={property.name}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          </div>
-        )}
-        {property.images?.slice(1, 5).map((image, index) => (
-          <PropertyImage
-            key={image.id}
-            src={image.urls?.medium || image.url}
-            alt={`${property.name} - ${index + 2}`}
-            className="w-full h-full object-cover rounded-lg"
-          />
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Property Details */}
-        <div className="md:col-span-2">
-          <h1 className="text-3xl font-bold mb-2">{property.name}</h1>
-          <div className="flex items-center text-muted-foreground mb-6">
-            <MapPin className="mr-1 h-4 w-4" />
-            {property.city}, {property.country}
-          </div>
-
-          {/* Quick Info */}
-          <div className="flex flex-wrap gap-4 mb-8">
-            <div className="flex items-center">
-              <Users className="mr-2 h-5 w-5 text-muted-foreground" />
-              <span>{property.maxGuests} {t('booking.property.maxGuests', { count: property.maxGuests })}</span>
-            </div>
-            <div className="flex items-center">
-              <Bed className="mr-2 h-5 w-5 text-muted-foreground" />
-              <span>{property.bedrooms} {t('booking.property.bedrooms', { count: property.bedrooms })}</span>
-            </div>
-            <div className="flex items-center">
-              <Bath className="mr-2 h-5 w-5 text-muted-foreground" />
-              <span>{property.bathrooms} {t('booking.property.bathrooms', { count: property.bathrooms })}</span>
-            </div>
-            <div className="flex items-center">
-              <Home className="mr-2 h-5 w-5 text-muted-foreground" />
-              <span>{property.surfaceArea} m²</span>
-            </div>
-          </div>
-
-          {/* Description */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>{t('booking.property.description')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="whitespace-pre-line">{property.description[locale] || property.description.fr}</p>
-            </CardContent>
-          </Card>
-
-          {/* Amenities */}
-          {property.amenities && Array.isArray(property.amenities) && property.amenities.length > 0 && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>{t('booking.property.amenities')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {property.amenities.map((amenity) => (
-                    <div key={amenity} className="flex items-center">
-                      <span className="text-sm">{t(`booking.amenities.${amenity}`)}</span>
-                    </div>
-                  ))}
+      <main className="py-16">
+        <div className="container mx-auto px-4">
+          {/* Galerie d'images */}
+          <section className="mb-16">
+            <div className="grid md:grid-cols-4 gap-4">
+              <div className="md:col-span-3">
+                <div className="relative overflow-hidden rounded-lg shadow-xl">
+                  <PropertyImage
+                    src={property.images?.[selectedImageIndex]?.urls?.large || property.images?.[selectedImageIndex]?.url}
+                    alt={property.name}
+                    className="w-full h-[500px] object-cover"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* House Rules */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('booking.property.houseRules')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <p>{t('booking.property.checkInTime', { time: property.checkInTime })}</p>
-              <p>{t('booking.property.checkOutTime', { time: property.checkOutTime })}</p>
-              <p>{t('booking.property.minStay', { nights: property.minNights })}</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Booking Widget */}
-        <div>
-          <Card className="sticky top-24">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>{t('booking.booking.title')}</span>
-                <span className="text-2xl font-bold">
-                  {formatPrice(property.basePrice)} <span className="text-sm font-normal">{t('booking.property.perNight')}</span>
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4">
-                <AvailabilityCalendar
-                  propertyId={property.id}
-                  onDateSelect={handleDateSelect}
-                  basePrice={property.basePrice}
-                  minNights={property.minNights}
-                />
               </div>
-              
-              {/* Message d'instruction si aucune date sélectionnée */}
-              {(!selectedDates.checkIn || !selectedDates.checkOut) && (
-                <div className="mb-4 p-3 bg-muted/50 rounded-md text-sm text-center">
-                  <p className="font-medium">Sélectionnez vos dates pour réserver</p>
-                  <p className="text-muted-foreground mt-1">
-                    Choisissez une date d'arrivée puis une date de départ
+              <div className="space-y-4">
+                {property.images?.slice(0, 4).map((image, index) => (
+                  <button
+                    key={image.id}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={cn(
+                      "relative overflow-hidden rounded-lg shadow-md transition-all w-full",
+                      selectedImageIndex === index && "ring-2 ring-accent"
+                    )}
+                  >
+                    <PropertyImage
+                      src={image.urls?.small || image.url}
+                      alt={`${property.name} - ${index + 1}`}
+                      className="w-full h-24 object-cover hover:scale-110 transition-transform"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {/* Informations principales */}
+            <div className="md:col-span-2">
+              {/* Stats rapides */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                <div className="text-center p-4 bg-white rounded-lg shadow-md">
+                  <Users className="h-8 w-8 text-accent mx-auto mb-2" />
+                  <p className="font-playfair text-2xl text-primary">{property.maxGuests}</p>
+                  <p className="text-sm text-gray-600">Personnes</p>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg shadow-md">
+                  <Bed className="h-8 w-8 text-accent mx-auto mb-2" />
+                  <p className="font-playfair text-2xl text-primary">{property.bedrooms}</p>
+                  <p className="text-sm text-gray-600">Chambres</p>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg shadow-md">
+                  <Bath className="h-8 w-8 text-accent mx-auto mb-2" />
+                  <p className="font-playfair text-2xl text-primary">{property.bathrooms}</p>
+                  <p className="text-sm text-gray-600">Salles de bain</p>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg shadow-md">
+                  <Home className="h-8 w-8 text-accent mx-auto mb-2" />
+                  <p className="font-playfair text-2xl text-primary">{property.surfaceArea}</p>
+                  <p className="text-sm text-gray-600">m²</p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <section className="mb-12">
+                <h2 className="font-playfair text-3xl text-primary mb-6">À propos de cette propriété</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {property.description[locale] || property.description.fr}
+                </p>
+              </section>
+
+              {/* Équipements */}
+              {property.amenities && property.amenities.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="font-playfair text-3xl text-primary mb-6">Équipements</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {property.amenities.map((amenity) => (
+                      <div key={amenity} className="flex items-center p-3 bg-white rounded-lg shadow-sm">
+                        <Check className="h-5 w-5 text-accent mr-3 flex-shrink-0" />
+                        <span className="text-gray-700">{t(`booking.amenities.${amenity}`)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Règles de la maison */}
+              <section className="mb-12">
+                <h2 className="font-playfair text-3xl text-primary mb-6">Informations pratiques</h2>
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-3">Horaires</h3>
+                      <div className="space-y-2">
+                        <p className="text-gray-700">
+                          <span className="text-gray-500">Arrivée :</span> {property.checkInTime}
+                        </p>
+                        <p className="text-gray-700">
+                          <span className="text-gray-500">Départ :</span> {property.checkOutTime}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 mb-3">Règles</h3>
+                      <div className="space-y-2">
+                        <p className="text-gray-700">
+                          <span className="text-gray-500">Séjour minimum :</span> {property.minNights} nuits
+                        </p>
+                        <p className="text-gray-700">
+                          <span className="text-gray-500">Capacité max :</span> {property.maxGuests} personnes
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* Widget de réservation */}
+            <div>
+              <div className="sticky top-24">
+                <div className="bg-white rounded-lg shadow-xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-playfair text-2xl text-primary">Réserver</h3>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-primary">{formatPrice(property.basePrice)}</p>
+                      <p className="text-sm text-gray-500">par nuit</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <AvailabilityCalendar
+                      propertyId={property.id}
+                      onDateSelect={handleDateSelect}
+                      basePrice={property.basePrice}
+                      minNights={property.minNights}
+                    />
+                  </div>
+
+                  {selectedDates.checkIn && selectedDates.checkOut && (
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-gray-600">Arrivée</span>
+                        <span className="font-medium">{format(selectedDates.checkIn, 'dd/MM/yyyy')}</span>
+                      </div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-gray-600">Départ</span>
+                        <span className="font-medium">{format(selectedDates.checkOut, 'dd/MM/yyyy')}</span>
+                      </div>
+                      <div className="pt-2 mt-2 border-t border-gray-200">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-gray-600">{formatPrice(property.basePrice)} × {nights} nuits</span>
+                          <span className="font-medium">{formatPrice(property.basePrice * nights)}</span>
+                        </div>
+                        {property.cleaningFee > 0 && (
+                          <div className="flex justify-between text-sm mb-2">
+                            <span className="text-gray-600">Frais de ménage</span>
+                            <span className="font-medium">{formatPrice(property.cleaningFee)}</span>
+                          </div>
+                        )}
+                        <div className="pt-2 mt-2 border-t border-gray-200 flex justify-between">
+                          <span className="font-semibold">Total</span>
+                          <span className="font-bold text-lg text-primary">
+                            {formatPrice((property.basePrice * nights) + property.cleaningFee)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleBooking}
+                    disabled={!selectedDates.checkIn || !selectedDates.checkOut}
+                    className={cn(
+                      "w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all",
+                      selectedDates.checkIn && selectedDates.checkOut
+                        ? "bg-accent text-white hover:bg-accent/90 shadow-lg hover:shadow-xl"
+                        : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    )}
+                  >
+                    {selectedDates.checkIn && selectedDates.checkOut 
+                      ? 'Réserver maintenant'
+                      : 'Sélectionnez vos dates'
+                    }
+                  </button>
+                </div>
+
+                {/* Informations supplémentaires */}
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Réservation sans engagement :</strong> Vous ne serez débité qu'après confirmation du propriétaire.
                   </p>
                 </div>
-              )}
-              
-              {/* Résumé de la réservation si dates sélectionnées */}
-              {selectedDates.checkIn && selectedDates.checkOut && (
-                <div className="mb-4 p-3 bg-primary/5 border border-primary/20 rounded-md">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Arrivée:</span>
-                    <span className="font-medium">{format(selectedDates.checkIn, 'dd MMM yyyy')}</span>
-                  </div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>Départ:</span>
-                    <span className="font-medium">{format(selectedDates.checkOut, 'dd MMM yyyy')}</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-medium pt-2 border-t">
-                    <span>Nombre de nuits:</span>
-                    <span>{Math.floor((selectedDates.checkOut.getTime() - selectedDates.checkIn.getTime()) / (1000 * 60 * 60 * 24))}</span>
-                  </div>
-                </div>
-              )}
-              
-              <button
-                onClick={handleBooking}
-                disabled={!selectedDates.checkIn || !selectedDates.checkOut}
-                className={cn(
-                  "w-full h-11 rounded-md px-8 font-semibold transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  "disabled:pointer-events-none disabled:opacity-50",
-                  !selectedDates.checkIn || !selectedDates.checkOut 
-                    ? "bg-gray-200 text-gray-700 border border-gray-400 hover:bg-gray-300 hover:text-gray-900" 
-                    : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
-                )}
-              >
-                {selectedDates.checkIn && selectedDates.checkOut 
-                  ? t('common.actions.book')
-                  : 'Sélectionnez vos dates'
-                }
-              </button>
-
-              {property.cleaningFee > 0 && (
-                <p className="text-sm text-muted-foreground mt-4">
-                  {t('booking.booking.cleaningFee')}: {formatPrice(property.cleaningFee)}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+
+      <BookingFooter 
+        siteName={tenant?.name || 'Maison Aviv'}
+        address={property.city + ', ' + property.country}
+        phone={tenant?.phone || '+33 3 88 00 00 00'}
+        email={tenant?.email || 'contact@maisonaviv.fr'}
+      />
     </div>
   )
 }

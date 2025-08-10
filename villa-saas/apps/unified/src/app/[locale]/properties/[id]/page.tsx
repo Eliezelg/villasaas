@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import PropertyContent from './property-content-villaaviv'
+import PropertyContent from './property-content'
 import { SchemaScript } from '@/components/booking/seo/schema-script'
 import { generatePropertySchema, generateBreadcrumbSchema } from '@/lib/schema-org'
 import { headers } from 'next/headers'
