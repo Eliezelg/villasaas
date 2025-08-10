@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter, useParams } from 'next/navigation'
 import { Plus, Building2, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,9 +31,13 @@ const statusLabels = {
 }
 
 export default function PropertiesPage() {
+  const router = useRouter()
+  const params = useParams()
+  const locale = params.locale as string
   const [properties, setProperties] = useState<Property[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [hasRedirected, setHasRedirected] = useState(false)
 
   useEffect(() => {
     loadProperties()
@@ -48,6 +53,13 @@ export default function PropertiesPage() {
       setError(error.message || 'Erreur lors du chargement des propriétés')
     } else if (data) {
       setProperties(data)
+      
+      // Si une seule propriété et pas encore redirigé, rediriger vers ses détails
+      if (data.length === 1 && !hasRedirected) {
+        setHasRedirected(true)
+        router.replace(`/${locale}/admin/dashboard/properties/${data[0].id}`)
+        return
+      }
     }
 
     setIsLoading(false)
@@ -172,7 +184,7 @@ export default function PropertiesPage() {
 
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" asChild className="flex-1">
-                    <Link href={`/dashboard/properties/${property.id}`}>
+                    <Link href={`/${locale}/admin/dashboard/properties/${property.id}`}>
                       <Edit className="mr-2 h-3 w-3" />
                       Modifier
                     </Link>

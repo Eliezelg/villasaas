@@ -1,13 +1,20 @@
 'use client';
 
 import { ReactNode, useEffect, useState, useCallback } from 'react';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft, Settings, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { propertiesService } from '@/services/properties.service';
 import { PropertyProvider } from '@/contexts/property-context';
 import type { Property } from '@/types/property';
@@ -46,8 +53,10 @@ const tabs = [
 export default function PropertyLayout({ children }: { children: ReactNode }) {
   const params = useParams();
   const pathname = usePathname();
+  const router = useRouter();
   const locale = useLocale();
   const [property, setProperty] = useState<Property | null>(null);
+  const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadProperty = useCallback(async () => {
@@ -61,9 +70,22 @@ export default function PropertyLayout({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, [params.id]);
 
+  const loadAllProperties = useCallback(async () => {
+    const { data } = await propertiesService.getAll();
+    if (data) {
+      setAllProperties(data);
+    }
+  }, []);
+
   useEffect(() => {
     loadProperty();
-  }, [loadProperty]);
+    loadAllProperties();
+  }, [loadProperty, loadAllProperties]);
+
+  const handlePropertyChange = (propertyId: string) => {
+    const currentPath = pathname.split(`/properties/${params.id}`)[1] || '/general';
+    router.push(`/${locale}/admin/dashboard/properties/${propertyId}${currentPath}`);
+  };
 
   const getCurrentTab = () => {
     const basePath = `/${locale}/admin/dashboard/properties/${params.id}`;
@@ -106,13 +128,41 @@ export default function PropertyLayout({ children }: { children: ReactNode }) {
   return (
     <PropertyProvider value={{ property, isLoading, reload: loadProperty }}>
       <div className="container max-w-6xl py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
+        {/* Sélecteur de propriété si plusieurs propriétés */}
+        {allProperties.length > 1 && (
+          <div className="mb-6 flex items-center justify-between border-b pb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Propriété actuelle :</span>
+              <Select value={params.id as string} onValueChange={handlePropertyChange}>
+                <SelectTrigger className="w-[250px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {allProperties.map((prop) => (
+                    <SelectItem key={prop.id} value={prop.id}>
+                      {prop.name} - {prop.city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button variant="outline" size="sm" asChild>
               <Link href={`/${locale}/admin/dashboard/properties`}>
-                <ArrowLeft className="h-4 w-4" />
+                Voir toutes les propriétés
               </Link>
             </Button>
+          </div>
+        )}
+
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {allProperties.length <= 1 && (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href={`/${locale}/admin/dashboard/properties`}>
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
             <div>
               <h1 className="text-3xl font-bold">{property.name}</h1>
               <p className="text-muted-foreground">
