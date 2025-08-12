@@ -15,8 +15,8 @@ interface LocationPageProps {
     address: string
     city: string
     country: string
-    latitude: number
-    longitude: number
+    latitude: number | null
+    longitude: number | null
     images?: Array<{
       url: string
       urls?: any
@@ -72,19 +72,25 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
   const mapInstanceRef = useRef<any>(null)
   const { tenant } = useTenant()
 
+  // Convertir les coordonnées en nombres si nécessaire
+  const latitude = property.latitude ? Number(property.latitude) : null
+  const longitude = property.longitude ? Number(property.longitude) : null
+
   // Debug: vérifier les coordonnées
   console.log('Property coordinates:', {
-    latitude: property.latitude,
-    longitude: property.longitude,
-    hasLat: !!property.latitude,
-    hasLng: !!property.longitude
+    originalLat: property.latitude,
+    originalLng: property.longitude,
+    latitude: latitude,
+    longitude: longitude,
+    hasLat: !!latitude,
+    hasLng: !!longitude
   })
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
 
     // Check if coordinates are available
-    if (!property.latitude || !property.longitude) {
+    if (!latitude || !longitude) {
       console.log('No coordinates available, skipping map init')
       return
     }
@@ -104,7 +110,7 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
 
       // Initialize map
       const map = L.map(mapRef.current!).setView(
-        [property.latitude, property.longitude],
+        [latitude, longitude],
         14
       )
 
@@ -113,7 +119,7 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
       }).addTo(map)
 
       // Add marker
-      L.marker([property.latitude, property.longitude])
+      L.marker([latitude, longitude])
         .addTo(map)
         .bindPopup(property.name)
 
@@ -128,7 +134,7 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
         mapInstanceRef.current = null
       }
     }
-  }, [property])
+  }, [latitude, longitude, property.name])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -162,7 +168,7 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
             )}
 
             {/* Map Section */}
-            {property.latitude && property.longitude ? (
+            {latitude && longitude ? (
               <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div ref={mapRef} className="h-[500px] w-full" />
               </section>
@@ -287,11 +293,11 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Latitude</p>
-                  <p className="font-mono text-lg font-semibold">{property.latitude?.toFixed(6) || 'N/A'}</p>
+                  <p className="font-mono text-lg font-semibold">{latitude?.toFixed(6) || 'N/A'}</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Longitude</p>
-                  <p className="font-mono text-lg font-semibold">{property.longitude?.toFixed(6) || 'N/A'}</p>
+                  <p className="font-mono text-lg font-semibold">{longitude?.toFixed(6) || 'N/A'}</p>
                 </div>
               </div>
             </section>

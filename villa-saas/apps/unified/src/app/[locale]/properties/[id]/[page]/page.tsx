@@ -26,6 +26,8 @@ async function getProperty(id: string) {
   const tenant = headersList.get('x-tenant') || ''
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   
+  console.log('Fetching property from:', `${apiUrl}/api/public/properties/${id}`, 'with tenant:', tenant)
+  
   try {
     const response = await fetch(`${apiUrl}/api/public/properties/${id}`, {
       headers: {
@@ -37,10 +39,16 @@ async function getProperty(id: string) {
     })
     
     if (!response.ok) {
+      console.error('API response not OK:', response.status)
       return null
     }
     
-    return response.json()
+    const data = await response.json()
+    console.log('API returned property with coords:', {
+      latitude: data.latitude,
+      longitude: data.longitude
+    })
+    return data
   } catch (error) {
     console.error('Error fetching property:', error)
     return null
@@ -63,6 +71,15 @@ export default async function PropertyCustomPage({ params }: PageProps) {
     notFound()
   }
 
+  // Debug: Log des coordonnées côté serveur
+  console.log('Server-side property coordinates:', {
+    id: property.id,
+    name: property.name,
+    latitude: property.latitude,
+    longitude: property.longitude,
+    hasCoords: !!(property.latitude && property.longitude)
+  })
+
   // Vérifier si la page est activée pour cette propriété
   const customPages = property.customPagesSettings || property.customPages || {}
   const isPageEnabled = customPages[page as keyof typeof customPages] === true
@@ -71,7 +88,14 @@ export default async function PropertyCustomPage({ params }: PageProps) {
     notFound()
   }
 
-  return <PageComponent property={property} locale={params.locale} />
+  // S'assurer que les coordonnées sont bien des nombres
+  const propertyWithCoords = {
+    ...property,
+    latitude: property.latitude ? Number(property.latitude) : null,
+    longitude: property.longitude ? Number(property.longitude) : null
+  }
+
+  return <PageComponent property={propertyWithCoords} locale={params.locale} />
 }
 
 // Générer les métadonnées dynamiques
