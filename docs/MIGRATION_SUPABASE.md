@@ -4,7 +4,7 @@
 
 1. Aller sur [supabase.com](https://supabase.com)
 2. Créer un nouveau projet
-3. Noter les informations suivantes :
+3. Noter les informations suivantes
    - Project URL
    - API Key (anon)
    - Service Role Key
