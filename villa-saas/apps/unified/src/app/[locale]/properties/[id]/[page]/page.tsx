@@ -24,7 +24,7 @@ const pageComponents = {
 async function getProperty(id: string) {
   const headersList = headers()
   const tenant = headersList.get('x-tenant') || ''
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'
   
   console.log('Fetching property from:', `${apiUrl}/api/public/properties/${id}`, 'with tenant:', tenant)
   

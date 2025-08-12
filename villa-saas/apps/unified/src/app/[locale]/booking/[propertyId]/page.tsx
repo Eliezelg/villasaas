@@ -10,9 +10,10 @@ import { apiClient } from '@/lib/api-client-booking'
 import { formatPrice, formatDate, formatDateRange, getDaysBetween } from '@/lib/utils'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { ArrowLeft, Calendar, Users, CreditCard, Check } from 'lucide-react'
+import { ArrowLeft, Calendar, Users, CreditCard, Check, Plus, Minus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { StripeWrapper } from '@/components/payment/stripe-wrapper'
 import { StripePaymentForm } from '@/components/payment/stripe-payment-form'
 
@@ -52,6 +53,20 @@ interface PricingDetails {
   }>
 }
 
+interface BookingOption {
+  id: string
+  name: any
+  description?: any
+  category: string
+  pricePerUnit: number
+  pricingType: string
+  pricingPeriod: string
+  isMandatory: boolean
+  minGuests?: number
+  maxGuests?: number
+  minNights?: number
+}
+
 interface BookingFormData {
   adults: number
   children: number
@@ -64,6 +79,7 @@ interface BookingFormData {
   guestCountry: string
   guestAddress: string
   specialRequests: string
+  selectedOptions?: Array<{ optionId: string; quantity: number }>
 }
 
 type BookingStep = 'details' | 'payment' | 'confirmation'
@@ -76,6 +92,7 @@ function BookingPageContent() {
   
   const [property, setProperty] = useState<Property | null>(null)
   const [pricing, setPricing] = useState<PricingDetails | null>(null)
+  const [options, setOptions] = useState<BookingOption[]>([])
   const [currentStep, setCurrentStep] = useState<BookingStep>('details')
   const [loading, setLoading] = useState(true)
   const [calculating, setCalculating] = useState(false)
@@ -97,7 +114,8 @@ function BookingPageContent() {
     guestPhone: '',
     guestCountry: 'FR',
     guestAddress: '',
-    specialRequests: ''
+    specialRequests: '',
+    selectedOptions: []
   })
 
   useEffect(() => {
@@ -119,13 +137,20 @@ function BookingPageContent() {
         setProperty(propertyResponse.data)
       }
       
+      // Charger les options
+      const optionsResponse = await apiClient.getPropertyOptions(propertyId)
+      if (optionsResponse.data) {
+        setOptions(optionsResponse.data)
+      }
+      
       // Calculer le prix
       setCalculating(true)
       const pricingResponse = await apiClient.calculatePrice({
         propertyId,
         checkIn: new Date(checkIn!).toISOString(),
         checkOut: new Date(checkOut!).toISOString(),
-        guests
+        guests,
+        selectedOptions: formData.selectedOptions
       })
       
       if (pricingResponse.data) {
@@ -148,6 +173,59 @@ function BookingPageContent() {
 
   function getTotalGuests() {
     return formData.adults + formData.children
+  }
+  
+  async function handleOptionChange(optionId: string, quantity: number) {
+    const newOptions = formData.selectedOptions || []
+    const existingIndex = newOptions.findIndex(o => o.optionId === optionId)
+    
+    if (quantity === 0) {
+      // Retirer l'option
+      if (existingIndex >= 0) {
+        newOptions.splice(existingIndex, 1)
+      }
+    } else {
+      // Ajouter ou mettre à jour l'option
+      if (existingIndex >= 0) {
+        newOptions[existingIndex].quantity = quantity
+      } else {
+        newOptions.push({ optionId, quantity })
+      }
+    }
+    
+    setFormData(prev => ({ ...prev, selectedOptions: newOptions }))
+    
+    // Recalculer le prix avec les options
+    setCalculating(true)
+    try {
+      const pricingResponse = await apiClient.calculatePrice({
+        propertyId,
+        checkIn: new Date(checkIn!).toISOString(),
+        checkOut: new Date(checkOut!).toISOString(),
+        guests,
+        selectedOptions: newOptions
+      })
+      
+      if (pricingResponse.data) {
+        setPricing(pricingResponse.data)
+      }
+    } catch (error) {
+      console.error('Error calculating price:', error)
+    } finally {
+      setCalculating(false)
+    }
+  }
+  
+  function getOptionQuantity(optionId: string): number {
+    const option = formData.selectedOptions?.find(o => o.optionId === optionId)
+    return option?.quantity || 0
+  }
+  
+  function formatOptionPrice(option: BookingOption): string {
+    let price = `${option.pricePerUnit}€`
+    if (option.pricingType === 'PER_PERSON') price += '/pers'
+    if (option.pricingPeriod === 'PER_DAY') price += '/jour'
+    return price
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -200,6 +278,7 @@ function BookingPageContent() {
             guestAddress: formData.guestAddress,
             specialRequests: formData.specialRequests,
             paymentIntentId: paymentResponse.data.paymentIntentId,
+            selectedOptions: formData.selectedOptions,
           })
           
           if (bookingResponse.data) {
@@ -386,6 +465,66 @@ function BookingPageContent() {
                         </p>
                       )}
                     </div>
+
+                    {/* Options supplémentaires */}
+                    {options.length > 0 && (
+                      <div>
+                        <h3 className="mb-4 font-medium">Options et services supplémentaires</h3>
+                        <div className="space-y-3">
+                          {options.map((option) => {
+                            const optionName = typeof option.name === 'object' ? (option.name as any).fr || 'Sans nom' : option.name || 'Sans nom'
+                            const optionDesc = typeof option.description === 'object' ? (option.description as any).fr : option.description
+                            const quantity = getOptionQuantity(option.id)
+                            const isApplicable = !option.minGuests || getTotalGuests() >= option.minGuests
+                            
+                            return (
+                              <div key={option.id} className={`rounded-lg border p-4 ${!isApplicable ? 'opacity-50' : ''}`}>
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <h4 className="font-medium">{optionName}</h4>
+                                      {option.isMandatory && (
+                                        <Badge variant="destructive" className="text-xs">Obligatoire</Badge>
+                                      )}
+                                    </div>
+                                    {optionDesc && (
+                                      <p className="text-sm text-muted-foreground mt-1">{optionDesc}</p>
+                                    )}
+                                    <p className="text-sm font-medium mt-2">{formatOptionPrice(option)}</p>
+                                    {option.minGuests && (
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        Minimum {option.minGuests} personnes
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleOptionChange(option.id, Math.max(0, quantity - 1))}
+                                      disabled={!isApplicable || (option.isMandatory && quantity <= 1)}
+                                    >
+                                      <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <span className="w-12 text-center font-medium">{quantity}</span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleOptionChange(option.id, quantity + 1)}
+                                      disabled={!isApplicable}
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Informations personnelles */}
                     <div>
@@ -606,6 +745,32 @@ function BookingPageContent() {
                         <span className="text-muted-foreground">Taxe de séjour</span>
                         <span>{formatPrice(pricing.touristTax)}</span>
                       </div>
+                    )}
+                    
+                    {/* Options sélectionnées */}
+                    {formData.selectedOptions && formData.selectedOptions.length > 0 && (
+                      <>
+                        <div className="border-t pt-2">
+                          <p className="text-sm font-medium mb-2">Options sélectionnées</p>
+                          {formData.selectedOptions.map((selectedOption) => {
+                            const option = options.find(o => o.id === selectedOption.optionId)
+                            if (!option) return null
+                            const optionName = typeof option.name === 'object' ? (option.name as any).fr || 'Sans nom' : option.name || 'Sans nom'
+                            const total = option.pricePerUnit * selectedOption.quantity * 
+                              (option.pricingPeriod === 'PER_DAY' ? pricing.nights : 1) * 
+                              (option.pricingType === 'PER_PERSON' ? getTotalGuests() : 1)
+                            
+                            return (
+                              <div key={selectedOption.optionId} className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">
+                                  {optionName} x{selectedOption.quantity}
+                                </span>
+                                <span>{formatPrice(total)}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </>
                     )}
                     
                     <div className="flex justify-between border-t pt-2 font-semibold">

@@ -16,7 +16,7 @@ interface Props {
 async function getProperty(id: string) {
   const headersList = headers()
   const tenant = headersList.get('x-tenant') || ''
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'
   
   try {
     const response = await fetch(`${apiUrl}/api/public/properties/${id}`, {
@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
   
-  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'
+  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr'
   const propertyUrl = `${baseUrl}/${params.locale}/properties/${property.id}`
   
   return {
@@ -141,7 +141,7 @@ export default async function PropertyPage({ params }: Props) {
     notFound()
   }
   
-  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'
+  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr'
   
   // Generate schema.org data
   const propertySchema = generatePropertySchema(property, tenant)

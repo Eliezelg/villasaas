@@ -70,7 +70,7 @@ export function ImageUploadS3({ propertyId, images, onImagesChange, maxImages = 
         // Récupérer le token depuis localStorage
         const token = localStorage.getItem('accessToken');
         
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/properties/${propertyId}/images`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'}/api/properties/${propertyId}/images`, {
           method: 'POST',
           body: formData,
           credentials: 'include',

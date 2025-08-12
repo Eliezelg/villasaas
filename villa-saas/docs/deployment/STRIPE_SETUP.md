@@ -35,7 +35,7 @@ stripe login
 stripe config --list
 
 # Écouter les webhooks en local
-stripe listen --forward-to localhost:3001/api/public/stripe/webhook
+stripe listen --forward-to api.webpro200.com/api/public/stripe/webhook
 
 # Le CLI va afficher votre webhook secret : whsec_xxxxxxxxxxxx
 ```
@@ -59,10 +59,10 @@ Si vous avez plusieurs environnements de test dans le même compte Stripe :
 
 ```bash
 # Utiliser la clé secrète de l'environnement de test spécifique
-stripe listen --forward-to localhost:3001/api/public/stripe/webhook --api-key sk_test_YOUR_SECRET_KEY
+stripe listen --forward-to api.webpro200.com/api/public/stripe/webhook --api-key sk_test_YOUR_SECRET_KEY
 
 # Exemple avec votre clé :
-stripe listen --forward-to localhost:3001/api/public/stripe/webhook --api-key sk_test_YOUR_SECRET_KEY
+stripe listen --forward-to api.webpro200.com/api/public/stripe/webhook --api-key sk_test_YOUR_SECRET_KEY
 
 # Le CLI va afficher un webhook secret spécifique à cet environnement
 ```
@@ -101,7 +101,7 @@ cd apps/unified
 npm run dev
 
 # Terminal 3 - Stripe webhooks
-stripe listen --forward-to localhost:3001/api/public/stripe/webhook
+stripe listen --forward-to api.webpro200.com/api/public/stripe/webhook
 ```
 
 ### Tester Stripe Connect

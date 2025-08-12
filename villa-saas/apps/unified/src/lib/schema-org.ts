@@ -1,5 +1,5 @@
 export function generatePropertySchema(property: any, tenant: any) {
-  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'
+  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr'
   
   return {
     '@context': 'https://schema.org',
@@ -60,7 +60,7 @@ export function generateBreadcrumbSchema(items: Array<{ name: string; url: strin
 }
 
 export function generateOrganizationSchema(tenant: any) {
-  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'
+  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr'
   
   return {
     '@context': 'https://schema.org',
@@ -79,7 +79,7 @@ export function generateOrganizationSchema(tenant: any) {
 }
 
 export function generateSearchActionSchema() {
-  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'
+  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr'
   
   return {
     '@context': 'https://schema.org',

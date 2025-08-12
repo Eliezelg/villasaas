@@ -32,6 +32,6 @@ DATABASE_URL="postgresql://villa_user:villa_password@localhost:5433/villa_saas?s
 cd ../..
 
 # Démarrer le backend
-echo "🎯 Démarrage du backend sur http://localhost:3001"
+echo "🎯 Démarrage du backend sur http://api.webpro200.com"
 cd apps/backend
 npm run dev

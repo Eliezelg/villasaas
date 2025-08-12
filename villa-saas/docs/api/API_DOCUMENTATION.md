@@ -4,9 +4,9 @@
 
 L'API Villa SaaS est une API RESTful qui permet de gérer une plateforme multi-tenant de location de propriétés de vacances.
 
-**Base URL**: `http://localhost:3001/api`
+**Base URL**: `http://api.webpro200.com/api`
 
-**Documentation Swagger**: `http://localhost:3001/documentation`
+**Documentation Swagger**: `http://api.webpro200.com/documentation`
 
 ## Authentification
 

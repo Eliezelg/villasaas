@@ -148,7 +148,7 @@ export async function middleware(request: NextRequest) {
       } else {
         // Faire une requête API pour obtenir le tenant/property
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'
           const response = await fetch(`${apiUrl}/api/public/domain-lookup/${hostname}`, {
             method: 'GET',
             headers: {

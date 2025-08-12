@@ -36,7 +36,7 @@ class FinalEndpointTester {
 
   constructor() {
     this.apiClient = axios.create({
-      baseURL: process.env.API_URL || 'http://localhost:3001',
+      baseURL: process.env.API_URL || 'http://api.webpro200.com',
       timeout: 10000,
       validateStatus: () => true, // Don't throw on any status
       withCredentials: true,

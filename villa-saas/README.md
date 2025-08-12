@@ -144,10 +144,10 @@ npm run dev
 ## 🌐 URLs
 
 - **Dashboard Admin**: http://localhost:3000
-- **Site de Réservation**: http://localhost:3002 (ou http://demo.localhost:3002)
+- **Site de Réservation**: http://webpro200.com (ou http://demo.webpro200.com)
 - **Hub AI**: http://localhost:3003
-- **Backend API**: http://localhost:3001
-- **API Documentation**: http://localhost:3001/documentation
+- **Backend API**: http://api.webpro200.com
+- **API Documentation**: http://api.webpro200.com/documentation
 - **PostgreSQL**: localhost:5433
 - **Redis**: localhost:6379
 
@@ -337,7 +337,7 @@ npm run test:coverage
 ## 📖 Documentation
 
 - **API**: Voir `apps/backend/API_DOCUMENTATION.md`
-- **Swagger**: http://localhost:3001/documentation
+- **Swagger**: http://api.webpro200.com/documentation
 - **Postman**: Importer `apps/backend/postman-collection.json`
 - **Plans de développement**: Voir `PHASE_1_PLAN.md` et `PHASE_2_PLAN.md`
 

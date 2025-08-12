@@ -179,13 +179,13 @@ async function main() {
   Password: Demo1234!
   
 🌐 Access the booking site at:
-  http://demo.localhost:3002
+  http://demo.webpro200.com
   
 📊 Access the admin dashboard at:
   http://localhost:3000
   
 🏠 View the property at:
-  http://demo.localhost:3002/properties/${property.id}`);
+  http://demo.webpro200.com/properties/${property.id}`);
 }
 
 main()

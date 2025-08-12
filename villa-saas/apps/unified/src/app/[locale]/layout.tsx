@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = tenantData?.metadata?.description || defaultDescription
   const keywords = tenantData?.metadata?.keywords || ['villa', 'location', 'vacances', 'réservation']
   
-  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'
+  const baseUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr'
   const headersList = headers()
   const host = headersList.get('host') || 'booking.villa-saas.com'
   const currentUrl = `https://${host}`

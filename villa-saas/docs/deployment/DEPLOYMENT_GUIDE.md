@@ -241,7 +241,7 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/api.votre-domaine.com/privkey.pem;
 
     location / {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://api.webpro200.com;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -300,7 +300,7 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/booking.votre-domaine.com/privkey.pem;
 
     location / {
-        proxy_pass http://localhost:3002;
+        proxy_pass http://webpro200.com;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';

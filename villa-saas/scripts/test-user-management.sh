@@ -3,7 +3,7 @@
 # Test User Management System
 # This script tests the complete user management functionality
 
-API_URL="${API_URL:-http://localhost:3001/api}"
+API_URL="${API_URL:-http://api.webpro200.com/api}"
 TOKEN=""
 
 # Colors for output

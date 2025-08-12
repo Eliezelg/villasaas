@@ -2,7 +2,7 @@
 
 # Script pour créer un tenant de démonstration avec site public
 
-API_URL="http://localhost:3001"
+API_URL="http://api.webpro200.com"
 
 echo "🏗️  Création d'un tenant de démonstration..."
 
@@ -178,7 +178,7 @@ echo "   Email: demo@villa-booking.com"
 echo "   Mot de passe: demo123456"
 echo -e "\n🌐 URLs de test :"
 echo "   Dashboard: http://localhost:3000"
-echo "   Site public: http://demo.localhost:3002"
+echo "   Site public: http://demo.webpro200.com"
 echo -e "\n💡 Le sous-domaine 'demo' est maintenant configuré pour ce tenant."
 
 rm -f /tmp/create-public-site.js

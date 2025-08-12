@@ -4,7 +4,7 @@ echo "=== Test du flow de signup complet ==="
 
 # 1. Créer une session
 echo -e "\n1. Création de la session..."
-SESSION_RESPONSE=$(curl -s -X POST http://localhost:3001/api/auth/signup/session \
+SESSION_RESPONSE=$(curl -s -X POST http://api.webpro200.com/api/auth/signup/session \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test'$(date +%s)'@example.com",
@@ -19,7 +19,7 @@ echo "Email: $EMAIL"
 
 # 2. Ajouter les informations personnelles
 echo -e "\n2. Ajout des informations personnelles..."
-curl -s -X POST http://localhost:3001/api/auth/signup/personal-info \
+curl -s -X POST http://api.webpro200.com/api/auth/signup/personal-info \
   -H "Content-Type: application/json" \
   -d "{
     \"sessionToken\": \"$SESSION_TOKEN\",
@@ -35,7 +35,7 @@ curl -s -X POST http://localhost:3001/api/auth/signup/personal-info \
 
 # 3. Sélectionner le plan
 echo -e "\n3. Sélection du plan..."
-curl -s -X POST http://localhost:3001/api/auth/signup/select-plan \
+curl -s -X POST http://api.webpro200.com/api/auth/signup/select-plan \
   -H "Content-Type: application/json" \
   -d "{
     \"sessionToken\": \"$SESSION_TOKEN\",
@@ -44,7 +44,7 @@ curl -s -X POST http://localhost:3001/api/auth/signup/select-plan \
 
 # 4. Créer la session Stripe Checkout
 echo -e "\n4. Création de la session Stripe Checkout..."
-CHECKOUT_RESPONSE=$(curl -s -X POST http://localhost:3001/api/subscriptions/signup-checkout \
+CHECKOUT_RESPONSE=$(curl -s -X POST http://api.webpro200.com/api/subscriptions/signup-checkout \
   -H "Content-Type: application/json" \
   -d "{
     \"plan\": \"starter\",
@@ -62,7 +62,7 @@ echo "$CHECKOUT_URL"
 
 # 5. Mettre à jour la session avec l'ID Stripe
 echo -e "\n5. Mise à jour de la session avec l'ID Stripe..."
-curl -s -X POST http://localhost:3001/api/auth/signup/select-plan \
+curl -s -X POST http://api.webpro200.com/api/auth/signup/select-plan \
   -H "Content-Type: application/json" \
   -d "{
     \"sessionToken\": \"$SESSION_TOKEN\",
@@ -77,7 +77,7 @@ echo "3. Date d'expiration: n'importe quelle date future"
 echo "4. CVC: n'importe quel 3 chiffres"
 echo "5. Après le paiement, exécutez la commande suivante:"
 echo ""
-echo "curl -X POST http://localhost:3001/api/auth/signup/complete \\"
+echo "curl -X POST http://api.webpro200.com/api/auth/signup/complete \\"
 echo "  -H \"Content-Type: application/json\" \\"
 echo "  -d '{"
 echo "    \"sessionToken\": \"$SESSION_TOKEN\","

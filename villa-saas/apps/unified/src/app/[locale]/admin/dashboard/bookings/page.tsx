@@ -268,22 +268,23 @@ export default function BookingsPage() {
         </form>
       </Card>
 
-      {/* Tableau des réservations */}
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Référence</TableHead>
-              <TableHead>Propriété</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Dates</TableHead>
-              <TableHead>Invités</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {/* Tableau des réservations - Desktop */}
+      <div className="hidden md:block">
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Référence</TableHead>
+                <TableHead>Propriété</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Dates</TableHead>
+                <TableHead>Invités</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
             {bookings.map((booking) => {
               const StatusIcon = statusConfig[booking.status].icon;
               return (
@@ -390,12 +391,102 @@ export default function BookingsPage() {
             <p className="text-muted-foreground">Aucune réservation trouvée</p>
           </div>
         )}
+      </Card>
+    </div>
 
-        {/* Pagination */}
-        {pagination.pages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t">
+    {/* Version Mobile - Cards */}
+    <div className="md:hidden space-y-4">
+      {bookings.map((booking) => {
+        const StatusIcon = statusConfig[booking.status].icon;
+        return (
+          <Card key={booking.id} className="p-4">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <p className="font-semibold text-sm">{booking.reference}</p>
+                <Badge className={`${statusConfig[booking.status].color} mt-1`}>
+                  <StatusIcon className="mr-1 h-3 w-3" />
+                  {statusConfig[booking.status].label}
+                </Badge>
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm">•••</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => router.push(`/dashboard/bookings/${booking.id}`)}
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Voir détails
+                  </DropdownMenuItem>
+                  {booking.status === 'PENDING' && (
+                    <DropdownMenuItem onClick={() => handleConfirm(booking)}>
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Confirmer
+                    </DropdownMenuItem>
+                  )}
+                  {['PENDING', 'CONFIRMED'].includes(booking.status) && (
+                    <DropdownMenuItem
+                      onClick={() => handleCancel(booking)}
+                      className="text-red-600"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Annuler
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Home className="h-4 w-4 text-muted-foreground" />
+                <span>{booking.property?.name}</span>
+              </div>
+              
+              <div>
+                <p className="font-medium">
+                  {booking.guestFirstName} {booking.guestLastName}
+                </p>
+                <p className="text-muted-foreground text-xs">{booking.guestEmail}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>
+                  {format(new Date(booking.checkIn), 'dd MMM', { locale: fr })} - 
+                  {format(new Date(booking.checkOut), 'dd MMM', { locale: fr })}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center pt-2 border-t">
+                <span className="flex items-center gap-1">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  {booking.adults + booking.children} pers.
+                </span>
+                <span className="font-semibold">{formatPrice(booking.total)}</span>
+              </div>
+            </div>
+          </Card>
+        );
+      })}
+
+      {bookings.length === 0 && (
+        <Card className="p-12 text-center">
+          <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground">Aucune réservation trouvée</p>
+        </Card>
+      )}
+    </div>
+
+      {/* Pagination */}
+      {pagination.pages > 1 && (
+        <Card className="mt-4">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4">
             <p className="text-sm text-muted-foreground">
-              Page {pagination.page} sur {pagination.pages} ({pagination.total} résultats)
+              <span className="hidden sm:inline">Page {pagination.page} sur {pagination.pages}</span>
+              <span className="sm:hidden">{pagination.page}/{pagination.pages}</span>
+              <span className="hidden sm:inline"> ({pagination.total} résultats)</span>
             </p>
             <div className="flex gap-2">
               <Button
@@ -416,8 +507,8 @@ export default function BookingsPage() {
               </Button>
             </div>
           </div>
-        )}
-      </Card>
+        </Card>
+      )}
     </div>
   );
 }

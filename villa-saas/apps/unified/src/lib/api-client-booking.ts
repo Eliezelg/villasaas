@@ -1,6 +1,6 @@
 import { getCookie } from './utils'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'
 
 interface ApiResponse<T = any> {
   data?: T
@@ -141,11 +141,16 @@ class ApiClient {
     checkIn: string
     checkOut: string
     guests: number
+    selectedOptions?: Array<{ optionId: string; quantity: number }>
   }) {
     return this.request('/api/public/pricing/calculate', {
       method: 'POST',
       body: JSON.stringify(data),
     })
+  }
+  
+  async getPropertyOptions(propertyId: string) {
+    return this.request(`/api/public/properties/${propertyId}/options`)
   }
   
   async createBooking(data: {
@@ -164,6 +169,7 @@ class ApiClient {
     guestAddress?: string
     specialRequests?: string
     paymentIntentId?: string
+    selectedOptions?: Array<{ optionId: string; quantity: number }>
   }) {
     return this.request('/api/public/bookings', {
       method: 'POST',

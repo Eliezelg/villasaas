@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 async function testPropertyCreation() {
   try {
     // First, let's login to get a valid token
-    const loginResponse = await fetch('http://localhost:3001/api/auth/login', {
+    const loginResponse = await fetch('http://api.webpro200.com/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ async function testPropertyCreation() {
       features: { modern: true, luxury: true }
     };
 
-    const createResponse = await fetch('http://localhost:3001/api/properties', {
+    const createResponse = await fetch('http://api.webpro200.com/api/properties', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

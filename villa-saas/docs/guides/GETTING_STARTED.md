@@ -63,7 +63,7 @@ cd apps/backend
 npm run dev
 ```
 
-The API will be available at: `http://localhost:3001`
+The API will be available at: `http://api.webpro200.com`
 
 #### Frontend (in `apps/web` directory):
 ```bash

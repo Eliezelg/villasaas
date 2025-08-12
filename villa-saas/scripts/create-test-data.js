@@ -1,6 +1,6 @@
 // Script pour créer des données de test
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = 'http://api.webpro200.com/api';
 
 // Login
 async function login() {

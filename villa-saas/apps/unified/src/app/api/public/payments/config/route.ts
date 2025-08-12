@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const cookieStore = cookies()
     const tenant = cookieStore.get('tenant')?.value
     
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'
     const response = await fetch(
       `${apiUrl}/api/public/payments/config`,
       {

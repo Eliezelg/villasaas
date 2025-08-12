@@ -22,7 +22,7 @@ Development guidelines and best practices:
 ### 🚀 [API Documentation](./api/)
 Complete API reference and integration guides:
 - [API Documentation](./api/API_DOCUMENTATION.md) - Full REST API reference
-- Swagger UI available at: `http://localhost:3001/documentation`
+- Swagger UI available at: `http://api.webpro200.com/documentation`
 
 ### 📦 [Releases](./releases/)
 Release notes and feature summaries:

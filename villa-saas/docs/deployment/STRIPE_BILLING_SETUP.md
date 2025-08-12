@@ -43,7 +43,7 @@ STRIPE_SUBSCRIPTION_WEBHOOK_SECRET=whsec_XXXXXXXXXXXXXXXXXX
 ### Option A : En développement (Stripe CLI)
 
 ```bash
-stripe listen --forward-to localhost:3001/api/public/stripe/subscription-webhook
+stripe listen --forward-to api.webpro200.com/api/public/stripe/subscription-webhook
 ```
 
 Copiez le webhook secret affiché et mettez-le dans `STRIPE_SUBSCRIPTION_WEBHOOK_SECRET`.

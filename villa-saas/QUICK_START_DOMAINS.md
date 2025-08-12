@@ -29,7 +29,7 @@
 ```bash
 # Frontend
 NEXT_PUBLIC_MAIN_DOMAIN=webpro200.fr
-NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_API_URL=http://api.webpro200.com
 
 # Backend (pour Vercel API)
 VERCEL_API_TOKEN=xxx

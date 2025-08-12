@@ -55,7 +55,7 @@ async function main() {
   });
   
   console.log('✅ Site public créé:', publicSite.subdomain);
-  console.log('🌐 URL: http://demo.localhost:3002');
+  console.log('🌐 URL: http://demo.webpro200.com');
 }
 
 main()

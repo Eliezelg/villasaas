@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr';
 
 export async function GET(
   request: Request,

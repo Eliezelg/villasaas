@@ -60,7 +60,7 @@ npm run typecheck
 
 Une fois le serveur démarré, accédez à la documentation interactive :
 
-**URL**: http://localhost:3001/documentation
+**URL**: http://api.webpro200.com/documentation
 
 ### 📄 Documentation complète
 
@@ -113,7 +113,7 @@ src/
 # Server
 NODE_ENV=development
 PORT=3001
-API_URL=http://localhost:3001
+API_URL=http://api.webpro200.com
 
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/villa_saas

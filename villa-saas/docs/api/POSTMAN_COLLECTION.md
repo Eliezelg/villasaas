@@ -15,7 +15,7 @@ Create a new Postman environment with these variables:
 
 ```json
 {
-  "base_url": "http://localhost:3001/api",
+  "base_url": "http://api.webpro200.com/api",
   "access_token": "",
   "refresh_token": "",
   "tenant_id": "",
@@ -300,5 +300,5 @@ Headers returned:
 ## 🔗 Useful Resources
 
 - [API Documentation](./API_DOCUMENTATION.md)
-- [Swagger UI](http://localhost:3001/documentation)
+- [Swagger UI](http://api.webpro200.com/documentation)
 - [Development Guidelines](../guides/DEVELOPMENT_GUIDELINES.md)

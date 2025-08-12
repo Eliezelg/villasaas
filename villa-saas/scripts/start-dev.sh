@@ -28,7 +28,7 @@ cd ../..
 # Démarrer les applications
 echo "🎯 Démarrage des applications..."
 echo ""
-echo "Backend: http://localhost:3001"
+echo "Backend: http://api.webpro200.com"
 echo "Frontend: http://localhost:3000"
 echo ""
 

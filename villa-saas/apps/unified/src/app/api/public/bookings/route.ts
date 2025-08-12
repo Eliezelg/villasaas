@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.webpro200.fr'
     
     const response = await fetch(
       `${apiUrl}/api/public/bookings`,

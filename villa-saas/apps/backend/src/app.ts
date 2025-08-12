@@ -75,9 +75,9 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       // Configuration pour le développement
       const devOrigins = [
         'http://localhost:3000',
-        'http://localhost:3002',
+        'http://webpro200.com',
         /^http:\/\/[a-zA-Z0-9-]+\.localhost:3000$/,  // Sous-domaines de localhost:3000 (app unifiée)
-        /^http:\/\/[a-zA-Z0-9-]+\.localhost:3002$/,  // Sous-domaines de localhost:3002
+        /^http:\/\/[a-zA-Z0-9-]+\.webpro200.com$/,  // Sous-domaines de webpro200.com
         /^http:\/\/localhost:\d+$/,  // N'importe quel port localhost
       ];
       
