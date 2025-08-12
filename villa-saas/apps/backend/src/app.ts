@@ -93,7 +93,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         'https://www.webpro200.fr',
         'https://aviv.webpro200.fr', // Ajouter explicitement aviv pour le test
         /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/, // Pattern pour tous les sous-domaines
-        // Force deployment: 2025-08-05T22:45:00Z - CORS fix for preflight
+        // Force deployment: 2025-08-12T10:57:00Z - CORS fix for PATCH method
       ].filter(Boolean) : [];
       
       const allowedOrigins = [...devOrigins, ...prodOrigins];
