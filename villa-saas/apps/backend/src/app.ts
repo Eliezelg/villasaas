@@ -48,6 +48,7 @@ import { dnsManagementRoutes } from './modules/domains/dns-management.routes';
 import { domainLookupRoutes } from './modules/public/domain-lookup.routes';
 import { publicSiteRoutes } from './modules/public-site/public-site.routes';
 import { subdomainCheckRoutes } from './modules/public/subdomain-check.routes';
+import { geocodingRoutes } from './modules/geocoding/geocoding.routes';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = Fastify(opts);
@@ -232,6 +233,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(publicSiteRoutes, { prefix: '/api' });
   await app.register(domainsRoutes);
   await app.register(dnsManagementRoutes, { prefix: '/api' });
+  await app.register(geocodingRoutes, { prefix: '/api/geocoding' });
   
   // Public routes (no auth required)
   await app.register(publicRoutes, { prefix: '/api' });

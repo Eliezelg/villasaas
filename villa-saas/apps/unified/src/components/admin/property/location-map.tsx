@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { apiClient } from '@/lib/api-client';
 
 interface LocationMapProps {
   latitude?: number;
@@ -111,23 +112,23 @@ export function LocationMap({
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Recherche d'adresse (utilise Nominatim d'OpenStreetMap)
+  // Recherche d'adresse via notre API backend
   const handleAddressSearch = async () => {
     if (!searchAddress.trim() || !map) return;
 
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          searchAddress
-        )}&limit=1`
-      );
-      const results = await response.json();
+      // Utiliser notre API backend pour éviter les problèmes CORS
+      const { data } = await apiClient.post('/api/geocoding/geocode', {
+        address: searchAddress,
+        city: '', // Recherche libre, on ne sépare pas l'adresse
+        postalCode: '',
+        country: 'FR',
+      });
 
-      if (results && results.length > 0) {
-        const result = results[0];
-        const lat = parseFloat(result.lat);
-        const lon = parseFloat(result.lon);
+      if (data.success) {
+        const lat = data.latitude;
+        const lon = data.longitude;
 
         // Centrer la carte
         map.setView([lat, lon], 16);
@@ -153,11 +154,15 @@ export function LocationMap({
         onLocationChange({
           latitude: lat,
           longitude: lon,
-          address: result.display_name,
+          address: data.display_name,
         });
+
+        if (data.fallback) {
+          alert('Coordonnées approximatives basées sur la ville. Vous pouvez ajuster manuellement en cliquant sur la carte.');
+        }
       } else {
         // Aucun résultat trouvé
-        alert('Adresse non trouvée. Essayez une recherche plus précise.');
+        alert(data.error || 'Adresse non trouvée. Essayez une recherche plus précise.');
       }
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);

@@ -81,19 +81,21 @@ export default function PropertyLocationPage() {
 
     setIsGeocoding(true);
     try {
-      const query = `${address}, ${postalCode} ${city}, ${country}`;
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-      );
-      const data = await response.json();
+      const { data } = await apiClient.post('/api/geocoding/geocode', {
+        address,
+        city,
+        postalCode,
+        country,
+      });
 
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        form.setValue('latitude', parseFloat(lat));
-        form.setValue('longitude', parseFloat(lon));
+      if (data.success) {
+        form.setValue('latitude', data.latitude);
+        form.setValue('longitude', data.longitude);
         toast({
           title: "Géolocalisation réussie",
-          description: "Les coordonnées ont été trouvées",
+          description: data.fallback 
+            ? "Coordonnées approximatives basées sur la ville"
+            : "Les coordonnées exactes ont été trouvées",
         });
       } else {
         toast({

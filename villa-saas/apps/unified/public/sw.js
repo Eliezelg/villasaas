@@ -51,6 +51,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Ignore les requêtes vers des domaines externes
+  const requestUrl = new URL(event.request.url);
+  const currentUrl = new URL(self.location);
+  if (requestUrl.origin !== currentUrl.origin) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {

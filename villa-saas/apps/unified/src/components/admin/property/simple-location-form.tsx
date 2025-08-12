@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { apiClient } from '@/lib/api-client';
 
 interface LocationFormProps {
   latitude?: number;
@@ -50,61 +51,30 @@ export function LocationForm({
 
       console.log('Recherche de:', fullQuery);
 
-      // Recherche avec Nominatim
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          fullQuery
-        )}&limit=5&accept-language=fr&countrycodes=fr,be,ch,lu,mc`
-      );
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors de la recherche');
-      }
+      // Recherche via notre API backend
+      const { data } = await apiClient.post('/api/geocoding/geocode', {
+        address: `${address || ''}${searchQuery ? `, ${searchQuery}` : ''}`.trim(),
+        city: city || '',
+        postalCode: postalCode || '',
+        country: country || 'FR',
+      });
 
-      const results = await response.json();
-      console.log('Résultats:', results);
+      console.log('Résultats:', data);
 
-      if (results && results.length > 0) {
-        const result = results[0];
-        const lat = parseFloat(result.lat);
-        const lon = parseFloat(result.lon);
-
+      if (data.success) {
         onLocationChange({
-          latitude: lat,
-          longitude: lon,
-          address: result.display_name,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          address: data.display_name,
         });
         
         // Réinitialiser la recherche après succès
         setSearchQuery('');
-      } else {
-        // Essayer une recherche plus simple si aucun résultat
-        const simpleQuery = `${city}, ${country || 'France'}`;
-        console.log('Recherche simplifiée:', simpleQuery);
-        
-        const simpleResponse = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-            simpleQuery
-          )}&limit=1&accept-language=fr`
-        );
-        
-        const simpleResults = await simpleResponse.json();
-        
-        if (simpleResults && simpleResults.length > 0) {
-          const result = simpleResults[0];
-          const lat = parseFloat(result.lat);
-          const lon = parseFloat(result.lon);
-
-          onLocationChange({
-            latitude: lat,
-            longitude: lon,
-            address: result.display_name,
-          });
-          
+        if (data.fallback) {
           alert('Coordonnées approximatives trouvées pour la ville. Vous pouvez les ajuster manuellement si nécessaire.');
-        } else {
-          alert('Adresse non trouvée. Essayez une recherche plus précise ou saisissez les coordonnées manuellement.');
         }
+      } else {
+        alert(data.error || 'Adresse non trouvée. Essayez une recherche plus précise ou saisissez les coordonnées manuellement.');
       }
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
