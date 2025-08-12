@@ -19,9 +19,10 @@ export default function ContentLayout({ children }: { children: ReactNode }) {
   const params = useParams();
   const pathname = usePathname();
   const { property } = useProperty();
+  const locale = params.locale as string;
 
   const getCurrentTab = () => {
-    const basePath = `/admin/dashboard/properties/${params.id}/content`;
+    const basePath = `/${locale}/admin/dashboard/properties/${params.id}/content`;
     if (pathname === basePath || pathname.includes('/settings')) return 'settings';
     if (pathname.includes('/location')) return 'location';
     if (pathname.includes('/rooms')) return 'rooms';
@@ -73,7 +74,7 @@ export default function ContentLayout({ children }: { children: ReactNode }) {
             return (
               <TabsTrigger key={tab.value} value={tab.value} asChild>
                 <Link 
-                  href={`/admin/dashboard/properties/${params.id}/content${tab.href}`}
+                  href={`/${locale}/admin/dashboard/properties/${params.id}/content${tab.href}`}
                   className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
                 >
                   <Icon className="h-4 w-4" />
