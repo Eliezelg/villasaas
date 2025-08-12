@@ -287,8 +287,8 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
     // Envoyer l'email d'invitation
     try {
       const loginUrl = process.env.NODE_ENV === 'production' 
-        ? `https://${tenant?.subdomain}.${process.env.DOMAIN}/admin/login`
-        : `http://localhost:3000/admin/login`;
+        ? `https://${tenant?.subdomain}.${process.env.DOMAIN || 'webpro200.fr'}/admin/login`
+        : `https://${tenant?.subdomain}.webpro200.fr/admin/login`;
 
       const emailHtml = await render(
         UserInvitationEmail({
@@ -389,8 +389,8 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
     // Renvoyer l'email d'invitation
     try {
       const loginUrl = process.env.NODE_ENV === 'production' 
-        ? `https://${tenant?.subdomain}.${process.env.DOMAIN}/admin/login`
-        : `http://localhost:3000/admin/login`;
+        ? `https://${tenant?.subdomain}.${process.env.DOMAIN || 'webpro200.fr'}/admin/login`
+        : `https://${tenant?.subdomain}.webpro200.fr/admin/login`;
 
       const emailHtml = await render(
         UserInvitationEmail({

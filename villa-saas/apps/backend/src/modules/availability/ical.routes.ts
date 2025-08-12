@@ -267,7 +267,7 @@ export default async function icalRoutes(fastify: FastifyInstance) {
         return reply.code(404).send({ error: 'Property not found' });
       }
 
-      const baseUrl = process.env.API_URL || `http://localhost:${process.env.PORT || 3001}`;
+      const baseUrl = process.env.API_URL || 'https://api.webpro200.fr';
       const exportUrl = `${baseUrl}/api/availability/ical/export/${propertyId}`;
 
       return reply.send({

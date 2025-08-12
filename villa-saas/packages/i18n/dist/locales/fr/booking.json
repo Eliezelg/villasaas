@@ -79,7 +79,8 @@
     "confirmBooking": "Confirmer la réservation",
     "processing": "Traitement en cours...",
     "bookingConfirmed": "Réservation confirmée !",
-    "bookingReference": "Référence : {reference}",
+    "bookingReference": "Référence de réservation",
+    "bookingReferenceWithValue": "Référence : {reference}",
     "emailSent": "Un email de confirmation a été envoyé à {email}"
   },
   "availability": {

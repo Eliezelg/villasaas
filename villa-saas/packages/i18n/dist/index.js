@@ -217,10 +217,15 @@ exports.messages = {
 function getLocaleFromAcceptLanguage(acceptLanguage) {
     const languages = acceptLanguage
         .split(',')
-        .map(lang => lang.split(';')[0].trim().toLowerCase());
+        .map(lang => {
+        const parts = lang.split(';');
+        return parts[0] ? parts[0].trim().toLowerCase() : '';
+    })
+        .filter(lang => lang !== '');
     for (const lang of languages) {
-        const locale = lang.split('-')[0];
-        if (exports.locales.includes(locale)) {
+        const localeParts = lang.split('-');
+        const locale = localeParts[0];
+        if (locale && exports.locales.includes(locale)) {
             return locale;
         }
     }

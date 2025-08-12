@@ -41,12 +41,16 @@ export const BookingConfirmationEmail = ({
   propertyImage,
   tenantName = 'Villa Booking',
   tenantLogo,
+  tenantSubdomain,
 }: BookingConfirmationEmailProps) => {
   const i18n = new I18nEmailService(locale);
   const previewText = i18n.t('emails.bookingConfirmation.subject', { reference: bookingReference });
   
-  // URL de consultation avec email et code
-  const bookingUrl = `${process.env.NEXT_PUBLIC_BOOKING_URL || 'http://localhost:3002'}/${locale}/my-booking?email=${encodeURIComponent(guestEmail)}&reference=${bookingReference}`;
+  // URL de consultation dynamique basée sur le sous-domaine du tenant
+  const baseUrl = tenantSubdomain 
+    ? `https://${tenantSubdomain}.webpro200.fr`
+    : (process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr');
+  const bookingUrl = `${baseUrl}/${locale}/my-booking?email=${encodeURIComponent(guestEmail)}&reference=${bookingReference}`;
 
   return (
     <BaseEmail

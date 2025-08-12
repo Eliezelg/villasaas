@@ -21,9 +21,15 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const tenant = getCookie('tenant')
     
+    // Ne pas ajouter X-Tenant pour certains endpoints qui n'en ont pas besoin
+    const skipTenantHeader = [
+      '/api/public/bookings/verify',
+      '/api/public/tenant/'
+    ].some(path => endpoint.startsWith(path))
+    
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
-      ...(tenant && { 'X-Tenant': tenant }),
+      ...(!skipTenantHeader && tenant && { 'X-Tenant': tenant }),
     }
     
     try {

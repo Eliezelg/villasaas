@@ -176,12 +176,12 @@ export default function PropertyLayout({ children }: { children: ReactNode }) {
         </div>
 
         <Tabs value={getCurrentTab()} className="mb-8">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-9">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-11 gap-1">
             {tabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value} asChild>
                 <Link 
                   href={`/${locale}/admin/dashboard/properties/${params.id}${tab.href}`}
-                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  className="data-[state=active]:bg-background data-[state=active]:shadow-sm text-xs lg:text-sm"
                 >
                   {tab.label}
                 </Link>

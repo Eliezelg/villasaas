@@ -90,8 +90,8 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       // Créer un lien d'onboarding
       const accountLink = await fastify.stripe.accountLinks.create({
         account: accountId,
-        refresh_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/fr/admin/dashboard/payment-configuration?refresh=true`,
-        return_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/fr/admin/dashboard/payment-configuration?success=true`,
+        refresh_url: `${process.env.FRONTEND_URL || 'https://webpro200.fr'}/fr/admin/dashboard/payment-configuration?refresh=true`,
+        return_url: `${process.env.FRONTEND_URL || 'https://webpro200.fr'}/fr/admin/dashboard/payment-configuration?success=true`,
         type: 'account_onboarding',
       });
 
@@ -218,7 +218,7 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
       timestamp: Date.now()
     })).toString('base64');
     
-    const redirectUri = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/api/stripe/connect/callback`;
+    const redirectUri = `${process.env.FRONTEND_URL || 'https://webpro200.fr'}/api/stripe/connect/callback`;
     
     const oauthUrl = `https://connect.stripe.com/oauth/authorize?` +
       `response_type=code&` +
@@ -763,7 +763,10 @@ export async function paymentsRoutes(fastify: FastifyInstance) {
             setImmediate(async () => {
               try {
                 const emailService = createEmailService(fastify);
-                const retryUrl = `${process.env.NEXT_PUBLIC_BOOKING_URL}/${booking.tenant.subdomain}/booking/retry/${booking.id}`;
+                const baseUrl = booking.tenant.subdomain 
+                  ? `https://${booking.tenant.subdomain}.webpro200.fr`
+                  : (process.env.NEXT_PUBLIC_BOOKING_URL || 'https://webpro200.fr');
+                const retryUrl = `${baseUrl}/${booking.guestCountry === 'GB' || booking.guestCountry === 'US' ? 'en' : 'fr'}/booking/retry/${booking.id}`;
                 
                 await emailService.sendPaymentFailedNotification({
                 to: booking.guestEmail,

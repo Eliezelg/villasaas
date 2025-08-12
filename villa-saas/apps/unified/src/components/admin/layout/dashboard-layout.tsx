@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import { Home, Building2, Calendar, Users, Settings, LogOut, BarChart3, MessageSquare, Package, CreditCard } from 'lucide-react'
+import { Home, Building2, Calendar, Users, Settings, LogOut, BarChart3, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/auth.store'
 import { AdminLanguageSelector } from '@/components/admin/language-selector'
@@ -14,8 +14,6 @@ const navigationItems = [
   { key: 'bookings', href: '/admin/dashboard/bookings', icon: Calendar },
   { key: 'messages', href: '/admin/dashboard/messages', icon: MessageSquare },
   { key: 'analytics', href: '/admin/dashboard/analytics', icon: BarChart3 },
-  { key: 'bookingOptions', href: '/admin/dashboard/booking-options', icon: Package },
-  { key: 'paymentConfiguration', href: '/admin/dashboard/payment-configuration', icon: CreditCard },
   { key: 'users', href: '/admin/dashboard/users', icon: Users },
   { key: 'settings', href: '/admin/dashboard/settings', icon: Settings },
 ]

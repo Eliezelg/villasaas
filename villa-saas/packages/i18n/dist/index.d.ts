@@ -143,6 +143,7 @@ export declare const messages: {
                 processing: string;
                 bookingConfirmed: string;
                 bookingReference: string;
+                bookingReferenceWithValue: string;
                 emailSent: string;
             };
             availability: {
