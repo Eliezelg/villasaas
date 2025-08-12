@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
-import { LocationPage } from '@/components/booking/property/location-page'
-import { RoomsPage } from '@/components/booking/property/rooms-page'
-import { ActivitiesPage } from '@/components/booking/property/activities-page'
-import { ServicesPage } from '@/components/booking/property/services-page'
+import { LocationPageModern } from '@/components/booking/property/location-page-modern'
+import { RoomsPageModern } from '@/components/booking/property/rooms-page-modern'
+import { ActivitiesPageModern } from '@/components/booking/property/activities-page-modern'
+import { ServicesPageModern } from '@/components/booking/property/services-page-modern'
 import { headers } from 'next/headers'
 
 interface PageProps {
@@ -14,10 +14,10 @@ interface PageProps {
 }
 
 const pageComponents = {
-  location: LocationPage,
-  rooms: RoomsPage,
-  activities: ActivitiesPage,
-  services: ServicesPage,
+  location: LocationPageModern,
+  rooms: RoomsPageModern,
+  activities: ActivitiesPageModern,
+  services: ServicesPageModern,
   // reviews: ReviewsPage, // À créer plus tard
 }
 
