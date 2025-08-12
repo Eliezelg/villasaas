@@ -73,19 +73,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
   }
   
-  // Si c'est une route admin
-  if (pathname.startsWith('/admin')) {
+  // Si c'est une route admin (avec ou sans locale)
+  const pathSegments = pathname.split('/')
+  const hasLocale = locales.includes(pathSegments[1] as any)
+  const pathWithoutLocale = hasLocale 
+    ? '/' + pathSegments.slice(2).join('/')
+    : pathname
+    
+  if (pathWithoutLocale.startsWith('/admin')) {
     mode = 'admin'
     
     // Appliquer le middleware i18n pour le mode admin
     const response = intlMiddleware(request as any)
-    
-    // Extraire le pathname sans la locale
-    const pathSegments = pathname.split('/')
-    const hasLocale = locales.includes(pathSegments[1] as any)
-    const pathWithoutLocale = hasLocale 
-      ? '/' + pathSegments.slice(2).join('/')
-      : pathname
     
     // Vérifier si c'est une route publique
     const isPublicRoute = publicRoutes.some(route => pathWithoutLocale === route)
@@ -101,8 +100,8 @@ export async function middleware(request: NextRequest) {
       
       if (!token) {
         // Rediriger vers la page de connexion avec la locale
-        const locale = hasLocale ? pathSegments[1] : 'fr'
-        const loginUrl = new URL(`/${locale}/admin/login`, request.url)
+        const currentLocale = hasLocale ? pathSegments[1] : 'fr'
+        const loginUrl = new URL(`/${currentLocale}/admin/login`, request.url)
         loginUrl.searchParams.set('from', pathname)
         return NextResponse.redirect(loginUrl)
       }
@@ -110,8 +109,8 @@ export async function middleware(request: NextRequest) {
     
     // Si on est sur login/signup et qu'on est déjà connecté
     if ((pathWithoutLocale === '/admin/login' || pathWithoutLocale === '/admin/signup') && request.cookies.get('access_token')) {
-      const locale = hasLocale ? pathSegments[1] : 'fr'
-      return NextResponse.redirect(new URL(`/${locale}/admin/dashboard`, request.url))
+      const currentLocale = hasLocale ? pathSegments[1] : 'fr'
+      return NextResponse.redirect(new URL(`/${currentLocale}/admin/dashboard`, request.url))
     }
     
     // Pour les autres routes admin, retourner la réponse i18n
