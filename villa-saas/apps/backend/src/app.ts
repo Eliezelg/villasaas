@@ -61,7 +61,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       reply
         .code(204)
         .header('Access-Control-Allow-Origin', request.headers.origin || '*')
-        .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        .header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
         .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant')
         .header('Access-Control-Allow-Credentials', 'true')
         .send();
@@ -120,7 +120,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant'],
     exposedHeaders: ['X-Total-Count'],
   });
