@@ -74,8 +74,7 @@ export async function middleware(request: NextRequest) {
   }
   
   // Si c'est une route admin (avec ou sans locale)
-  const pathSegments = pathname.split('/')
-  const hasLocale = locales.includes(pathSegments[1] as any)
+  // Utiliser les variables déjà déclarées plus haut
   const pathWithoutLocale = hasLocale 
     ? '/' + pathSegments.slice(2).join('/')
     : pathname
