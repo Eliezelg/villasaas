@@ -51,7 +51,8 @@ export default function LoginPage() {
     const result = await login(data)
 
     if (result.success) {
-      router.push(`/${locale}/admin/dashboard`)
+      // Forcer la redirection avec window.location pour contourner les problèmes de router
+      window.location.href = `/${locale}/admin/dashboard`
     } else {
       setError(result.error || 'Une erreur est survenue')
       setIsLoading(false)
