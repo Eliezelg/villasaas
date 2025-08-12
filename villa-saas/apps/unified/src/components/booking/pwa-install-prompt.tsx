@@ -12,6 +12,15 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   useEffect(() => {
+    // Désactiver sur les sites de réservation personnalisés
+    const isBookingSite = typeof window !== 'undefined' && 
+      !window.location.hostname.includes('villasaas') && 
+      !window.location.hostname.includes('localhost');
+    
+    if (isBookingSite) {
+      return
+    }
+
     // Vérifier si déjà installé
     if (window.matchMedia('(display-mode: standalone)').matches) {
       return

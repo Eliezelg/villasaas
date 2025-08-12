@@ -1,8 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { MapPin, Navigation, Clock, Car, Footprints } from 'lucide-react'
 import { BookingHeader } from '@/components/booking/layout/booking-header'
 import { BookingFooter } from '@/components/booking/layout/booking-footer'
@@ -71,39 +69,58 @@ const nearbyPlaces = [
 
 export function LocationPageModern({ property, locale }: LocationPageProps) {
   const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<L.Map | null>(null)
+  const mapInstanceRef = useRef<any>(null)
   const { tenant } = useTenant()
+
+  // Debug: vérifier les coordonnées
+  console.log('Property coordinates:', {
+    latitude: property.latitude,
+    longitude: property.longitude,
+    hasLat: !!property.latitude,
+    hasLng: !!property.longitude
+  })
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
 
     // Check if coordinates are available
-    if (!property.latitude || !property.longitude) return
+    if (!property.latitude || !property.longitude) {
+      console.log('No coordinates available, skipping map init')
+      return
+    }
 
-    // Fix Leaflet icon issue
-    delete (L.Icon.Default.prototype as any)._getIconUrl
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: '/leaflet/marker-icon-2x.png',
-      iconUrl: '/leaflet/marker-icon.png',
-      shadowUrl: '/leaflet/marker-shadow.png',
-    })
+    // Importer Leaflet dynamiquement côté client
+    const initMap = async () => {
+      const L = await import('leaflet')
+      await import('leaflet/dist/leaflet.css')
+      
+      // Fix Leaflet icon issue
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+        iconUrl: '/leaflet/marker-icon.png',
+        shadowUrl: '/leaflet/marker-shadow.png',
+      })
 
-    // Initialize map
-    const map = L.map(mapRef.current).setView(
-      [property.latitude, property.longitude],
-      14
-    )
+      // Initialize map
+      const map = L.map(mapRef.current!).setView(
+        [property.latitude, property.longitude],
+        14
+      )
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(map)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+      }).addTo(map)
 
-    // Add marker
-    L.marker([property.latitude, property.longitude])
-      .addTo(map)
-      .bindPopup(property.name)
+      // Add marker
+      L.marker([property.latitude, property.longitude])
+        .addTo(map)
+        .bindPopup(property.name)
 
-    mapInstanceRef.current = map
+      mapInstanceRef.current = map
+    }
+
+    initMap()
 
     return () => {
       if (mapInstanceRef.current) {

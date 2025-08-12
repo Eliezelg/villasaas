@@ -52,6 +52,7 @@ const dns_management_routes_1 = require("./modules/domains/dns-management.routes
 const domain_lookup_routes_1 = require("./modules/public/domain-lookup.routes");
 const public_site_routes_1 = require("./modules/public-site/public-site.routes");
 const subdomain_check_routes_1 = require("./modules/public/subdomain-check.routes");
+const geocoding_routes_1 = require("./modules/geocoding/geocoding.routes");
 async function buildApp(opts = {}) {
     const app = (0, fastify_1.default)(opts);
     // Global error handler
@@ -219,6 +220,7 @@ async function buildApp(opts = {}) {
     await app.register(public_site_routes_1.publicSiteRoutes, { prefix: '/api' });
     await app.register(domains_routes_1.domainsRoutes);
     await app.register(dns_management_routes_1.dnsManagementRoutes, { prefix: '/api' });
+    await app.register(geocoding_routes_1.geocodingRoutes, { prefix: '/api/geocoding' });
     // Public routes (no auth required)
     await app.register(public_routes_1.publicRoutes, { prefix: '/api' });
     await app.register(promocodes_public_routes_1.publicPromoCodesRoutes, { prefix: '/api' });

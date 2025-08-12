@@ -14,6 +14,17 @@ export function useServiceWorker() {
       return
     }
 
+    // Désactiver le Service Worker sur les sites de réservation personnalisés
+    // (domaines autres que le domaine principal)
+    const isBookingSite = typeof window !== 'undefined' && 
+      !window.location.hostname.includes('villasaas') && 
+      !window.location.hostname.includes('localhost');
+    
+    if (isBookingSite) {
+      console.log('Service Worker désactivé sur le site de réservation')
+      return
+    }
+
     // Vérifier le support du Service Worker
     if (!('serviceWorker' in navigator)) {
       console.log('Service Worker non supporté')
