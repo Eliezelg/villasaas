@@ -17,6 +17,9 @@ import { GuestChatWidget } from '@/components/messaging/guest-chat-widget'
 
 const inter = Inter({ subsets: ['latin'] })
 
+// Force le rendu dynamique car on utilise headers() pour récupérer les métadonnées du tenant
+export const dynamic = 'force-dynamic'
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
 }
