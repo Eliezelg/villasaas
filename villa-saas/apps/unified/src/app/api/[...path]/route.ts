@@ -3,6 +3,9 @@ import { cookies } from 'next/headers';
 
 const API_URL = process.env.API_URL || 'https://api.webpro200.fr';
 
+// Force le rendu dynamique car on utilise cookies()
+export const dynamic = 'force-dynamic';
+
 // Proxy toutes les requêtes API vers le backend
 export async function GET(
   request: NextRequest,
