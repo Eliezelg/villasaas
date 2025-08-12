@@ -64,7 +64,7 @@ export default async function PropertyCustomPage({ params }: PageProps) {
   }
 
   // Vérifier si la page est activée pour cette propriété
-  const customPages = property.customPages || {}
+  const customPages = property.customPagesSettings || property.customPages || {}
   const isPageEnabled = customPages[page as keyof typeof customPages] === true
 
   if (!isPageEnabled) {

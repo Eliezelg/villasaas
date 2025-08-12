@@ -157,7 +157,7 @@ export default async function PropertyPage({ params }: Props) {
       <SchemaScript schema={breadcrumbSchema} />
       <CustomPagesNav 
         propertyId={property.id}
-        customPages={property.customPages}
+        customPages={property.customPagesSettings || property.customPages}
         locale={params.locale}
       />
       <PropertyContent />
