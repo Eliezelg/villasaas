@@ -1,1 +1,0 @@
-{"version":3,"file":"s3.d.ts","sourceRoot":"","sources":["../../src/plugins/s3.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,SAAS,CAAC;AAE1C,OAAO,EAAE,QAAQ,EAAE,MAAM,oBAAoB,CAAC;AAE9C,OAAO,QAAQ,SAAS,CAAC;IACvB,UAAU,eAAe;QACvB,EAAE,EAAE,QAAQ,CAAC;KACd;CACF;AAED,iBAAe,QAAQ,CAAC,OAAO,EAAE,eAAe,iBAe/C;;AAED,wBAEG"}

@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd apps/backend && npm run build"
+buildCommand = "cd apps/backend && rm -rf dist && npm run build"
 
 [deploy]
 startCommand = "cd apps/backend && npm run start:production"

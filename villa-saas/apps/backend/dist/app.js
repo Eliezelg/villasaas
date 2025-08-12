@@ -62,7 +62,7 @@ async function buildApp(opts = {}) {
             reply
                 .code(204)
                 .header('Access-Control-Allow-Origin', request.headers.origin || '*')
-                .header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                .header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
                 .header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Tenant')
                 .header('Access-Control-Allow-Credentials', 'true')
                 .send();
@@ -92,7 +92,7 @@ async function buildApp(opts = {}) {
                 'https://www.webpro200.fr',
                 'https://aviv.webpro200.fr', // Ajouter explicitement aviv pour le test
                 /^https:\/\/[a-zA-Z0-9-]+\.webpro200\.fr$/, // Pattern pour tous les sous-domaines
-                // Force deployment: 2025-08-05T22:45:00Z - CORS fix for preflight
+                // Force deployment: 2025-08-12T10:57:00Z - CORS fix for PATCH method
             ].filter(Boolean) : [];
             const allowedOrigins = [...devOrigins, ...prodOrigins];
             // Si pas d'origine (ex: Postman), permettre
@@ -116,7 +116,7 @@ async function buildApp(opts = {}) {
             }
         },
         credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant'],
         exposedHeaders: ['X-Total-Count'],
     });
