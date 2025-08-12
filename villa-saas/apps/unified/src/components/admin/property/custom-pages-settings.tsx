@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import { Loader2, MapPin, Activity, Wrench, Star, Bed } from 'lucide-react'
+import { Loader2, MapPin, Activity, Wrench, Star, Bed, Edit } from 'lucide-react'
+import Link from 'next/link'
 
 interface CustomPagesSettingsProps {
   propertyId: string
@@ -61,13 +63,34 @@ export function CustomPagesSettings({
   const [settings, setSettings] = useState(initialSettings)
   const [saving, setSaving] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
-  const handleToggle = (pageId: string) => {
+  const handleToggle = async (pageId: string) => {
     const newSettings = {
       ...settings,
       [pageId]: !settings[pageId as keyof typeof settings]
     }
     setSettings(newSettings)
+    
+    // Sauvegarde automatique
+    setSaving(true)
+    try {
+      await onSettingsChange(newSettings)
+      toast({
+        title: 'Page ' + (newSettings[pageId as keyof typeof newSettings] ? 'activée' : 'désactivée'),
+        description: 'Les modifications ont été sauvegardées',
+      })
+    } catch (error) {
+      // Revert en cas d'erreur
+      setSettings(settings)
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder les paramètres',
+        variant: 'destructive',
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleSave = async () => {
@@ -107,9 +130,9 @@ export function CustomPagesSettings({
               key={page.id}
               className="flex items-center justify-between space-x-4 p-4 rounded-lg border"
             >
-              <div className="flex items-start space-x-4">
+              <div className="flex items-start space-x-4 flex-1">
                 <Icon className={`h-5 w-5 mt-0.5 ${isEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
-                <div className="space-y-1">
+                <div className="space-y-1 flex-1">
                   <Label htmlFor={page.id} className="text-base font-medium">
                     {page.label}
                   </Label>
@@ -118,21 +141,29 @@ export function CustomPagesSettings({
                   </p>
                 </div>
               </div>
-              <Switch
-                id={page.id}
-                checked={isEnabled}
-                onCheckedChange={() => handleToggle(page.id)}
-              />
+              <div className="flex items-center gap-2">
+                {isEnabled && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => router.push(`${window.location.pathname.replace('/settings', `/${page.id}`)}`)}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Éditer
+                  </Button>
+                )}
+                <Switch
+                  id={page.id}
+                  checked={isEnabled}
+                  onCheckedChange={() => handleToggle(page.id)}
+                  disabled={saving}
+                />
+              </div>
             </div>
           )
         })}
 
-        <div className="flex justify-end pt-4">
-          <Button onClick={handleSave} disabled={saving}>
-            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sauvegarder
-          </Button>
-        </div>
+        {/* Bouton de sauvegarde supprimé car la sauvegarde est automatique */}
       </CardContent>
     </Card>
   )
