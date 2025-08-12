@@ -77,6 +77,9 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
 
+    // Check if coordinates are available
+    if (!property.latitude || !property.longitude) return
+
     // Fix Leaflet icon issue
     delete (L.Icon.Default.prototype as any)._getIconUrl
     L.Icon.Default.mergeOptions({
@@ -142,9 +145,18 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
             )}
 
             {/* Map Section */}
-            <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div ref={mapRef} className="h-[500px] w-full" />
-            </section>
+            {property.latitude && property.longitude ? (
+              <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div ref={mapRef} className="h-[500px] w-full" />
+              </section>
+            ) : (
+              <section className="bg-white rounded-2xl shadow-sm p-8">
+                <div className="text-center py-12">
+                  <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">Coordonnées GPS non disponibles</p>
+                </div>
+              </section>
+            )}
 
             {/* Nearby Places Section */}
             <section>
@@ -258,11 +270,11 @@ export function LocationPageModern({ property, locale }: LocationPageProps) {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Latitude</p>
-                  <p className="font-mono text-lg font-semibold">{property.latitude.toFixed(6)}</p>
+                  <p className="font-mono text-lg font-semibold">{property.latitude?.toFixed(6) || 'N/A'}</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Longitude</p>
-                  <p className="font-mono text-lg font-semibold">{property.longitude.toFixed(6)}</p>
+                  <p className="font-mono text-lg font-semibold">{property.longitude?.toFixed(6) || 'N/A'}</p>
                 </div>
               </div>
             </section>
