@@ -464,7 +464,34 @@ apiClient.get('/properties')
 apiClient.post('/bookings')
 ```
 
-### 4. Gestion des réponses 204 No Content
+### 2. Gestion des Cookies d'Authentification (CRITIQUE)
+```typescript
+// ✅ SOLUTION QUI FONCTIONNE - Simple transmission des headers Set-Cookie
+// Dans /app/api/[...path]/route.ts
+const setCookieHeaders = response.headers.getSetCookie();
+if (setCookieHeaders) {
+  setCookieHeaders.forEach(cookie => {
+    responseHeaders.append('Set-Cookie', cookie);
+  });
+}
+
+// ❌ NE JAMAIS FAIRE - Tentative de manipulation des cookies
+nextResponse.cookies.set({
+  name: 'access_token',
+  value: token,
+  domain: '.webpro200.fr', // ÉCHOUE sur Vercel
+  // ...
+});
+
+// ✅ Points clés pour l'authentification :
+// 1. Laisser le navigateur gérer le domaine automatiquement
+// 2. Utiliser les mécanismes HTTP standards
+// 3. Ne pas définir de domaine explicite dans les cookies
+// 4. Transmettre les cookies du backend sans modification
+// 5. Utiliser credentials: 'include' dans l'API client
+```
+
+### 3. Gestion des réponses 204 No Content
 ```typescript
 // ✅ TOUJOURS vérifier le status 204 avant de parser JSON
 if (response.status === 204) {
@@ -476,7 +503,7 @@ const data = await response.json();
 const data = await response.json(); // Erreur si 204
 ```
 
-### 2. Gestion des données undefined
+### 4. Gestion des données undefined
 ```typescript
 // ✅ TOUJOURS vérifier
 const { data } = await service.getData();
@@ -488,7 +515,7 @@ if (data) {
 setExportUrl(data.url); // Erreur si data undefined
 ```
 
-### 3. TypeScript Array.from pour Set
+### 5. TypeScript Array.from pour Set
 ```typescript
 // ✅ CORRECT pour la compatibilité
 const uniqueIds = Array.from(new Set(items.map(i => i.id)));
